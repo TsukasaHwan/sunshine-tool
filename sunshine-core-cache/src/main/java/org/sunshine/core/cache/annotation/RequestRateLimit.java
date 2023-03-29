@@ -14,7 +14,7 @@ import java.lang.annotation.*;
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RateLimit {
+public @interface RequestRateLimit {
 
     /**
      * 资源名称

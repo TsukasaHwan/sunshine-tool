@@ -10,7 +10,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.sunshine.core.cache.exception.RateLimitException;
+import org.sunshine.core.cache.exception.RequestRateLimitException;
 import org.sunshine.core.tool.api.code.CommonCode;
 import org.sunshine.core.tool.api.code.ResultCode;
 import org.sunshine.core.tool.api.response.Result;
@@ -44,7 +44,7 @@ public class ResponseExceptionHandler {
     static {
         BUILDER.put(HttpMessageNotReadableException.class, CommonCode.INVALID_PARAM);
         BUILDER.put(HttpRequestMethodNotSupportedException.class, CommonCode.REQUEST_NOT_SUPPORTED);
-        BUILDER.put(RateLimitException.class, CommonCode.FREQUENT_OPERATION);
+        BUILDER.put(RequestRateLimitException.class, CommonCode.FREQUENT_OPERATION);
     }
 
     /**

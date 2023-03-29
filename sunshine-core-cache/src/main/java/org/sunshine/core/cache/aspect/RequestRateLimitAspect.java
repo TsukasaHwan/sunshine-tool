@@ -12,7 +12,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.scripting.support.ResourceScriptSource;
 import org.springframework.util.Assert;
-import org.sunshine.core.cache.annotation.RateLimit;
+import org.sunshine.core.cache.annotation.RequestRateLimit;
 import org.sunshine.core.cache.enums.LimitType;
 import org.sunshine.core.tool.util.StringPool;
 import org.sunshine.core.tool.util.StringUtils;
@@ -26,9 +26,9 @@ import java.lang.reflect.Method;
  * @since 2021/04/23
  */
 @Aspect
-public class RateLimitAspect {
+public class RequestRateLimitAspect {
 
-    private final static Logger log = LoggerFactory.getLogger(RateLimitAspect.class);
+    private final static Logger log = LoggerFactory.getLogger(RequestRateLimitAspect.class);
 
     private final static ResourceScriptSource RATE_LIMIT_SCRIPT = new ResourceScriptSource(new ClassPathResource("scripts/rate_limit_lua.lua"));
 
@@ -36,19 +36,19 @@ public class RateLimitAspect {
 
     private final RuntimeException throwException;
 
-    public RateLimitAspect(RedisTemplate<String, Object> redisTemplate, RuntimeException throwException) {
+    public RequestRateLimitAspect(RedisTemplate<String, Object> redisTemplate, RuntimeException throwException) {
         this.redisTemplate = redisTemplate;
         this.throwException = throwException;
     }
 
-    @Around("@annotation(rateLimit)")
-    public Object around(ProceedingJoinPoint joinPoint, RateLimit rateLimit) throws Throwable {
+    @Around("@annotation(requestRateLimit)")
+    public Object around(ProceedingJoinPoint joinPoint, RequestRateLimit requestRateLimit) throws Throwable {
         HttpServletRequest request = WebUtils.getRequest();
         Assert.notNull(request, "HttpServletRequest is null");
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method signatureMethod = signature.getMethod();
-        String key = rateLimit.key();
-        LimitType limitType = rateLimit.limitType();
+        String key = requestRateLimit.key();
+        LimitType limitType = requestRateLimit.limitType();
         if (StringUtils.isBlank(key)) {
             if (limitType == LimitType.DEFAULT) {
                 // 默认取方法名为key
@@ -58,15 +58,15 @@ public class RateLimitAspect {
                 key = WebUtils.getIP();
             }
         }
-        ImmutableList<String> keys = ImmutableList.of(rateLimit.prefix() + key + StringPool.COLON + request.getRequestURI());
+        ImmutableList<String> keys = ImmutableList.of(requestRateLimit.prefix() + key + StringPool.COLON + request.getRequestURI());
         DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>();
         redisScript.setResultType(Long.class);
         redisScript.setScriptSource(RATE_LIMIT_SCRIPT);
-        Long result = redisTemplate.execute(redisScript, keys, rateLimit.count(), rateLimit.period());
+        Long result = redisTemplate.execute(redisScript, keys, requestRateLimit.count(), requestRateLimit.period());
         if (result == null || result.equals(0L)) {
             throw throwException;
         }
-        log.info("限流key为 [{}]，描述为 [{}] 的接口", keys, rateLimit.name());
+        log.info("限流key为 [{}]，描述为 [{}] 的接口", keys, requestRateLimit.name());
         return joinPoint.proceed();
     }
 }
