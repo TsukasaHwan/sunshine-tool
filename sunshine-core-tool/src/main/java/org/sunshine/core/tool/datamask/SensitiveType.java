@@ -1,8 +1,8 @@
 package org.sunshine.core.tool.datamask;
 
-import org.sunshine.core.tool.datamask.strategy.NameMask;
 import org.sunshine.core.tool.datamask.strategy.EmailMask;
 import org.sunshine.core.tool.datamask.strategy.HashMask;
+import org.sunshine.core.tool.datamask.strategy.NameMask;
 import org.sunshine.core.tool.datamask.strategy.PartMask;
 
 /**

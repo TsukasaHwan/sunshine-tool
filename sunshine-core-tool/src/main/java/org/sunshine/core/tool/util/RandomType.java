@@ -6,8 +6,8 @@ package org.sunshine.core.tool.util;
  * @author L.cm
  */
 public enum RandomType {
-	/**
-	 * INT STRING ALL
-	 */
-	INT, STRING, ALL
+    /**
+     * INT STRING ALL
+     */
+    INT, STRING, ALL
 }

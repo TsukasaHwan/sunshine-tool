@@ -1,8 +1,8 @@
 package org.sunshine.core.tool.support.aliyun.oss;
 
-import org.sunshine.core.tool.support.aliyun.oss.model.PutOssFile;
-import org.sunshine.core.tool.support.aliyun.oss.model.OssFile;
 import org.springframework.web.multipart.MultipartFile;
+import org.sunshine.core.tool.support.aliyun.oss.model.OssFile;
+import org.sunshine.core.tool.support.aliyun.oss.model.PutOssFile;
 
 import java.io.InputStream;
 import java.util.List;

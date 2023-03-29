@@ -1,7 +1,5 @@
 package org.sunshine.core.tool.util;
 
-import org.sunshine.core.tool.support.bean.BaseBeanCopier;
-import org.sunshine.core.tool.support.bean.BeanProperty;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.BeansException;
@@ -9,6 +7,8 @@ import org.springframework.cglib.beans.BeanGenerator;
 import org.springframework.cglib.beans.BeanMap;
 import org.springframework.cglib.core.CodeGenerationException;
 import org.springframework.util.Assert;
+import org.sunshine.core.tool.support.bean.BaseBeanCopier;
+import org.sunshine.core.tool.support.bean.BeanProperty;
 
 import java.beans.PropertyDescriptor;
 import java.util.*;

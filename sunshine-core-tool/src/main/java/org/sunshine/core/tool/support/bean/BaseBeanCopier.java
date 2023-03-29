@@ -1,9 +1,9 @@
 package org.sunshine.core.tool.support.bean;
 
-import org.sunshine.core.tool.util.BeanUtils;
 import org.springframework.asm.ClassVisitor;
 import org.springframework.asm.Type;
 import org.springframework.cglib.core.*;
+import org.sunshine.core.tool.util.BeanUtils;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Modifier;
