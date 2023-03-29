@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.sunshine.core.log.LogAutoConfiguration,\
+  com.sunshine.core.log.aspect.RequestLogAspect
