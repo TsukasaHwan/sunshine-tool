@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * logApi的父类，拥有相同的属性值
+ * log的父类，拥有相同的属性值
  *
  * @author Teamo
  */

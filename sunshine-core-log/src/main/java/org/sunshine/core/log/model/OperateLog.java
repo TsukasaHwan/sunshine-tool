@@ -6,8 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
  * @author Teamo
  * @since 2023/01/13
  */
-@TableName("sys_log_api")
-public class LogApi extends LogAbstract {
+@TableName("sys_operate_log")
+public class OperateLog extends LogAbstract {
 
     /**
      * 日志标题

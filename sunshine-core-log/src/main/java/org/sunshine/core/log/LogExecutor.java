@@ -1,7 +1,7 @@
 package org.sunshine.core.log;
 
-import org.sunshine.core.log.annotation.ApiLog;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.sunshine.core.log.annotation.OperateLog;
 
 /**
  * @author Teamo
@@ -16,9 +16,9 @@ public interface LogExecutor {
     /**
      * 执行日志逻辑
      *
-     * @param point  切点
-     * @param apiLog ApiLog注解
-     * @param time   执行时长（毫秒）
+     * @param point      切点
+     * @param operateLog OperateLog注解
+     * @param time       执行时长（毫秒）
      */
-    void execute(ProceedingJoinPoint point, ApiLog apiLog, long time);
+    void execute(ProceedingJoinPoint point, OperateLog operateLog, long time);
 }

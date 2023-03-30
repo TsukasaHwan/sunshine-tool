@@ -1,15 +1,15 @@
 package org.sunshine.core.log;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.sunshine.core.log.aspect.LogApiAspect;
-import org.sunshine.core.log.event.ApiLogListener;
-import org.sunshine.core.log.filter.TraceFilter;
-import org.sunshine.core.log.model.LogApi;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.sunshine.core.log.aspect.OperateLogAspect;
+import org.sunshine.core.log.event.OperateLogListener;
+import org.sunshine.core.log.filter.TraceFilter;
+import org.sunshine.core.log.model.OperateLog;
 import org.sunshine.core.tool.config.ServerInfo;
 import org.sunshine.core.tool.enums.WebFilterOrderEnum;
 
@@ -27,16 +27,16 @@ public class LogAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(LogApiAspect.class)
-    public LogApiAspect logApiAspect(LogExecutor logExecutor) {
-        return new LogApiAspect(logExecutor);
+    @ConditionalOnMissingBean(OperateLogAspect.class)
+    public OperateLogAspect logApiAspect(LogExecutor logExecutor) {
+        return new OperateLogAspect(logExecutor);
     }
 
     @Bean
-    @ConditionalOnMissingBean(ApiLogListener.class)
-    @ConditionalOnBean(value = LogApi.class, parameterizedContainer = BaseMapper.class)
-    public ApiLogListener apiLogListener(ServerInfo serverInfo, BaseMapper<LogApi> logApiMapper) {
-        return new ApiLogListener(serverInfo, logApiMapper);
+    @ConditionalOnMissingBean(OperateLogListener.class)
+    @ConditionalOnBean(value = OperateLog.class, parameterizedContainer = BaseMapper.class)
+    public OperateLogListener apiLogListener(ServerInfo serverInfo, BaseMapper<OperateLog> logApiMapper) {
+        return new OperateLogListener(serverInfo, logApiMapper);
     }
 
     @Bean

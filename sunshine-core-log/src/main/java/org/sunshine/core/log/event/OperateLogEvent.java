@@ -8,9 +8,9 @@ import java.util.Map;
  * @author Teamo
  * @since 2021/06/02
  */
-public class ApiLogEvent extends ApplicationEvent {
+public class OperateLogEvent extends ApplicationEvent {
 
-    public ApiLogEvent(Map<String, Object> source) {
+    public OperateLogEvent(Map<String, Object> source) {
         super(source);
     }
 }
