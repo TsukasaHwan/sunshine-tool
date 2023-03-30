@@ -38,9 +38,9 @@ public class JwtSecurityProperties {
     private List<String> permitAllPaths = Arrays.asList(
             "/",
             "/*.html",
-            "/**/*.html",
-            "/**/*.css",
-            "/**/*.js",
+            "/*/*.html",
+            "/*/*.css",
+            "/*/*.js",
             "/profile/**",
             "/favicon.ico",
             "/swagger-ui.html",
