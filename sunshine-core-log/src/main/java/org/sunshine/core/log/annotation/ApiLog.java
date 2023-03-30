@@ -1,4 +1,4 @@
-package com.sunshine.core.log.annotation;
+package org.sunshine.core.log.annotation;
 
 import java.lang.annotation.*;
 

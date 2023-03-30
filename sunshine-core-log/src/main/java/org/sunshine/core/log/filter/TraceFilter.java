@@ -1,4 +1,4 @@
-package com.sunshine.core.log.filter;
+package org.sunshine.core.log.filter;
 
 import org.slf4j.MDC;
 import org.springframework.web.filter.OncePerRequestFilter;

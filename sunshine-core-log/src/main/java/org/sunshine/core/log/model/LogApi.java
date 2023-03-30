@@ -1,4 +1,4 @@
-package com.sunshine.core.log.model;
+package org.sunshine.core.log.model;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 

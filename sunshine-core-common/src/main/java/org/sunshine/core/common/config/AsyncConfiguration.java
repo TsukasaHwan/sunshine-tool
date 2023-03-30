@@ -1,6 +1,6 @@
 package org.sunshine.core.common.config;
 
-import com.sunshine.core.log.mdc.ThreadPoolExecutorMdcWrapper;
+import org.sunshine.core.log.mdc.ThreadPoolExecutorMdcWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;

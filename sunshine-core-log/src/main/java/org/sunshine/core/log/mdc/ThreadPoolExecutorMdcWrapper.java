@@ -1,6 +1,6 @@
-package com.sunshine.core.log.mdc;
+package org.sunshine.core.log.mdc;
 
-import com.sunshine.core.log.filter.TraceFilter;
+import org.sunshine.core.log.filter.TraceFilter;
 import org.slf4j.MDC;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.sunshine.core.tool.util.StringUtils;

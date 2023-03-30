@@ -1,4 +1,4 @@
-package com.sunshine.core.log.aspect;
+package org.sunshine.core.log.aspect;
 
 import com.alibaba.fastjson2.JSON;
 import org.aspectj.lang.ProceedingJoinPoint;

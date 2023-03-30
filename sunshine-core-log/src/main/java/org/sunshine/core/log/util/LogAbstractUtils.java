@@ -1,6 +1,6 @@
-package com.sunshine.core.log.util;
+package org.sunshine.core.log.util;
 
-import com.sunshine.core.log.model.LogAbstract;
+import org.sunshine.core.log.model.LogAbstract;
 import org.sunshine.core.tool.config.ServerInfo;
 import org.sunshine.core.tool.util.StringPool;
 import org.sunshine.core.tool.util.UrlUtils;

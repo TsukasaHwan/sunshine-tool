@@ -1,3 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  org.sunshine.core.cache.config.RedissonAutoConfiguration,\
-  org.sunshine.core.cache.config.CacheAutoConfiguration

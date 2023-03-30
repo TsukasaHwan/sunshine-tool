@@ -1,0 +1,2 @@
+org.sunshine.core.log.LogAutoConfiguration
+org.sunshine.core.log.aspect.RequestLogAspect

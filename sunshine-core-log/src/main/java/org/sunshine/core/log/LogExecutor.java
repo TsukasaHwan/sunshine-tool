@@ -1,6 +1,6 @@
-package com.sunshine.core.log;
+package org.sunshine.core.log;
 
-import com.sunshine.core.log.annotation.ApiLog;
+import org.sunshine.core.log.annotation.ApiLog;
 import org.aspectj.lang.ProceedingJoinPoint;
 
 /**

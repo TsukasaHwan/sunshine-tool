@@ -1,6 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  org.sunshine.core.tool.config.AliOssConfiguration,\
-  org.sunshine.core.tool.config.AliSmsConfiguration,\
-  org.sunshine.core.tool.config.ServerInfo,\
-  org.sunshine.core.tool.config.ToolConfiguration,\
-  org.sunshine.core.tool.config.XssConfiguration

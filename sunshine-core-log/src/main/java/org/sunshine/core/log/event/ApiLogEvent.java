@@ -1,4 +1,4 @@
-package com.sunshine.core.log.event;
+package org.sunshine.core.log.event;
 
 import org.springframework.context.ApplicationEvent;
 
