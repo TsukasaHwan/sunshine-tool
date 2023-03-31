@@ -30,6 +30,7 @@
         <module>sunshine-core-security</module>
         <module>sunshine-core-log</module>
         <module>sunshine-core-cache</module>
+        <module>sunshine-core-mybatis</module>
     </modules>
     <packaging>pom</packaging>
 

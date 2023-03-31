@@ -1,4 +1,4 @@
-package org.sunshine.core.common.support.query;
+package org.sunshine.core.mp.support;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
@@ -13,6 +13,7 @@ import org.sunshine.core.tool.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
@@ -23,7 +24,7 @@ import java.util.function.Supplier;
 public class Condition {
 
     /**
-     * 转化成mybatis plus中的Page
+     * 转化成mybatis-plus中的Page
      *
      * @param query 查询条件
      * @return IPage
@@ -43,7 +44,7 @@ public class Condition {
     }
 
     /**
-     * 转化成jpa中的Page
+     * 转化成spring-data-jpa中的Page
      *
      * @param query 查询条件
      * @return PageRequest
@@ -68,14 +69,16 @@ public class Condition {
      * @param query Query
      */
     private static void checkQuery(Query query) {
-        Integer current = query.getCurrent();
-        Integer size = query.getSize();
-        if (current == null || current <= 0) {
-            query.setCurrent(Query.DEFAULT_CURRENT);
-        }
-        if (size == null || size <= 0) {
-            query.setSize(Query.DEFAULT_SIZE);
-        }
+        Optional.ofNullable(query.getCurrent()).ifPresent(current -> {
+            if (current <= 0) {
+                query.setCurrent(Query.DEFAULT_CURRENT);
+            }
+        });
+        Optional.ofNullable(query.getSize()).ifPresent(size -> {
+            if (size <= 0) {
+                query.setSize(Query.DEFAULT_SIZE);
+            }
+        });
     }
 
     public static <E, V> IPage<V> pageVo(IPage<E> pages, Supplier<V> target) {

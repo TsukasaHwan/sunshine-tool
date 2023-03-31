@@ -1,4 +1,4 @@
-package org.sunshine.core.tool.support.mybatis.handler;
+package org.sunshine.core.mp.handler;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import org.apache.ibatis.reflection.MetaObject;

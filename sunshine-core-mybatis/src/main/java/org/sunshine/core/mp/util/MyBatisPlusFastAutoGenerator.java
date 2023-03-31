@@ -1,4 +1,4 @@
-package org.sunshine.core.tool.util;
+package org.sunshine.core.mp.util;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.core.exceptions.MybatisPlusException;
@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.generator.FastAutoGenerator;
 import com.baomidou.mybatisplus.generator.config.OutputFile;
 import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
 import com.baomidou.mybatisplus.generator.fill.Column;
+import org.sunshine.core.tool.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
