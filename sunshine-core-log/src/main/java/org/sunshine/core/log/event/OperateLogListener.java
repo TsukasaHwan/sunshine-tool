@@ -29,7 +29,10 @@ public class OperateLogListener {
     @Async
     @Order
     @EventListener(OperateLogEvent.class)
-    public void saveApiLog(OperateLogEvent event) {
+    public void saveOperateLogLog(OperateLogEvent event) {
+        if (baseMapper == null) {
+            return;
+        }
         @SuppressWarnings("unchecked")
         Map<String, Object> source = (Map<String, Object>) event.getSource();
         OperateLog operateLog = (OperateLog) source.get(LogExecutor.EVENT_LOG);
