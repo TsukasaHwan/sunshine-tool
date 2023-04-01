@@ -28,7 +28,7 @@ public class LogAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(OperateLogAspect.class)
-    public OperateLogAspect logApiAspect(LogExecutor logExecutor) {
+    public OperateLogAspect operateLogAspect(LogExecutor logExecutor) {
         return new OperateLogAspect(logExecutor);
     }
 
