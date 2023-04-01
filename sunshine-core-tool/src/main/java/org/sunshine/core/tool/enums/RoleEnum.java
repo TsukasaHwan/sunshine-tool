@@ -8,12 +8,7 @@ public enum RoleEnum {
     /**
      * 管理员
      */
-    ADMIN(1L, RoleName.ADMIN_ROLE_NAME),
-
-    /**
-     * 普通用户
-     */
-    USER(2L, RoleName.NORMAL_USER_ROLE_NAME);
+    ADMIN(1L, RoleName.ADMIN_ROLE_NAME);
 
     private final long id;
 
@@ -34,7 +29,5 @@ public enum RoleEnum {
 
     public static class RoleName {
         public static final String ADMIN_ROLE_NAME = "ROLE_ADMIN";
-
-        public static final String NORMAL_USER_ROLE_NAME = "ROLE_USER";
     }
 }
