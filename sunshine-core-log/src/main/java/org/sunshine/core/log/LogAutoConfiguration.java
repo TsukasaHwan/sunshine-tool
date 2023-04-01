@@ -2,7 +2,6 @@ package org.sunshine.core.log;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -34,9 +33,8 @@ public class LogAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(OperateLogListener.class)
-    @ConditionalOnBean(value = OperateLog.class, parameterizedContainer = BaseMapper.class)
-    public OperateLogListener apiLogListener(ServerInfo serverInfo, BaseMapper<OperateLog> logApiMapper) {
-        return new OperateLogListener(serverInfo, logApiMapper);
+    public OperateLogListener apiLogListener(ServerInfo serverInfo, BaseMapper<OperateLog> operateLogMapper) {
+        return new OperateLogListener(serverInfo, operateLogMapper);
     }
 
     @Bean
