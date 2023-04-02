@@ -28,13 +28,13 @@ public class Query {
     /**
      * 正序排序字段名
      */
-    @Schema(description = "正序排序字段名")
+    @Schema(description = "正序排序字段名(多个以,分割)")
     private String ascs;
 
     /**
      * 倒序排序字段名
      */
-    @Schema(description = "倒序排序字段名")
+    @Schema(description = "倒序排序字段名(多个以,分割)")
     private String descs;
 
     public Integer getCurrent() {
