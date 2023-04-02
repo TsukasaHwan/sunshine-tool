@@ -94,7 +94,7 @@ public class JwtSecurityAutoConfiguration {
 
         http.authorizeHttpRequests().anyRequest().authenticated();
 
-        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(userDetailsService, authenticationFailureHandler);
+        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(userDetailsService, authenticationFailureHandler, jwtSecurityProperties);
         jwtAuthenticationFilter.setPermitAllAntPatterns(permitAllAntPatterns);
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

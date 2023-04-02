@@ -1,5 +1,6 @@
 package org.sunshine.core.security.filter;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.sunshine.core.security.exception.JwtExpiredException;
+import org.sunshine.core.security.properties.JwtSecurityProperties;
 import org.sunshine.core.security.util.JwtClaimsUtils;
 import org.sunshine.core.security.util.SecurityUtils;
 
@@ -36,11 +38,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final AuthenticationFailureHandler authenticationFailureHandler;
 
+    private final JwtSecurityProperties properties;
+
     private Set<String> permitAllAntPatterns;
 
-    public JwtAuthenticationFilter(UserDetailsService userDetailsService, AuthenticationFailureHandler authenticationFailureHandler) {
+    public JwtAuthenticationFilter(UserDetailsService userDetailsService, AuthenticationFailureHandler authenticationFailureHandler, JwtSecurityProperties properties) {
         this.userDetailsService = userDetailsService;
         this.authenticationFailureHandler = authenticationFailureHandler;
+        this.properties = properties;
     }
 
     @Override
@@ -53,24 +58,48 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String authToken = JwtClaimsUtils.getToken(request);
 
-        if (authToken != null) {
-            try {
-                String username = JwtClaimsUtils.getUsernameFromToken(authToken);
-                if (username != null && SecurityUtils.getAuthentication() == null) {
-                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                    if (JwtClaimsUtils.validateToken(authToken, userDetails.getUsername())) {
-                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, authToken, userDetails.getAuthorities());
-                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                        SecurityUtils.setAuthentication(authentication);
-                    }
+        if (authToken == null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        try {
+            Claims claims = JwtClaimsUtils.parseToken(authToken);
+
+            String refreshTokenClaim = claims.get(JwtClaimsUtils.REFRESH_TOKEN_CLAIM_KEY, String.class);
+            if (refreshTokenClaim != null && refreshTokenClaim.equals(properties.getRefreshTokenClaim())) {
+                if (request.getServletPath().equals(properties.getRefreshTokenPath())) {
+                    authenticate(request, authToken, claims);
                 }
-            } catch (Exception e) {
-                unsuccessfulAuthentication(request, response, e);
+                filterChain.doFilter(request, response);
                 return;
             }
+            authenticate(request, authToken, claims);
+        } catch (Exception e) {
+            unsuccessfulAuthentication(request, response, e);
+            return;
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    /**
+     * 认证
+     *
+     * @param request   HttpServletRequest
+     * @param authToken JWT
+     * @param claims    Claims
+     */
+    private void authenticate(HttpServletRequest request, String authToken, Claims claims) {
+        String username = claims.getSubject();
+        if (username != null && SecurityUtils.getAuthentication() == null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            if (JwtClaimsUtils.validateToken(authToken, userDetails.getUsername())) {
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, authToken, userDetails.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityUtils.setAuthentication(authentication);
+            }
+        }
     }
 
     private void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, Exception e) throws ServletException, IOException {

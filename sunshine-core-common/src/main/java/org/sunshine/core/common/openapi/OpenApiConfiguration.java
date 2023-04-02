@@ -91,7 +91,7 @@ public interface OpenApiConfiguration {
     @Bean
     default OperationCustomizer operationCustomizer() {
         return (operation, handlerMethod) -> {
-            Schema stringSchema = new StringSchema()._default(JwtClaimsUtils.TOKEN_PREFIX).name("Authorization").description("请求接口Authorization");
+            Schema stringSchema = new StringSchema()._default(JwtClaimsUtils.ACCESS_TOKEN_PREFIX).name("Authorization").description("请求接口Authorization");
             Parameter headerParameter = new HeaderParameter().name("Authorization").description("请求接口Authorization").schema(stringSchema);
             return operation.addParametersItem(headerParameter);
         };

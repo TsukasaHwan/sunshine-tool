@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -16,7 +17,10 @@ import java.util.Map;
  * @since 2023/3/26
  */
 public class JwtClaimsUtils {
-    public final static String TOKEN_PREFIX = "Bearer ";
+
+    public static final String ACCESS_TOKEN_PREFIX = "Bearer ";
+
+    public static final String REFRESH_TOKEN_CLAIM_KEY = "refresh";
 
     private static JwtSecurityProperties properties;
 
@@ -25,14 +29,27 @@ public class JwtClaimsUtils {
     }
 
     /**
-     * 签名
+     * 访问令牌
      *
      * @param subject 主题(用户名)
      * @return JWT
      */
-    public static String sign(String subject) {
+    public static String accessToken(String subject) {
         Duration expiresIn = properties.getExpiresIn();
         return sign(subject, expiresIn, null);
+    }
+
+    /**
+     * 刷新令牌
+     *
+     * @param subject 主题(用户名)
+     * @return JWT
+     */
+    public static String refreshToken(String subject) {
+        Duration refreshTokenExpiresIn = properties.getRefreshTokenExpiresIn();
+        Map<String, Object> claims = new HashMap<>(1);
+        claims.put(REFRESH_TOKEN_CLAIM_KEY, properties.getRefreshTokenClaim());
+        return sign(subject, refreshTokenExpiresIn, claims);
     }
 
     /**
@@ -112,7 +129,7 @@ public class JwtClaimsUtils {
         if (authHeader == null) {
             return null;
         }
-        int indexOf = authHeader.indexOf(TOKEN_PREFIX);
+        int indexOf = authHeader.indexOf(ACCESS_TOKEN_PREFIX);
         if (indexOf == -1) {
             return null;
         }
