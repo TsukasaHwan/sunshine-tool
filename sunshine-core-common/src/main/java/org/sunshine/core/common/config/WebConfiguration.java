@@ -70,8 +70,8 @@ public class WebConfiguration implements WebMvcConfigurer {
         fastMediaTypes.add(MediaType.valueOf("application/vnd.spring-boot.actuator.v2+json"));
         fastJsonConverter.setSupportedMediaTypes(fastMediaTypes);
         fastJsonConverter.setFastJsonConfig(config);
-        converters.add(fastJsonConverter);
-        converters.add(new StringHttpMessageConverter(StandardCharsets.UTF_8));
+        converters.add(0, fastJsonConverter);
+        converters.add(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
     }
 
     @Override
