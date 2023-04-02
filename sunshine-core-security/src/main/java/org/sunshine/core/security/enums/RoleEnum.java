@@ -1,4 +1,4 @@
-package org.sunshine.core.tool.enums;
+package org.sunshine.core.security.enums;
 
 /**
  * @author Teamo
@@ -28,6 +28,8 @@ public enum RoleEnum {
     }
 
     public static class RoleName {
-        public static final String ADMIN_ROLE_NAME = "ROLE_ADMIN";
+        public static final String ROLE_PREFIX = "ROLE_";
+
+        public static final String ADMIN_ROLE_NAME = ROLE_PREFIX + "ADMIN";
     }
 }
