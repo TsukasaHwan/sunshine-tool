@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * @author Teamo
@@ -30,6 +31,19 @@ public class JwtClaimsUtils {
      * @return JWT
      */
     public static String sign(String subject) {
+        Duration expiresIn = properties.getExpiresIn();
+        return sign(subject, expiresIn, null);
+    }
+
+    /**
+     * 签名
+     *
+     * @param subject   主题(用户名)
+     * @param expiresIn 过期时间
+     * @param claims    声称要设置为 JWT 主体
+     * @return JWT
+     */
+    public static String sign(String subject, Duration expiresIn, Map<String, Object> claims) {
         Instant now = Instant.now();
         JwtBuilder jwtBuilder = Jwts.builder()
                 .setIssuedAt(Date.from(now))
@@ -37,9 +51,12 @@ public class JwtClaimsUtils {
                 .setSubject(subject)
                 .signWith(properties.getSecret().getPrivateKey());
 
-        Duration expiresIn = properties.getExpiresIn();
         if (expiresIn != null) {
             jwtBuilder.setExpiration(Date.from(now.plus(expiresIn)));
+        }
+
+        if (claims != null) {
+            jwtBuilder.addClaims(claims);
         }
 
         return jwtBuilder.compact();
