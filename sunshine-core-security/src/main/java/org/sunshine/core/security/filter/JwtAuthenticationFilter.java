@@ -67,6 +67,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             Claims claims = JwtClaimsUtils.parseToken(authToken);
 
             String refreshTokenClaim = claims.get(JwtClaimsUtils.REFRESH_TOKEN_CLAIM_KEY, String.class);
+            if (refreshTokenClaim == null && request.getServletPath().contains(properties.getRefreshTokenPath())) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
             if (refreshTokenClaim != null && refreshTokenClaim.equals(properties.getRefreshTokenClaim())) {
                 if (request.getServletPath().equals(properties.getRefreshTokenPath())) {
                     authenticate(request, authToken, claims);
@@ -74,6 +79,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 filterChain.doFilter(request, response);
                 return;
             }
+
             authenticate(request, authToken, claims);
         } catch (Exception e) {
             unsuccessfulAuthentication(request, response, e);
