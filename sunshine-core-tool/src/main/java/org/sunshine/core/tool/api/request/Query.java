@@ -28,13 +28,13 @@ public class Query {
     /**
      * 正序排序字段名
      */
-    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(description = "正序排序字段名")
     private String ascs;
 
     /**
      * 倒序排序字段名
      */
-    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(description = "倒序排序字段名")
     private String descs;
 
     public Integer getCurrent() {
