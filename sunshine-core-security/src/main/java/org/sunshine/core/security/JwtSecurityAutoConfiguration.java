@@ -65,7 +65,8 @@ public class JwtSecurityAutoConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                   JwtAuthenticationFilter jwtAuthenticationFilter,
+                                                   UserDetailsService userDetailsService,
+                                                   AuthenticationFailureHandler authenticationFailureHandler,
                                                    CorsConfigurationSource corsConfigurationSource,
                                                    AuthenticationEntryPoint authenticationEntryPoint,
                                                    AccessDeniedHandler accessDeniedHandler,
@@ -73,9 +74,12 @@ public class JwtSecurityAutoConfiguration {
                                                    @Autowired(required = false) LogoutSuccessHandler logoutSuccessHandler) throws Exception {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
+        Set<String> permitAllAntPatterns = new LinkedHashSet<>();
+
         List<String> permitAllPaths = jwtSecurityProperties.getPermitAllPaths();
         if (!permitAllPaths.isEmpty()) {
             http.authorizeHttpRequests().antMatchers(permitAllPaths.toArray(new String[0])).permitAll();
+            permitAllAntPatterns.addAll(permitAllPaths);
         }
 
         AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry = http.authorizeHttpRequests();
@@ -84,10 +88,14 @@ public class JwtSecurityAutoConfiguration {
             antPatternsSet.removeIf(permitAllPaths::contains);
             if (!antPatternsSet.isEmpty()) {
                 registry.antMatchers(httpMethod, antPatternsSet.toArray(new String[0])).permitAll();
+                permitAllAntPatterns.addAll(antPatternsSet);
             }
         });
 
         http.authorizeHttpRequests().anyRequest().authenticated();
+
+        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(userDetailsService, authenticationFailureHandler);
+        jwtAuthenticationFilter.setPermitAllAntPatterns(permitAllAntPatterns);
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -145,12 +153,6 @@ public class JwtSecurityAutoConfiguration {
     @ConditionalOnMissingBean(PasswordEncoder.class)
     public PasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public JwtAuthenticationFilter jwtTokenAuthenticationFilter(UserDetailsService userDetailsService,
-                                                                AuthenticationFailureHandler authenticationFailureHandler) {
-        return new JwtAuthenticationFilter(userDetailsService, authenticationFailureHandler);
     }
 
     @Bean

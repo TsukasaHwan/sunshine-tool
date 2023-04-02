@@ -20,6 +20,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Set;
 
 /**
  * JwtToken拦截器
@@ -35,6 +36,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final AuthenticationFailureHandler authenticationFailureHandler;
 
+    private Set<String> permitAllAntPatterns;
+
     public JwtAuthenticationFilter(UserDetailsService userDetailsService, AuthenticationFailureHandler authenticationFailureHandler) {
         this.userDetailsService = userDetailsService;
         this.authenticationFailureHandler = authenticationFailureHandler;
@@ -43,6 +46,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     @SuppressWarnings("NullableProblems")
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        if (isPermitAll(request)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String authToken = JwtClaimsUtils.getToken(request);
 
         if (authToken != null) {
@@ -91,5 +99,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             log.error(e.getMessage(), e);
         }
         return null;
+    }
+
+    /**
+     * 判断请求路径是否包含@PermitAll注解
+     *
+     * @param request HttpServletRequest
+     * @return 是否需要token认证
+     */
+    private boolean isPermitAll(HttpServletRequest request) {
+        boolean isPermitAll = false;
+        if (permitAllAntPatterns != null && !permitAllAntPatterns.isEmpty()) {
+            if (permitAllAntPatterns.contains(request.getServletPath())) {
+                isPermitAll = true;
+            }
+        }
+        return isPermitAll;
+    }
+
+    public Set<String> getPermitAllAntPatterns() {
+        return permitAllAntPatterns;
+    }
+
+    public void setPermitAllAntPatterns(Set<String> permitAllAntPatterns) {
+        this.permitAllAntPatterns = permitAllAntPatterns;
     }
 }
