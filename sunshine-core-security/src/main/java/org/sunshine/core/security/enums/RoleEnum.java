@@ -8,7 +8,7 @@ public enum RoleEnum {
     /**
      * 管理员
      */
-    ADMIN(1L, RoleName.ADMIN_ROLE_CODE);
+    ADMIN(1L, RoleCode.ADMIN_ROLE_CODE);
 
     private final long id;
 
@@ -27,7 +27,7 @@ public enum RoleEnum {
         return roleName;
     }
 
-    public static class RoleName {
+    public static class RoleCode {
         public static final String ROLE_PREFIX = "ROLE_";
 
         public static final String ADMIN_ROLE_CODE = ROLE_PREFIX + "ADMIN";
