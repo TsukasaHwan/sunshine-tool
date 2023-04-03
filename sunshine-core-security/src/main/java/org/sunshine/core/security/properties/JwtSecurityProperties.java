@@ -53,11 +53,9 @@ public class JwtSecurityProperties {
             "/*/*.js",
             "/profile/**",
             "/favicon.ico",
-            "/swagger-ui.html",
             "/swagger-resources/**",
             "/webjars/**",
-            "/*/api-docs/**",
-            "/doc.html"
+            "/*/api-docs/**"
     );
 
     /**

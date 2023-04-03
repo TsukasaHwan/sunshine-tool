@@ -13,7 +13,6 @@ import org.sunshine.core.tool.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
@@ -69,16 +68,14 @@ public class Condition {
      * @param query Query
      */
     private static void checkQuery(Query query) {
-        Optional.ofNullable(query.getCurrent()).ifPresent(current -> {
-            if (current <= 0) {
-                query.setCurrent(Query.DEFAULT_CURRENT);
-            }
-        });
-        Optional.ofNullable(query.getSize()).ifPresent(size -> {
-            if (size <= 0) {
-                query.setSize(Query.DEFAULT_SIZE);
-            }
-        });
+        Integer current = query.getCurrent();
+        Integer size = query.getSize();
+        if (current == null || current <= 0) {
+            query.setCurrent(Query.DEFAULT_CURRENT);
+        }
+        if (size == null || size <= 0) {
+            query.setSize(Query.DEFAULT_SIZE);
+        }
     }
 
     public static <E, V> IPage<V> pageVo(IPage<E> pages, Supplier<V> target) {
