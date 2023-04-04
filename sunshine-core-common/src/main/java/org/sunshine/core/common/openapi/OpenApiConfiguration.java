@@ -100,13 +100,13 @@ public interface OpenApiConfiguration {
     class GroupedOpenApiConfig {
         private final String groupName;
 
-        private final String paths;
+        private final String[] paths;
 
-        private final String basePackage;
+        private final String[] basePackage;
 
         private final Info info;
 
-        GroupedOpenApiConfig(String groupName, String paths, String basePackage, Info info) {
+        GroupedOpenApiConfig(String groupName, String[] paths, String[] basePackage, Info info) {
             this.groupName = groupName;
             this.paths = paths;
             this.basePackage = basePackage;
@@ -121,11 +121,11 @@ public interface OpenApiConfiguration {
             return groupName;
         }
 
-        public String getPaths() {
+        public String[] getPaths() {
             return paths;
         }
 
-        public String getBasePackage() {
+        public String[] getBasePackage() {
             return basePackage;
         }
 
@@ -135,8 +135,8 @@ public interface OpenApiConfiguration {
 
         public static class Builder {
             private String groupName;
-            private String paths;
-            private String basePackage;
+            private String[] paths;
+            private String[] basePackage;
             private Info info;
 
             Builder() {
@@ -147,12 +147,12 @@ public interface OpenApiConfiguration {
                 return this;
             }
 
-            public Builder paths(String paths) {
+            public Builder paths(String... paths) {
                 this.paths = paths;
                 return this;
             }
 
-            public Builder basePackage(String basePackage) {
+            public Builder basePackage(String... basePackage) {
                 this.basePackage = basePackage;
                 return this;
             }
