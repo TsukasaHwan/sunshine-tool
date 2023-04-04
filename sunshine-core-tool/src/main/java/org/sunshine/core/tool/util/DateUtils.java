@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.date.format.FastDateFormat;
 
 import java.util.Calendar;
 import java.util.List;
@@ -13,7 +14,10 @@ import java.util.stream.Collectors;
  * @author Teamo
  */
 public class DateUtils extends DateUtil {
-    public static final String PATTERN_YEAR_MONTH = "yyyy-MM";
+
+    public static final FastDateFormat YEAR_MOTH_FORMAT = FastDateFormat.getInstance("yyyy-MM");
+
+    public static final FastDateFormat SLASH_DATE_FORMAT = FastDateFormat.getInstance("yyyy/MM/dd");
 
     /**
      * 根据年份，周获取当前周的开始日期和结束日期
@@ -88,6 +92,6 @@ public class DateUtils extends DateUtil {
                 return null;
         }
         List<DateTime> dateTimes = rangeToList(beginOfDay(start.getTime()), endOfDay(end.getTime()), DateField.MONTH);
-        return dateTimes.stream().map(dateTime -> dateTime.toString(PATTERN_YEAR_MONTH)).collect(Collectors.toList());
+        return dateTimes.stream().map(dateTime -> dateTime.toString(YEAR_MOTH_FORMAT)).collect(Collectors.toList());
     }
 }
