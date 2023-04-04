@@ -81,7 +81,7 @@ public class ResponseExceptionHandler {
     /**
      * 处理绑定异常
      *
-     * @param ex 方法参数无效异常
+     * @param ex 绑定异常
      * @return {Result}
      */
     private Result<Void> handleBindException(BindException ex) {
