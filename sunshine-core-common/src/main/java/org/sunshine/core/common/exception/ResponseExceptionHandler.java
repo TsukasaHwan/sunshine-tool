@@ -5,10 +5,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.sunshine.core.cache.exception.RequestRateLimitException;
@@ -55,17 +55,12 @@ public class ResponseExceptionHandler {
      * @param ex 异常
      * @return {Result}
      */
-    @ExceptionHandler({
-            Exception.class,
-            CustomException.class,
-            MethodArgumentNotValidException.class,
-            ConstraintViolationException.class
-    })
+    @ExceptionHandler(Exception.class)
     public Result<?> handleException(Exception ex) {
         if (ex instanceof CustomException) {
             return handleCustomException((CustomException) ex);
-        } else if (ex instanceof MethodArgumentNotValidException) {
-            return handleMethodArgumentNotValidException((MethodArgumentNotValidException) ex);
+        } else if (ex instanceof BindException) {
+            return handleBindException((BindException) ex);
         } else if (ex instanceof ConstraintViolationException) {
             return handleConstraintViolationException((ConstraintViolationException) ex);
         } else {
@@ -84,12 +79,12 @@ public class ResponseExceptionHandler {
     }
 
     /**
-     * 处理方法参数无效异常
+     * 处理绑定异常
      *
      * @param ex 方法参数无效异常
      * @return {Result}
      */
-    private Result<Void> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+    private Result<Void> handleBindException(BindException ex) {
         BindingResult bindingResult = ex.getBindingResult();
         FieldError fieldError = bindingResult.getFieldError();
         if (Objects.nonNull(fieldError)) {
