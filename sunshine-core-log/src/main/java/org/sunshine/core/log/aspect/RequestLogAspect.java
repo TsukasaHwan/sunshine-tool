@@ -23,11 +23,13 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MultipartFile;
+import org.sunshine.core.tool.util.ReflectUtils;
 import org.sunshine.core.tool.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -116,6 +118,13 @@ public class RequestLogAspect {
                     paraName = requestParam.value();
                 } else {
                     paraName = methodParameter.getParameterName();
+
+                    Field field = ReflectUtils.findField(value.getClass(), null, MultipartFile.class);
+                    if (Objects.nonNull(field)) {
+                        ReflectUtils.makeAccessible(field);
+                        ReflectUtils.setField(field, value, null);
+                    }
+
                 }
                 paramMap.put(paraName, value);
             }
