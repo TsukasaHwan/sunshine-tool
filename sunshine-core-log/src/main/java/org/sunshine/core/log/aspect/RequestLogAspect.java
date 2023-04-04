@@ -118,15 +118,14 @@ public class RequestLogAspect {
                     paraName = requestParam.value();
                 } else {
                     paraName = methodParameter.getParameterName();
-
-                    Field field = ReflectUtils.findField(value.getClass(), null, MultipartFile.class);
-                    if (Objects.nonNull(field)) {
-                        ReflectUtils.makeAccessible(field);
-                        ReflectUtils.setField(field, value, null);
-                    }
-
                 }
-                paramMap.put(paraName, value);
+
+                Field field = ReflectUtils.findField(value.getClass(), null, MultipartFile.class);
+                if (Objects.nonNull(field)) {
+                    paramMap.put(paraName, "此参数不能序列化为json");
+                } else {
+                    paramMap.put(paraName, value);
+                }
             }
         }
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
