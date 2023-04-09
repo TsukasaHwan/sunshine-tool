@@ -79,7 +79,7 @@ public interface OpenApiConfiguration {
                 .forEach(operation -> {
                     ApiResponses responses = operation.getResponses();
                     Arrays.stream(CommonCode.values())
-                            .forEach(commonCode -> responses.addApiResponse(String.valueOf(commonCode.code()), new ApiResponse().description(commonCode.msg())));
+                            .forEach(commonCode -> responses.put(String.valueOf(commonCode.code()), new ApiResponse().description(commonCode.msg())));
                 });
     }
 
