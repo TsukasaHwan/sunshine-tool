@@ -1,10 +1,10 @@
 package org.sunshine.core.tool.api.response;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.data.domain.Page;
 import org.sunshine.core.tool.api.request.Query;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
@@ -14,31 +14,37 @@ import java.util.List;
  * @author Teamo
  * @since 2019/7/10
  */
-public class QueryResult<T> implements Serializable {
+@Schema
+public class QueryResult<T> implements Response {
 
     /**
      * 返回数据
      */
+    @Schema(description = "返回数据")
     private List<T> records;
 
     /**
      * 当前页
      */
+    @Schema(description = "当前页")
     private long current;
 
     /**
      * 当前分页总页数
      */
+    @Schema(description = "当前分页总页数")
     private long pages;
 
     /**
      * 每页显示条数
      */
+    @Schema(description = "每页显示条数")
     private long size;
 
     /**
      * 当前满足条件总行数
      */
+    @Schema(description = "当前满足条件总行数")
     private long total;
 
     private QueryResult(Query query) {
