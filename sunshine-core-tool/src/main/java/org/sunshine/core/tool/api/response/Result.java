@@ -1,5 +1,6 @@
 package org.sunshine.core.tool.api.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.sunshine.core.tool.api.code.CommonCode;
 import org.sunshine.core.tool.api.code.ResultCode;
 import org.sunshine.core.tool.util.ObjectUtils;
@@ -10,9 +11,16 @@ import java.util.Optional;
  * @author Temo
  * @since 2020/10/23
  */
+@Schema
 public class Result<T> implements Response {
+
+    @Schema(description = "状态码")
     private int code;
+
+    @Schema(description = "消息")
     private String msg;
+
+    @Schema(description = "数据")
     private T data;
 
     private Result(int code, String msg, T data) {
