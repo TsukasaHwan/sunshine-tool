@@ -3,6 +3,7 @@ package org.sunshine.core.common.config;
 import com.alibaba.fastjson2.JSONReader;
 import com.alibaba.fastjson2.JSONWriter;
 import com.alibaba.fastjson2.support.config.FastJsonConfig;
+import com.alibaba.fastjson2.support.spring.http.converter.FastJsonHttpMessageConverter;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -16,7 +17,6 @@ import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.sunshine.core.common.exception.ResponseExceptionHandler;
-import org.sunshine.core.common.fastjson.CustomFastJsonHttpMessageConverter;
 import org.sunshine.core.tool.datamask.DataMaskJsonFilter;
 import org.sunshine.core.tool.enums.WebFilterOrderEnum;
 
@@ -57,7 +57,7 @@ public class WebConfiguration implements WebMvcConfigurer {
      */
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        CustomFastJsonHttpMessageConverter fastJsonConverter = new CustomFastJsonHttpMessageConverter();
+        FastJsonHttpMessageConverter fastJsonConverter = new FastJsonHttpMessageConverter();
         FastJsonConfig config = new FastJsonConfig();
         config.setReaderFeatures(JSONReader.Feature.FieldBased, JSONReader.Feature.SupportArrayToBean);
         config.setWriterFeatures(
