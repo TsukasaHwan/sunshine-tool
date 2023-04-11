@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -32,7 +31,6 @@ import org.springframework.util.Assert;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.sunshine.core.security.authentication.NoPasswordAuthenticationProvider;
 import org.sunshine.core.security.context.TransmittableThreadLocalSecurityContextHolderStrategy;
 import org.sunshine.core.security.filter.JwtAuthenticationFilter;
 import org.sunshine.core.security.handler.JwtLogoutSuccessHandler;
@@ -69,8 +67,7 @@ public class JwtSecurityAutoConfiguration {
                                                    UserDetailsService userDetailsService,
                                                    CorsConfigurationSource corsConfigurationSource,
                                                    JwtPermitAllAnnotationSupport jwtPermitAllAnnotationSupport,
-                                                   @Autowired(required = false) LogoutSuccessHandler logoutSuccessHandler,
-                                                   @Autowired(required = false) AuthenticationProvider authenticationProvider) throws Exception {
+                                                   @Autowired(required = false) LogoutSuccessHandler logoutSuccessHandler) throws Exception {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         Set<String> permitAllAntPatterns = new LinkedHashSet<>();
@@ -103,10 +100,6 @@ public class JwtSecurityAutoConfiguration {
 
         if (logoutSuccessHandler != null) {
             http.logout().logoutUrl(jwtSecurityProperties.getLogoutPath()).logoutSuccessHandler(logoutSuccessHandler);
-        }
-
-        if (authenticationProvider != null) {
-            http.authenticationProvider(authenticationProvider);
         }
 
         http.exceptionHandling((exceptions) -> exceptions
@@ -205,15 +198,5 @@ public class JwtSecurityAutoConfiguration {
         methodInvokingFactoryBean.setTargetMethod("setStrategyName");
         methodInvokingFactoryBean.setArguments(TransmittableThreadLocalSecurityContextHolderStrategy.class.getName());
         return methodInvokingFactoryBean;
-    }
-
-    @Bean
-    @ConditionalOnProperty(value = "jwt.security.enablePasswordAuthentication", havingValue = "false")
-    public AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) throws Exception {
-        NoPasswordAuthenticationProvider authenticationProvider = new NoPasswordAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userDetailsService);
-        authenticationProvider.setPasswordEncoder(passwordEncoder);
-        authenticationProvider.afterPropertiesSet();
-        return authenticationProvider;
     }
 }
