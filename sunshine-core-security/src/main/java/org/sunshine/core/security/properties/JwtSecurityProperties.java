@@ -23,6 +23,11 @@ public class JwtSecurityProperties {
     private boolean enable = false;
 
     /**
+     * Whether to enable password authentication.
+     */
+    private boolean enablePasswordAuthentication = true;
+
+    /**
      * Token Custom Request Header.
      */
     private String header = HttpHeaders.AUTHORIZATION;
@@ -107,6 +112,14 @@ public class JwtSecurityProperties {
 
     public void setEnable(boolean enable) {
         this.enable = enable;
+    }
+
+    public boolean isEnablePasswordAuthentication() {
+        return enablePasswordAuthentication;
+    }
+
+    public void setEnablePasswordAuthentication(boolean enablePasswordAuthentication) {
+        this.enablePasswordAuthentication = enablePasswordAuthentication;
     }
 
     public String getHeader() {
