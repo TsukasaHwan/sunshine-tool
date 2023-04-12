@@ -120,7 +120,10 @@ public class RequestLogAspect {
                     paraName = methodParameter.getParameterName();
                 }
 
-                Field field = ReflectUtils.findField(value.getClass(), null, MultipartFile.class);
+                Field field = null;
+                if (Objects.nonNull(value)) {
+                    field = ReflectUtils.findField(value.getClass(), null, MultipartFile.class);
+                }
                 if (Objects.nonNull(field)) {
                     paramMap.put(paraName, "此参数不能序列化为json");
                 } else {
