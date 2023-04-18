@@ -1,7 +1,6 @@
 package org.sunshine.core.tool.util;
 
 import cn.hutool.core.date.DateField;
-import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.format.FastDateFormat;
@@ -20,45 +19,10 @@ public class DateUtils extends DateUtil {
     public static final FastDateFormat SLASH_DATE_FORMAT = FastDateFormat.getInstance("yyyy/MM/dd");
 
     /**
-     * 根据年份，周获取当前周的开始日期和结束日期
-     *
-     * @param year
-     * @param week
-     * @return
-     */
-    public static String getWeekDays(final int year, final int week) {
-        Calendar cal = calendar();
-        // 设置每周的开始日期
-        cal.setFirstDayOfWeek(Calendar.MONDAY);
-        cal.set(Calendar.YEAR, year);
-        cal.set(Calendar.WEEK_OF_YEAR, week);
-        cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
-        String beginDate = format(cal.getTime(), DatePattern.NORM_DATE_FORMAT);
-        cal.add(Calendar.DAY_OF_WEEK, 6);
-        String endDate = format(cal.getTime(), DatePattern.NORM_DATE_FORMAT);
-        return beginDate + StringPool.TILDA + endDate;
-    }
-
-    /**
-     * 根据剩余秒倒计时
-     *
-     * @return 返回格式 HH:mm:ss
-     */
-    public static String countDown(long second) {
-        if (second > 0) {
-            long hh = second / 60 / 60 % 60;
-            long mm = second / 60 % 60;
-            long ss = second % 60;
-            return String.format("%02d", hh) + StringPool.COLON + String.format("%02d", mm) + StringPool.COLON + String.format("%02d", ss);
-        }
-        return StringPool.EMPTY;
-    }
-
-    /**
      * 根据季度获取日期
      *
-     * @param quarter
-     * @return
+     * @param quarter 季度
+     * @return 日期列表
      */
     public static List<String> getDateQuarter(int quarter) {
         Calendar start = Calendar.getInstance();
