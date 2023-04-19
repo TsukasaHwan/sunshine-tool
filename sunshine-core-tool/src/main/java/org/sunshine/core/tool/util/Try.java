@@ -64,8 +64,90 @@ public class Try {
         };
     }
 
+    public static <T> Consumer<T> accept(UncheckedConsumer<T> mapper) {
+        Objects.requireNonNull(mapper);
+
+        return t -> {
+            try {
+                mapper.accept(t);
+            } catch (Exception e) {
+                throw Exceptions.unchecked(e);
+            }
+        };
+    }
+
+    public static <T> Consumer<T> accept(UncheckedConsumer<T> mapper, Consumer<Throwable> handler) {
+        Objects.requireNonNull(mapper);
+        Objects.requireNonNull(handler);
+
+        return t -> {
+            try {
+                mapper.accept(t);
+            } catch (Exception e) {
+                handler.accept(e);
+            }
+        };
+    }
+
+    public static Runnable run(UncheckedRunnable mapper) {
+        Objects.requireNonNull(mapper);
+
+        return () -> {
+            try {
+                mapper.run();
+            } catch (Exception e) {
+                throw Exceptions.unchecked(e);
+            }
+        };
+    }
+
+    public static Runnable run(UncheckedRunnable mapper, Consumer<Throwable> handler) {
+        Objects.requireNonNull(mapper);
+        Objects.requireNonNull(handler);
+
+        return () -> {
+            try {
+                mapper.run();
+            } catch (Exception e) {
+                handler.accept(e);
+            }
+        };
+    }
+
+    public static Runnable run(UncheckedRunnable mapper, Finally finallyHandler) {
+        Objects.requireNonNull(mapper);
+        Objects.requireNonNull(finallyHandler);
+
+        return () -> {
+            try {
+                mapper.run();
+            } catch (Exception e) {
+                throw Exceptions.unchecked(e);
+            } finally {
+                finallyHandler.execute();
+            }
+        };
+    }
+
+    public static Runnable run(UncheckedRunnable mapper, Consumer<Throwable> handler, Finally finallyHandler) {
+        Objects.requireNonNull(mapper);
+        Objects.requireNonNull(handler);
+        Objects.requireNonNull(finallyHandler);
+
+        return () -> {
+            try {
+                mapper.run();
+            } catch (Exception e) {
+                handler.accept(e);
+            } finally {
+                finallyHandler.execute();
+            }
+        };
+    }
+
     @FunctionalInterface
     public interface UncheckedFunction<T, R> {
+
         /**
          * 调用
          *
@@ -78,6 +160,7 @@ public class Try {
 
     @FunctionalInterface
     public interface UncheckedPredicate<T> {
+
         /**
          * 调用
          *
@@ -86,5 +169,37 @@ public class Try {
          * @throws Exception Exception
          */
         boolean test(T t) throws Exception;
+    }
+
+    @FunctionalInterface
+    public interface UncheckedConsumer<T> {
+
+        /**
+         * 调用
+         *
+         * @param t t
+         * @throws Exception Exception
+         */
+        void accept(T t) throws Exception;
+    }
+
+    @FunctionalInterface
+    public interface UncheckedRunnable {
+
+        /**
+         * 调用
+         *
+         * @throws Exception Exception
+         */
+        void run() throws Exception;
+    }
+
+    @FunctionalInterface
+    public interface Finally {
+
+        /**
+         * 执行
+         */
+        void execute();
     }
 }

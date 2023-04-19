@@ -1,5 +1,9 @@
 package org.sunshine.core.cache;
 
+import org.springframework.data.redis.connection.stream.ObjectRecord;
+import org.springframework.data.redis.connection.stream.Record;
+import org.springframework.data.redis.connection.stream.RecordId;
+import org.springframework.data.redis.connection.stream.StringRecord;
 import org.springframework.data.redis.core.ZSetOperations;
 
 import java.util.List;
@@ -421,7 +425,60 @@ public interface RedisClient {
      * 根据前缀批量删除key
      *
      * @param prefix 前缀
-     * @return
      */
     void batchDel(String prefix);
+
+    /**
+     * 添加Stream消息
+     *
+     * @param record StringRecord
+     * @return RecordId
+     */
+    RecordId streamAdd(StringRecord record);
+
+    /**
+     * 添加Stream消息
+     *
+     * @param record record
+     * @return RecordId
+     */
+    RecordId streamAdd(Record<String, ?> record);
+
+    /**
+     * 添加Stream消息
+     *
+     * @param stream Stream key
+     * @param value  Map消息
+     * @return RecordId
+     */
+    RecordId streamAdd(String stream, Map<String, ?> value);
+
+    /**
+     * 从一个或多个StreamOffset中读取消息作为ObjectRecord
+     *
+     * @param clazz    目标类型
+     * @param stream   Stream key
+     * @param recordId RecordId
+     * @return 消息
+     */
+    <T> Optional<List<ObjectRecord<String, T>>> streamRead(Class<T> clazz, String stream, RecordId recordId);
+
+    /**
+     * Stream确认消息
+     *
+     * @param group  组
+     * @param record 消息
+     * @return Long
+     */
+    Long streamAck(String group, Record<String, ?> record);
+
+    /**
+     * Stream确认消息
+     *
+     * @param stream    Stream key
+     * @param group     组
+     * @param recordIds 消息id
+     * @return Long
+     */
+    Long streamAck(String stream, String group, String... recordIds);
 }

@@ -2,6 +2,7 @@ package org.sunshine.core.cache;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 
@@ -453,6 +454,67 @@ public class RedisClientImpl implements RedisClient {
         Set<String> keys = batchGetKeys(prefix);
         if (keys != null && keys.size() > 0) {
             redisTemplate.delete(keys);
+        }
+    }
+
+    @Override
+    public RecordId streamAdd(StringRecord record) {
+        try {
+            return redisTemplate.opsForStream().add(record);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return null;
+        }
+    }
+
+    @Override
+    public RecordId streamAdd(Record<String, ?> record) {
+        try {
+            return redisTemplate.opsForStream().add(record);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return null;
+        }
+    }
+
+    @Override
+    public RecordId streamAdd(String stream, Map<String, ?> value) {
+        try {
+            return redisTemplate.opsForStream().add(stream, value);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return null;
+        }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> Optional<List<ObjectRecord<String, T>>> streamRead(Class<T> clazz, String stream, RecordId recordId) {
+        try {
+            return Optional.of(redisTemplate.opsForStream().read(clazz, StreamOffset.create(stream, ReadOffset.from(recordId))));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Long streamAck(String group, Record<String, ?> record) {
+        try {
+            return redisTemplate.opsForStream().acknowledge(group, record);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return null;
+        }
+    }
+
+    @Override
+    public Long streamAck(String stream, String group, String... recordIds) {
+        try {
+            return redisTemplate.opsForStream().acknowledge(stream, group, recordIds);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return null;
         }
     }
 }
