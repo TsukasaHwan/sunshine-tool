@@ -1,7 +1,6 @@
 package org.sunshine.core.cache;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Range;
 import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
@@ -15,8 +14,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class RedisClientImpl implements RedisClient {
 
-    private final static Logger log = LoggerFactory.getLogger(RedisClientImpl.class);
-
     private final RedisTemplate<String, Object> redisTemplate;
 
     public RedisClientImpl(RedisTemplate<String, Object> redisTemplate) {
@@ -24,18 +21,9 @@ public class RedisClientImpl implements RedisClient {
     }
 
     @Override
-    public boolean expire(String key, long time) {
-        try {
-            if (time > 0) {
-                redisTemplate.expire(key, time, TimeUnit.SECONDS);
-            }
-            return true;
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            return false;
-        }
+    public Boolean expire(String key, long time) {
+        return redisTemplate.expire(key, time, TimeUnit.SECONDS);
     }
-
 
     @Override
     public Long getExpire(String key) {
@@ -44,12 +32,7 @@ public class RedisClientImpl implements RedisClient {
 
     @Override
     public Boolean hasKey(String key) {
-        try {
-            return redisTemplate.hasKey(key);
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            return false;
-        }
+        return redisTemplate.hasKey(key);
     }
 
     @Override
@@ -69,43 +52,25 @@ public class RedisClientImpl implements RedisClient {
     }
 
     @Override
-    public boolean set(String key, Object value) {
-        try {
-            redisTemplate.opsForValue().set(key, value);
-            return true;
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            return false;
+    public void set(String key, Object value) {
+        redisTemplate.opsForValue().set(key, value);
+    }
+
+    @Override
+    public void set(String key, Object value, long time) {
+        if (time > 0) {
+            redisTemplate.opsForValue().set(key, value, time, TimeUnit.SECONDS);
+        } else {
+            set(key, value);
         }
     }
 
     @Override
-    public boolean set(String key, Object value, long time) {
-        try {
-            if (time > 0) {
-                redisTemplate.opsForValue().set(key, value, time, TimeUnit.SECONDS);
-            } else {
-                set(key, value);
-            }
-            return true;
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            return false;
-        }
-    }
-
-    @Override
-    public boolean set(String key, Object value, long time, TimeUnit timeUnit) {
-        try {
-            if (time > 0) {
-                redisTemplate.opsForValue().set(key, value, time, timeUnit);
-            } else {
-                set(key, value);
-            }
-            return true;
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            return false;
+    public void set(String key, Object value, long time, TimeUnit timeUnit) {
+        if (time > 0) {
+            redisTemplate.opsForValue().set(key, value, time, timeUnit);
+        } else {
+            set(key, value);
         }
     }
 
@@ -137,58 +102,34 @@ public class RedisClientImpl implements RedisClient {
     }
 
     @Override
-    public boolean hmset(String key, Map<String, Object> map) {
-        try {
-            redisTemplate.opsForHash().putAll(key, map);
-            return true;
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            return false;
+    public void hmset(String key, Map<String, Object> map) {
+        redisTemplate.opsForHash().putAll(key, map);
+    }
+
+    @Override
+    public void hmset(String key, Map<String, Object> map, long time) {
+        redisTemplate.opsForHash().putAll(key, map);
+        if (time > 0) {
+            expire(key, time);
         }
     }
 
     @Override
-    public boolean hmset(String key, Map<String, Object> map, long time) {
-        try {
-            redisTemplate.opsForHash().putAll(key, map);
-            if (time > 0) {
-                expire(key, time);
-            }
-            return true;
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            return false;
+    public void hset(String key, String item, Object value) {
+        redisTemplate.opsForHash().put(key, item, value);
+    }
+
+    @Override
+    public void hset(String key, String item, Object value, long time) {
+        redisTemplate.opsForHash().put(key, item, value);
+        if (time > 0) {
+            expire(key, time);
         }
     }
 
     @Override
-    public boolean hset(String key, String item, Object value) {
-        try {
-            redisTemplate.opsForHash().put(key, item, value);
-            return true;
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            return false;
-        }
-    }
-
-    @Override
-    public boolean hset(String key, String item, Object value, long time) {
-        try {
-            redisTemplate.opsForHash().put(key, item, value);
-            if (time > 0) {
-                expire(key, time);
-            }
-            return true;
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            return false;
-        }
-    }
-
-    @Override
-    public void hdel(String key, Object... item) {
-        redisTemplate.opsForHash().delete(key, item);
+    public Long hdel(String key, Object... item) {
+        return redisTemplate.opsForHash().delete(key, item);
     }
 
     @Override
@@ -198,250 +139,151 @@ public class RedisClientImpl implements RedisClient {
 
     @Override
     public Double hincr(String key, String item, double by) {
+        if (by < 0) {
+            throw new RuntimeException("递增因子必须大于0");
+        }
         return redisTemplate.opsForHash().increment(key, item, by);
     }
 
     @Override
     public Double hdecr(String key, String item, double by) {
+        if (by < 0) {
+            throw new RuntimeException("递减因子必须大于0");
+        }
         return redisTemplate.opsForHash().increment(key, item, -by);
     }
 
     @Override
     public Set<Object> sGet(String key) {
-        try {
-            return redisTemplate.opsForSet().members(key);
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            return null;
-        }
+        return redisTemplate.opsForSet().members(key);
     }
 
     @Override
     public Boolean sHasKey(String key, Object value) {
-        try {
-            return redisTemplate.opsForSet().isMember(key, value);
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            return false;
-        }
+        return redisTemplate.opsForSet().isMember(key, value);
     }
 
     @Override
     public Long sSet(String key, Object... values) {
-        try {
-            return redisTemplate.opsForSet().add(key, values);
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            return 0L;
-        }
+        return redisTemplate.opsForSet().add(key, values);
     }
 
     @Override
-    public Long sSetAndTime(String key, long time, Object... values) {
-        try {
-            Long count = redisTemplate.opsForSet().add(key, values);
-            if (time > 0) {
-                expire(key, time);
-            }
-            return count;
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            return 0L;
+    public Long sSet(String key, long time, Object... values) {
+        Long count = redisTemplate.opsForSet().add(key, values);
+        if (time > 0) {
+            expire(key, time);
         }
+        return count;
     }
 
     @Override
-    public Long sGetSetSize(String key) {
-        try {
-            return redisTemplate.opsForSet().size(key);
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            return 0L;
-        }
+    public Long sSize(String key) {
+        return redisTemplate.opsForSet().size(key);
     }
 
     @Override
-    public Long setRemove(String key, Object... values) {
-        try {
-            return redisTemplate.opsForSet().remove(key, values);
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            return 0L;
-        }
+    public Long sDel(String key, Object... values) {
+        return redisTemplate.opsForSet().remove(key, values);
     }
 
     @Override
     public List<Object> lGet(String key, long start, long end) {
-        try {
-            return redisTemplate.opsForList().range(key, start, end);
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            return null;
-        }
+        return redisTemplate.opsForList().range(key, start, end);
     }
 
     @Override
-    public Long lGetListSize(String key) {
-        try {
-            return redisTemplate.opsForList().size(key);
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            return 0L;
-        }
+    public Long lSize(String key) {
+        return redisTemplate.opsForList().size(key);
     }
 
     @Override
-    public Optional<Object> lGetIndex(String key, long index) {
-        try {
-            return Optional.ofNullable(redisTemplate.opsForList().index(key, index));
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            return Optional.empty();
-        }
+    public Optional<Object> lIndex(String key, long index) {
+        return Optional.ofNullable(redisTemplate.opsForList().index(key, index));
     }
 
     @Override
-    public boolean lSet(String key, Object value) {
-        try {
-            redisTemplate.opsForList().rightPush(key, value);
-            return true;
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            return false;
-        }
+    public Long lSet(String key, Object value) {
+        return redisTemplate.opsForList().rightPush(key, value);
     }
 
     @Override
-    public boolean lSet(String key, Object value, long time) {
-        try {
-            redisTemplate.opsForList().rightPush(key, value);
-            if (time > 0) {
-                expire(key, time);
-            }
-            return true;
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            return false;
+    public Long lSet(String key, Object value, long time) {
+        Long count = redisTemplate.opsForList().rightPush(key, value);
+        if (time > 0) {
+            expire(key, time);
         }
+        return count;
     }
 
     @Override
-    public boolean lSet(String key, List<Object> value) {
-        try {
-            redisTemplate.opsForList().rightPushAll(key, value);
-            return true;
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            return false;
-        }
+    public Long lSet(String key, List<Object> value) {
+        return redisTemplate.opsForList().rightPushAll(key, value);
     }
 
     @Override
-    public boolean lSet(String key, List<Object> value, long time) {
-        try {
-            redisTemplate.opsForList().rightPushAll(key, value);
-            if (time > 0) {
-                expire(key, time);
-            }
-            return true;
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            return false;
+    public Long lSet(String key, List<Object> value, long time) {
+        Long count = redisTemplate.opsForList().rightPushAll(key, value);
+        if (time > 0) {
+            expire(key, time);
         }
+        return count;
     }
 
     @Override
-    public boolean lUpdateIndex(String key, long index, Object value) {
-        try {
-            redisTemplate.opsForList().set(key, index, value);
-            return true;
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            return false;
-        }
+    public void lUpdateIndex(String key, long index, Object value) {
+        redisTemplate.opsForList().set(key, index, value);
     }
 
     @Override
-    public Long lRemove(String key, long count, Object value) {
-        try {
-            return redisTemplate.opsForList().remove(key, count, value);
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            return 0L;
-        }
+    public Long lDel(String key, long count, Object value) {
+        return redisTemplate.opsForList().remove(key, count, value);
     }
 
     @Override
-    public boolean zsSet(String key, Object value, double score) {
-        try {
-            redisTemplate.opsForZSet().add(key, value, score);
-            return true;
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            return false;
-        }
+    public Boolean zsSet(String key, Object value, double score) {
+        return redisTemplate.opsForZSet().add(key, value, score);
     }
 
     @Override
-    public boolean zsUpdateScore(String key, Object value, double score) {
-        try {
-            redisTemplate.opsForZSet().incrementScore(key, value, score);
-            return true;
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            return false;
+    public Double zsIncrScore(String key, Object value, double score) {
+        if (score < 0) {
+            throw new RuntimeException("增加分数必须大于0");
         }
+        return redisTemplate.opsForZSet().incrementScore(key, value, score);
     }
 
     @Override
-    public boolean zsBatchSet(String key, Set<ZSetOperations.TypedTuple<Object>> tuples) {
-        try {
-            redisTemplate.opsForZSet().add(key, tuples);
-            return true;
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            return false;
+    public Double zsDecrScore(String key, Object value, double score) {
+        if (score < 0) {
+            throw new RuntimeException("减少分数必须大于0");
         }
+        return redisTemplate.opsForZSet().incrementScore(key, value, -score);
     }
 
     @Override
-    public Long reverseRank(String key, Object value) {
-        try {
-            return redisTemplate.opsForZSet().reverseRank(key, value);
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            return 0L;
-        }
+    public Long zsBatchSet(String key, Set<ZSetOperations.TypedTuple<Object>> tuples) {
+        return redisTemplate.opsForZSet().add(key, tuples);
     }
 
     @Override
-    public Double score(String key, Object value) {
-        try {
-            return redisTemplate.opsForZSet().score(key, value);
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            return 0D;
-        }
+    public Long zsReverseRank(String key, Object value) {
+        return redisTemplate.opsForZSet().reverseRank(key, value);
     }
 
     @Override
-    public Set<ZSetOperations.TypedTuple<Object>> rangeWithScores(String key, long start, long end) {
-        try {
-            return redisTemplate.opsForZSet().rangeWithScores(key, start, end);
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            return null;
-        }
+    public Double zsScore(String key, Object value) {
+        return redisTemplate.opsForZSet().score(key, value);
     }
 
     @Override
-    public Set<ZSetOperations.TypedTuple<Object>> reverseRangeWithScores(String key, long start, long end) {
-        try {
-            return redisTemplate.opsForZSet().reverseRangeWithScores(key, start, end);
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            return null;
-        }
+    public Set<ZSetOperations.TypedTuple<Object>> zsRangeWithScores(String key, long start, long end) {
+        return redisTemplate.opsForZSet().rangeWithScores(key, start, end);
+    }
+
+    @Override
+    public Set<ZSetOperations.TypedTuple<Object>> zsReverseRangeWithScores(String key, long start, long end) {
+        return redisTemplate.opsForZSet().reverseRangeWithScores(key, start, end);
     }
 
     @Override
@@ -458,63 +300,48 @@ public class RedisClientImpl implements RedisClient {
     }
 
     @Override
+    public StreamInfo.XInfoGroups streamGroups(String stream) {
+        return redisTemplate.opsForStream().groups(stream);
+    }
+
+    @Override
+    public boolean streamCreateGroup(String stream, String group) {
+        String result = redisTemplate.opsForStream().createGroup(stream, group);
+        return "OK".equals(result);
+    }
+
+    @Override
     public RecordId streamAdd(StringRecord record) {
-        try {
-            return redisTemplate.opsForStream().add(record);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return null;
-        }
+        return redisTemplate.opsForStream().add(record);
     }
 
     @Override
     public RecordId streamAdd(Record<String, ?> record) {
-        try {
-            return redisTemplate.opsForStream().add(record);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return null;
-        }
+        return redisTemplate.opsForStream().add(record);
     }
 
     @Override
     public RecordId streamAdd(String stream, Map<String, ?> value) {
-        try {
-            return redisTemplate.opsForStream().add(stream, value);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return null;
-        }
+        return redisTemplate.opsForStream().add(stream, value);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <T> Optional<List<ObjectRecord<String, T>>> streamRead(Class<T> clazz, String stream, RecordId recordId) {
-        try {
-            return Optional.of(redisTemplate.opsForStream().read(clazz, StreamOffset.create(stream, ReadOffset.from(recordId))));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Optional.empty();
-        }
+    public <T> List<ObjectRecord<String, T>> streamRangeAll(Class<T> clazz, String stream) {
+        return streamRange(clazz, stream, Range.unbounded());
+    }
+
+    @Override
+    public <T> List<ObjectRecord<String, T>> streamRange(Class<T> clazz, String stream, Range<String> range) {
+        return redisTemplate.opsForStream().range(clazz, stream, Range.unbounded());
     }
 
     @Override
     public Long streamAck(String group, Record<String, ?> record) {
-        try {
-            return redisTemplate.opsForStream().acknowledge(group, record);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return null;
-        }
+        return redisTemplate.opsForStream().acknowledge(group, record);
     }
 
     @Override
     public Long streamAck(String stream, String group, String... recordIds) {
-        try {
-            return redisTemplate.opsForStream().acknowledge(stream, group, recordIds);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return null;
-        }
+        return redisTemplate.opsForStream().acknowledge(stream, group, recordIds);
     }
 }
