@@ -336,6 +336,16 @@ public class RedisClientImpl implements RedisClient {
     }
 
     @Override
+    public Optional<PendingMessagesSummary> pending(String stream, String group) {
+        return Optional.ofNullable(redisTemplate.opsForStream().pending(stream, group));
+    }
+
+    @Override
+    public PendingMessages pending(String stream, Consumer consumer) {
+        return redisTemplate.opsForStream().pending(stream, consumer);
+    }
+
+    @Override
     public Long streamAck(String group, Record<String, ?> record) {
         return redisTemplate.opsForStream().acknowledge(group, record);
     }

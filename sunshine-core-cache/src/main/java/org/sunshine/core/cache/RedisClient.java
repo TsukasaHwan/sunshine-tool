@@ -493,6 +493,24 @@ public interface RedisClient {
     <T> List<ObjectRecord<String, T>> streamRange(Class<T> clazz, String stream, Range<String> range);
 
     /**
+     * 从指定Stream获取指定组待办消息
+     *
+     * @param stream Stream key
+     * @param group  组
+     * @return PendingMessagesSummary
+     */
+    Optional<PendingMessagesSummary> pending(String stream, String group);
+
+    /**
+     * 从指定Stream获取指定消费者待办消息
+     *
+     * @param stream   Stream key
+     * @param consumer 消费者
+     * @return 待办消息
+     */
+    PendingMessages pending(String stream, Consumer consumer);
+
+    /**
      * Stream确认消息
      *
      * @param group  组
