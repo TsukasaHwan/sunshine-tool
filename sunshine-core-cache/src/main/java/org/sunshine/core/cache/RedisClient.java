@@ -510,4 +510,13 @@ public interface RedisClient {
      * @return Long
      */
     Long streamAck(String stream, String group, String... recordIds);
+
+    /**
+     * 清理指定Stream中的数据
+     *
+     * @param stream Stream key
+     * @param limit  保留数
+     * @return Long
+     */
+    Long streamTrim(String stream, Long limit);
 }

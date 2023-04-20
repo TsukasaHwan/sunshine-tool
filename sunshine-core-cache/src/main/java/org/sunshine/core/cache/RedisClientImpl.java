@@ -344,4 +344,9 @@ public class RedisClientImpl implements RedisClient {
     public Long streamAck(String stream, String group, String... recordIds) {
         return redisTemplate.opsForStream().acknowledge(stream, group, recordIds);
     }
+
+    @Override
+    public Long streamTrim(String stream, Long limit) {
+        return redisTemplate.opsForStream().trim(stream, limit);
+    }
 }
