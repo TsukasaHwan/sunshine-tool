@@ -518,5 +518,5 @@ public interface RedisClient {
      * @param limit  保留数
      * @return Long
      */
-    Long streamTrim(String stream, Long limit);
+    Long streamTrim(String stream, long limit);
 }

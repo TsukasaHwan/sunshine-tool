@@ -346,7 +346,10 @@ public class RedisClientImpl implements RedisClient {
     }
 
     @Override
-    public Long streamTrim(String stream, Long limit) {
+    public Long streamTrim(String stream, long limit) {
+        if (limit < 0) {
+            throw new RuntimeException("流保留数必须大于或等于0");
+        }
         return redisTemplate.opsForStream().trim(stream, limit);
     }
 }
