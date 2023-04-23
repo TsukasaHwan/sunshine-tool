@@ -3,6 +3,7 @@ package org.sunshine.core.cache.redission.util;
 import org.sunshine.core.cache.redission.Locker;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 /**
  * @author Teamo
@@ -83,6 +84,41 @@ public class RedissionLockUtils {
     }
 
     /**
+     * 尝试获取锁
+     *
+     * @param lockKey      锁名称
+     * @param lockConsumer 锁消费者
+     */
+    public static void tryLock(String lockKey, Consumer<Boolean> lockConsumer) {
+        boolean isLocked = false;
+        try {
+            isLocked = tryLock(lockKey);
+            lockConsumer.accept(isLocked);
+        } finally {
+            unlock(isLocked, lockKey);
+        }
+    }
+
+    /**
+     * 尝试获取锁
+     *
+     * @param lockKey       锁名称
+     * @param lockConsumer  锁消费者
+     * @param errorConsumer 异常消费者
+     */
+    public static void tryLock(String lockKey, Consumer<Boolean> lockConsumer, Consumer<Throwable> errorConsumer) {
+        boolean isLocked = false;
+        try {
+            isLocked = tryLock(lockKey);
+            lockConsumer.accept(isLocked);
+        } catch (Exception e) {
+            errorConsumer.accept(e);
+        } finally {
+            unlock(isLocked, lockKey);
+        }
+    }
+
+    /**
      * 尝试获取锁，在给定的waitTime时间内尝试，获取到返回true,获取失败返回false,获取到后再给定的leaseTime时间超时释放
      *
      * @param lockKey   锁名称
@@ -94,6 +130,28 @@ public class RedissionLockUtils {
      */
     public static boolean tryLock(String lockKey, long waitTime, long leaseTime, TimeUnit unit) throws InterruptedException {
         return locker.tryLock(lockKey, waitTime, leaseTime, unit);
+    }
+
+    /**
+     * 尝试获取锁，在给定的waitTime时间内尝试，获取到返回true,获取失败返回false,获取到后再给定的leaseTime时间超时释放
+     *
+     * @param lockKey       锁名称
+     * @param waitTime      等待时长
+     * @param leaseTime     超时释放
+     * @param unit          时间单位
+     * @param lockConsumer  锁消费者
+     * @param errorConsumer 异常消费者
+     */
+    public static void tryLock(String lockKey, long waitTime, long leaseTime, TimeUnit unit, Consumer<Boolean> lockConsumer, Consumer<Throwable> errorConsumer) {
+        boolean isLocked = false;
+        try {
+            isLocked = tryLock(lockKey, waitTime, leaseTime, unit);
+            lockConsumer.accept(isLocked);
+        } catch (Exception e) {
+            errorConsumer.accept(e);
+        } finally {
+            unlock(isLocked, lockKey);
+        }
     }
 
     /**
