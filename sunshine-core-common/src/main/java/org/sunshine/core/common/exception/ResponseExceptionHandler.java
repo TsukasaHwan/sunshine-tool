@@ -1,5 +1,6 @@
 package org.sunshine.core.common.exception;
 
+import com.google.common.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -18,11 +19,9 @@ import org.sunshine.core.tool.api.response.Result;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 统一异常处理类
@@ -40,7 +39,7 @@ public class ResponseExceptionHandler {
      */
     private static Map<Class<? extends Throwable>, ResultCode> exceptions;
 
-    private static final ConcurrentHashMap<Class<? extends Throwable>, ResultCode> BUILDER = new ConcurrentHashMap<>(3);
+    private static final ImmutableMap.Builder<Class<? extends Throwable>, ResultCode> BUILDER = ImmutableMap.builder();
 
     static {
         BUILDER.put(HttpMessageNotReadableException.class, CommonCode.INVALID_PARAM);
@@ -121,7 +120,7 @@ public class ResponseExceptionHandler {
      */
     private Result<Void> handleUnknownException(Exception ex) {
         if (exceptions == null) {
-            exceptions = Collections.unmodifiableMap(BUILDER);
+            exceptions = BUILDER.build();
         }
         // 从EXCEPTIONS中找异常类型所对应的错误代码，如果找到了将错误代码响应给用户，如果找不到给用户响应系统异常
         if (exceptions.get(ex.getClass()) == null) {
