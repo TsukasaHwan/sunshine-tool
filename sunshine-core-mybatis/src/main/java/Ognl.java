@@ -5,6 +5,15 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
+ * Ognl工具类，主要是为了在ognl表达式访问静态方法时可以减少长长的类名称编写
+ * Ognl访问静态方法的表达式： @class@method(args)
+ *
+ * <pre>
+ *   &lt;if test="@Ognl@isNotEmpty(userId)">
+ *  	and user_id = #{userId}
+ *   &lt;/if>
+ * </pre>
+ *
  * @author Teamo
  * @since 2022/02/24
  */
