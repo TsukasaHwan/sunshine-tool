@@ -4,7 +4,6 @@
 CREATE TABLE `sys_operate_log`
 (
     `id`           bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-    `title`        varchar(300)        NULL     DEFAULT NULL COMMENT '日志标题',
     `server_ip`    varchar(20)         NULL     DEFAULT NULL COMMENT '服务器IP',
     `server_host`  varchar(50)         NULL     DEFAULT NULL COMMENT '服务器名',
     `remote_ip`    varchar(20)         NULL     DEFAULT NULL COMMENT '操作IP',
