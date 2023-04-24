@@ -44,8 +44,9 @@ public class BeanUtils extends org.springframework.beans.BeanUtils {
     @SuppressWarnings("unchecked")
     public static <S, T> List<T> copyListProperties(List<S> sources, Supplier<T> target, BeanCallBack<S, T> callBack) {
         List<T> list = new ArrayList<>(sources.size());
+        T t;
         for (S source : sources) {
-            T t = target.get();
+            t = target.get();
             if (source instanceof Map) {
                 t = (T) toBean((Map<String, ?>) source, t.getClass());
             } else {
