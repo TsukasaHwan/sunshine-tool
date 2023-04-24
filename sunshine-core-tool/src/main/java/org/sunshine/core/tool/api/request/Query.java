@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * @author Teamo
  * @since 2020/10/27
  */
-@Schema(description = "查询条件")
+@Schema
 public class Query {
 
     public static final Integer DEFAULT_CURRENT = 1;
