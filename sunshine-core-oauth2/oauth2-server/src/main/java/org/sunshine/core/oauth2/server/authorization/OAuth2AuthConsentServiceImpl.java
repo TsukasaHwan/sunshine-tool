@@ -1,4 +1,4 @@
-package org.sunshine.core.oauth2.authorization;
+package org.sunshine.core.oauth2.server.authorization;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -12,7 +12,7 @@ import org.springframework.security.oauth2.server.authorization.OAuth2Authorizat
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.util.Assert;
-import org.sunshine.core.oauth2.entity.OAuth2AuthConsent;
+import org.sunshine.core.oauth2.server.entity.OAuth2AuthConsent;
 import org.sunshine.core.tool.util.ObjectUtils;
 import org.sunshine.core.tool.util.StringUtils;
 
@@ -50,7 +50,7 @@ public class OAuth2AuthConsentServiceImpl implements OAuth2AuthorizationConsentS
 
     private void insertAuthConsent(OAuth2AuthorizationConsent authorizationConsent) {
         OAuth2AuthConsent oAuth2AuthConsent = new OAuth2AuthConsent();
-        oAuth2AuthConsent.setPrincipalName(oAuth2AuthConsent.getPrincipalName());
+        oAuth2AuthConsent.setPrincipalName(authorizationConsent.getPrincipalName());
         oAuth2AuthConsent.setAuthorities(StringUtils.collectionToCommaDelimitedString(authorizationConsent.getAuthorities()));
         oAuth2AuthConsentMapper.insert(oAuth2AuthConsent);
     }

@@ -1,4 +1,4 @@
-package org.sunshine.core.oauth2.properties;
+package org.sunshine.core.oauth2.server.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

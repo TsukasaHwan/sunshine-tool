@@ -1,10 +1,13 @@
-package org.sunshine.core.oauth2.authorization;
+package org.sunshine.core.oauth2.server.authorization;
 
-import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.dao.DataRetrievalFailureException;
+import org.springframework.security.jackson2.SecurityJackson2Modules;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2RefreshToken;
@@ -17,9 +20,10 @@ import org.springframework.security.oauth2.server.authorization.OAuth2Authorizat
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.jackson2.OAuth2AuthorizationServerJackson2Module;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
-import org.sunshine.core.oauth2.entity.OAuth2Auth;
+import org.sunshine.core.oauth2.server.entity.OAuth2Auth;
 import org.sunshine.core.tool.util.ObjectUtils;
 import org.sunshine.core.tool.util.StringUtils;
 
@@ -27,6 +31,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,6 +40,7 @@ import java.util.Set;
  * @since 2023/4/26
  */
 public class OAuth2AuthServiceImpl implements OAuth2AuthorizationService {
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final BaseMapper<OAuth2Auth> oAuth2AuthMapper;
 
@@ -46,6 +52,11 @@ public class OAuth2AuthServiceImpl implements OAuth2AuthorizationService {
         Assert.notNull(registeredClientRepository, "registeredClientRepository cannot be null");
         this.oAuth2AuthMapper = oAuth2AuthMapper;
         this.registeredClientRepository = registeredClientRepository;
+
+        ClassLoader classLoader = OAuth2AuthServiceImpl.class.getClassLoader();
+        List<Module> securityModules = SecurityJackson2Modules.getModules(classLoader);
+        this.objectMapper.registerModules(securityModules);
+        this.objectMapper.registerModule(new OAuth2AuthorizationServerJackson2Module());
     }
 
     @Override
@@ -126,7 +137,7 @@ public class OAuth2AuthServiceImpl implements OAuth2AuthorizationService {
         oAuth2Auth.setPrincipalName(authorization.getPrincipalName());
         oAuth2Auth.setAuthorizationGrantType(authorization.getAuthorizationGrantType().getValue());
         oAuth2Auth.setAuthorizedScopes(StringUtils.collectionToCommaDelimitedString(authorization.getAuthorizedScopes()));
-        oAuth2Auth.setAttributes(JSON.toJSONString(authorization.getAttributes()));
+        oAuth2Auth.setAttributes(writeMap(authorization.getAttributes()));
         String state = null;
         String authorizationState = authorization.getAttribute(OAuth2ParameterNames.STATE);
         if (StringUtils.isNotBlank(authorizationState)) {
@@ -183,7 +194,7 @@ public class OAuth2AuthServiceImpl implements OAuth2AuthorizationService {
                 .principalName(oAuth2Auth.getPrincipalName())
                 .authorizationGrantType(new AuthorizationGrantType(oAuth2Auth.getAuthorizationGrantType()))
                 .authorizedScopes(authorizedScopes)
-                .attributes((attrs) -> attrs.putAll(JSON.parseObject(oAuth2Auth.getAttributes())));
+                .attributes((attrs) -> attrs.putAll(parseMap(oAuth2Auth.getAttributes())));
 
         String state = oAuth2Auth.getState();
         if (StringUtils.isNotBlank(state)) {
@@ -196,7 +207,7 @@ public class OAuth2AuthServiceImpl implements OAuth2AuthorizationService {
         if (StringUtils.isNotBlank(authorizationCodeValue)) {
             tokenIssuedAt = oAuth2Auth.getAuthorizationCodeIssuedAt().atZone(ZoneId.systemDefault()).toInstant();
             tokenExpiresAt = oAuth2Auth.getAuthorizationCodeExpiresAt().atZone(ZoneId.systemDefault()).toInstant();
-            Map<String, Object> authorizationCodeMetadata = JSON.parseObject(oAuth2Auth.getAuthorizationCodeMetadata());
+            Map<String, Object> authorizationCodeMetadata = parseMap(oAuth2Auth.getAuthorizationCodeMetadata());
 
             OAuth2AuthorizationCode authorizationCode = new OAuth2AuthorizationCode(
                     authorizationCodeValue, tokenIssuedAt, tokenExpiresAt);
@@ -207,7 +218,7 @@ public class OAuth2AuthServiceImpl implements OAuth2AuthorizationService {
         if (StringUtils.isNotBlank(accessTokenValue)) {
             tokenIssuedAt = oAuth2Auth.getAccessTokenIssuedAt().atZone(ZoneId.systemDefault()).toInstant();
             tokenExpiresAt = oAuth2Auth.getAccessTokenExpiresAt().atZone(ZoneId.systemDefault()).toInstant();
-            Map<String, Object> accessTokenMetadata = JSON.parseObject(oAuth2Auth.getAccessTokenMetadata());
+            Map<String, Object> accessTokenMetadata = parseMap(oAuth2Auth.getAccessTokenMetadata());
             OAuth2AccessToken.TokenType tokenType = null;
             if (OAuth2AccessToken.TokenType.BEARER.getValue().equalsIgnoreCase(oAuth2Auth.getAccessTokenType())) {
                 tokenType = OAuth2AccessToken.TokenType.BEARER;
@@ -226,7 +237,7 @@ public class OAuth2AuthServiceImpl implements OAuth2AuthorizationService {
         if (StringUtils.isNotBlank(oidcIdTokenValue)) {
             tokenIssuedAt = oAuth2Auth.getOidcIdTokenIssuedAt().atZone(ZoneId.systemDefault()).toInstant();
             tokenExpiresAt = oAuth2Auth.getOidcIdTokenExpiresAt().atZone(ZoneId.systemDefault()).toInstant();
-            Map<String, Object> oidcTokenMetadata = JSON.parseObject(oAuth2Auth.getOidcIdTokenMetadata());
+            Map<String, Object> oidcTokenMetadata = parseMap(oAuth2Auth.getOidcIdTokenMetadata());
 
             @SuppressWarnings("unchecked")
             OidcIdToken oidcToken = new OidcIdToken(
@@ -242,7 +253,7 @@ public class OAuth2AuthServiceImpl implements OAuth2AuthorizationService {
             if (refreshTokenExpiresAt != null) {
                 tokenExpiresAt = refreshTokenExpiresAt.atZone(ZoneId.systemDefault()).toInstant();
             }
-            Map<String, Object> refreshTokenMetadata = JSON.parseObject(oAuth2Auth.getRefreshTokenMetadata());
+            Map<String, Object> refreshTokenMetadata = parseMap(oAuth2Auth.getRefreshTokenMetadata());
 
             OAuth2RefreshToken refreshToken = new OAuth2RefreshToken(
                     refreshTokenValue, tokenIssuedAt, tokenExpiresAt);
@@ -269,7 +280,7 @@ public class OAuth2AuthServiceImpl implements OAuth2AuthorizationService {
         if (ObjectUtils.isNotEmpty(t.getExpiresAt())) {
             tokenExpiresAt = LocalDateTime.ofInstant(t.getExpiresAt(), ZoneId.systemDefault());
         }
-        metadata = JSON.toJSONString(token.getMetadata());
+        metadata = writeMap(token.getMetadata());
 
         if (t instanceof OAuth2AuthorizationCode) {
             oAuth2Auth.setAuthorizationCodeValue(tokenValue);
@@ -291,6 +302,23 @@ public class OAuth2AuthServiceImpl implements OAuth2AuthorizationService {
             oAuth2Auth.setRefreshTokenIssuedAt(tokenIssuedAt);
             oAuth2Auth.setRefreshTokenExpiresAt(tokenExpiresAt);
             oAuth2Auth.setRefreshTokenMetadata(metadata);
+        }
+    }
+
+    private String writeMap(Map<String, Object> data) {
+        try {
+            return this.objectMapper.writeValueAsString(data);
+        } catch (Exception ex) {
+            throw new IllegalArgumentException(ex.getMessage(), ex);
+        }
+    }
+
+    private Map<String, Object> parseMap(String data) {
+        try {
+            return this.objectMapper.readValue(data, new TypeReference<Map<String, Object>>() {
+            });
+        } catch (Exception ex) {
+            throw new IllegalArgumentException(ex.getMessage(), ex);
         }
     }
 }

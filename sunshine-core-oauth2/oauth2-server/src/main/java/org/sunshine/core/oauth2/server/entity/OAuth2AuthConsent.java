@@ -1,4 +1,4 @@
-package org.sunshine.core.oauth2.entity;
+package org.sunshine.core.oauth2.server.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;

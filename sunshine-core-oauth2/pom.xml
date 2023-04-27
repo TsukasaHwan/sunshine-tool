@@ -8,8 +8,16 @@
         <artifactId>sunshine-tool</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-
     <artifactId>sunshine-core-oauth2</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>oauth2-server</module>
+    </modules>
+
+    <properties>
+        <spring-security-oauth2-server.version>0.4.2</spring-security-oauth2-server.version>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -17,27 +25,7 @@
             <artifactId>sunshine-core-tool</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-
-        <dependency>
-            <groupId>org.sunshine</groupId>
-            <artifactId>sunshine-core-mybatis</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-oauth2-authorization-server</artifactId>
-            <version>${spring-security-oauth2-server.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.mysql</groupId>
-            <artifactId>mysql-connector-j</artifactId>
-        </dependency>
     </dependencies>
+
+
 </project>

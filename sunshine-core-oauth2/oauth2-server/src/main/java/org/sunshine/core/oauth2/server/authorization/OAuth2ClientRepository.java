@@ -1,27 +1,28 @@
-package org.sunshine.core.oauth2.authorization;
+package org.sunshine.core.oauth2.server.authorization;
 
-import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.security.jackson2.SecurityJackson2Modules;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.jackson2.OAuth2AuthorizationServerJackson2Module;
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 import org.springframework.util.Assert;
-import org.sunshine.core.oauth2.entity.OAuth2Client;
+import org.sunshine.core.oauth2.server.entity.OAuth2Client;
 import org.sunshine.core.tool.util.BeanUtils;
 import org.sunshine.core.tool.util.ObjectUtils;
 import org.sunshine.core.tool.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -29,12 +30,18 @@ import java.util.stream.Collectors;
  * @since 2023/4/26
  */
 public class OAuth2ClientRepository implements RegisteredClientRepository {
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final BaseMapper<OAuth2Client> oAuth2ClientMapper;
 
     public OAuth2ClientRepository(BaseMapper<OAuth2Client> oAuth2ClientMapper) {
         Assert.notNull(oAuth2ClientMapper, "oAuth2ClientMapper cannot be null");
         this.oAuth2ClientMapper = oAuth2ClientMapper;
+
+        ClassLoader classLoader = OAuth2ClientRepository.class.getClassLoader();
+        List<Module> securityModules = SecurityJackson2Modules.getModules(classLoader);
+        this.objectMapper.registerModules(securityModules);
+        this.objectMapper.registerModule(new OAuth2AuthorizationServerJackson2Module());
     }
 
     @Override
@@ -65,8 +72,8 @@ public class OAuth2ClientRepository implements RegisteredClientRepository {
                 .set(OAuth2Client::getAuthorizationGrantTypes, StringUtils.collectionToCommaDelimitedString(authorizationGrantTypes))
                 .set(OAuth2Client::getRedirectUris, StringUtils.collectionToCommaDelimitedString(registeredClient.getRedirectUris()))
                 .set(OAuth2Client::getScopes, StringUtils.collectionToCommaDelimitedString(registeredClient.getScopes()))
-                .set(OAuth2Client::getClientSettings, JSON.toJSONString(registeredClient.getClientSettings()))
-                .set(OAuth2Client::getTokenSettings, JSON.toJSONString(registeredClient.getTokenSettings()));
+                .set(OAuth2Client::getClientSettings, writeMap(registeredClient.getClientSettings().getSettings()))
+                .set(OAuth2Client::getTokenSettings, writeMap(registeredClient.getTokenSettings().getSettings()));
         oAuth2ClientMapper.update(null, updateWrapper);
     }
 
@@ -92,8 +99,8 @@ public class OAuth2ClientRepository implements RegisteredClientRepository {
         oAuth2Client.setAuthorizationGrantTypes(StringUtils.collectionToCommaDelimitedString(authorizationGrantTypes));
         oAuth2Client.setRedirectUris(StringUtils.collectionToCommaDelimitedString(registeredClient.getRedirectUris()));
         oAuth2Client.setScopes(StringUtils.collectionToCommaDelimitedString(registeredClient.getScopes()));
-        oAuth2Client.setClientSettings(JSON.toJSONString(registeredClient.getClientSettings()));
-        oAuth2Client.setTokenSettings(JSON.toJSONString(registeredClient.getTokenSettings()));
+        oAuth2Client.setClientSettings(writeMap(registeredClient.getClientSettings().getSettings()));
+        oAuth2Client.setTokenSettings(writeMap(registeredClient.getTokenSettings().getSettings()));
         oAuth2ClientMapper.insert(oAuth2Client);
     }
 
@@ -144,8 +151,8 @@ public class OAuth2ClientRepository implements RegisteredClientRepository {
                 })
                 .redirectUris(redirectUris -> redirectUris.addAll(StringUtils.commaDelimitedListToSet(oAuth2Client.getRedirectUris())))
                 .scopes(scopes -> scopes.addAll(StringUtils.commaDelimitedListToSet(oAuth2Client.getScopes())))
-                .clientSettings(JSON.parseObject(oAuth2Client.getClientSettings(), ClientSettings.class))
-                .tokenSettings(JSON.parseObject(oAuth2Client.getTokenSettings(), TokenSettings.class));
+                .clientSettings(ClientSettings.withSettings(parseMap(oAuth2Client.getClientSettings())).build())
+                .tokenSettings(TokenSettings.withSettings(parseMap(oAuth2Client.getTokenSettings())).build());
 
         if (ObjectUtils.isNotEmpty(oAuth2Client.getClientIdIssuedAt())) {
             builder.clientIdIssuedAt(oAuth2Client.getClientIdIssuedAt().atZone(ZoneId.systemDefault()).toInstant());
@@ -154,5 +161,22 @@ public class OAuth2ClientRepository implements RegisteredClientRepository {
             builder.clientSecretExpiresAt(oAuth2Client.getClientSecretExpiresAt().atZone(ZoneId.systemDefault()).toInstant());
         }
         return builder.build();
+    }
+
+    private String writeMap(Map<String, Object> data) {
+        try {
+            return this.objectMapper.writeValueAsString(data);
+        } catch (Exception ex) {
+            throw new IllegalArgumentException(ex.getMessage(), ex);
+        }
+    }
+
+    private Map<String, Object> parseMap(String data) {
+        try {
+            return this.objectMapper.readValue(data, new TypeReference<Map<String, Object>>() {
+            });
+        } catch (Exception ex) {
+            throw new IllegalArgumentException(ex.getMessage(), ex);
+        }
     }
 }

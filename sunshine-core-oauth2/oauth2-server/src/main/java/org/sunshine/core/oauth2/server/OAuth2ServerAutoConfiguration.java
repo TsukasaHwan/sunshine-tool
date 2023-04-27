@@ -1,4 +1,4 @@
-package org.sunshine.core.oauth2;
+package org.sunshine.core.oauth2.server;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -30,13 +30,13 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.Assert;
-import org.sunshine.core.oauth2.authorization.OAuth2AuthConsentServiceImpl;
-import org.sunshine.core.oauth2.authorization.OAuth2AuthServiceImpl;
-import org.sunshine.core.oauth2.authorization.OAuth2ClientRepository;
-import org.sunshine.core.oauth2.entity.OAuth2Auth;
-import org.sunshine.core.oauth2.entity.OAuth2AuthConsent;
-import org.sunshine.core.oauth2.entity.OAuth2Client;
-import org.sunshine.core.oauth2.properties.OAuth2ServerProperties;
+import org.sunshine.core.oauth2.server.authorization.OAuth2AuthConsentServiceImpl;
+import org.sunshine.core.oauth2.server.authorization.OAuth2AuthServiceImpl;
+import org.sunshine.core.oauth2.server.authorization.OAuth2ClientRepository;
+import org.sunshine.core.oauth2.server.entity.OAuth2Auth;
+import org.sunshine.core.oauth2.server.entity.OAuth2AuthConsent;
+import org.sunshine.core.oauth2.server.entity.OAuth2Client;
+import org.sunshine.core.oauth2.server.properties.OAuth2ServerProperties;
 
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
@@ -51,6 +51,8 @@ import java.util.UUID;
 @ConditionalOnProperty(value = "spring.oauth2.server.enable", havingValue = "true")
 public class OAuth2ServerAutoConfiguration {
 
+    private static final String CUSTOM_CONSENT_PAGE_URI = "/oauth2/consent";
+
     private final OAuth2ServerProperties oAuth2ServerProperties;
 
     public OAuth2ServerAutoConfiguration(OAuth2ServerProperties oAuth2ServerProperties) {
@@ -63,6 +65,7 @@ public class OAuth2ServerAutoConfiguration {
         OAuth2AuthorizationServerConfigurer authorizationServerConfigurer =
                 new OAuth2AuthorizationServerConfigurer();
         authorizationServerConfigurer
+                .authorizationEndpoint(authorizationEndpoint -> authorizationEndpoint.consentPage(CUSTOM_CONSENT_PAGE_URI))
                 // Enable OpenID Connect 1.0
                 .oidc(Customizer.withDefaults());
 

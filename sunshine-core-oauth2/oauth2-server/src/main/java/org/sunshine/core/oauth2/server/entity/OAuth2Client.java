@@ -1,4 +1,4 @@
-package org.sunshine.core.oauth2.entity;
+package org.sunshine.core.oauth2.server.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -20,7 +20,7 @@ public class OAuth2Client {
     /**
      * 客户端ID
      */
-    @TableId(value = "id", type = IdType.ASSIGN_UUID)
+    @TableId(value = "id", type = IdType.NONE)
     private String id;
 
     /**
