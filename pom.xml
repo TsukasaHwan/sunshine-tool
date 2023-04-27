@@ -56,6 +56,8 @@
         <jjwt.version>0.11.5</jjwt.version>
         <easyexcel.version>3.2.1</easyexcel.version>
         <transmittable-thread-local.version>2.14.2</transmittable-thread-local.version>
+        <google.autoservice.version>1.0-rc2</google.autoservice.version>
+        <javapoet.version>1.8.0</javapoet.version>
     </properties>
 
     <dependencyManagement>
