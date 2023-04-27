@@ -8,7 +8,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>enum-conversion</artifactId>
+    <artifactId>enums-conversion</artifactId>
     <version>${parent.version}</version>
     <name>enums-conversion</name>
 

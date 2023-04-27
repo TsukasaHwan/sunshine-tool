@@ -11,7 +11,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>enums-scanner</module>
-        <module>enum-conversion</module>
+        <module>enums-conversion</module>
         <module>enums-core</module>
     </modules>
 
