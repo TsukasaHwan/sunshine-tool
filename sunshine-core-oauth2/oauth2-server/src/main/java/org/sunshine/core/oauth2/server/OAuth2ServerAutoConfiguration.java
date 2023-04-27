@@ -173,14 +173,12 @@ public class OAuth2ServerAutoConfiguration {
     /**
      * token生成器
      *
-     * @param jwtEncoder    JwtEncoder
-     * @param jwtCustomizer OAuth2TokenCustomizer<JwtEncodingContext>
+     * @param jwtEncoder JwtEncoder
      * @return OAuth2TokenGenerator<?>
      */
     @Bean
     @ConditionalOnMissingBean(OAuth2TokenGenerator.class)
-    public OAuth2TokenGenerator<?> tokenGenerator(JwtEncoder jwtEncoder,
-                                                  @Autowired(required = false) OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer) {
+    public OAuth2TokenGenerator<?> tokenGenerator(JwtEncoder jwtEncoder) {
         JwtGenerator jwtGenerator = new JwtGenerator(jwtEncoder);
         OAuth2AccessTokenGenerator accessTokenGenerator = new OAuth2AccessTokenGenerator();
         OAuth2RefreshTokenGenerator refreshTokenGenerator = new OAuth2RefreshTokenGenerator();
