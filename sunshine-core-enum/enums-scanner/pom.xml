@@ -12,8 +12,6 @@
     <version>${parent.version}</version>
     <name>enums-scanner</name>
 
-    <description>Demo project for Spring Boot</description>
-
     <properties>
         <google.autoservice.version>1.0-rc2</google.autoservice.version>
         <javapoet.version>1.8.0</javapoet.version>

@@ -1,22 +1,22 @@
 package org.sunshine.enums.core;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.sunshine.enums.core.mvc.JsonEnumConverter;
-import org.sunshine.enums.core.mvc.MvcConfiguration;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.sunshine.enums.core.mvc.JsonEnumConverter;
+import org.sunshine.enums.core.mvc.MvcConfiguration;
 
 /**
  * @author sneb
  * @description
  * @since 2022-11-09 10:06
  **/
-@Configuration
+@AutoConfiguration
 public class EnumsCoreAutoConfiguration {
 
     @Bean
@@ -34,7 +34,7 @@ public class EnumsCoreAutoConfiguration {
 
     @Bean
     @ConditionalOnClass(WebMvcConfigurer.class)
-    public MvcConfiguration mvcConfiguration(){
+    public MvcConfiguration mvcConfiguration() {
         return new MvcConfiguration();
     }
 }

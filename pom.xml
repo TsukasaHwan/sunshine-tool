@@ -31,6 +31,8 @@
         <module>sunshine-core-log</module>
         <module>sunshine-core-cache</module>
         <module>sunshine-core-mybatis</module>
+        <module>sunshine-core-enum</module>
+        <module>sunshine-core-oauth2</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -40,6 +42,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <spring-boot.version>2.7.11</spring-boot.version>
+        <spring-security-oauth2-server.version>0.4.2</spring-security-oauth2-server.version>
         <guava.version>31.1-jre</guava.version>
 
         <mybatis-plus.version>3.5.3.1</mybatis-plus.version>

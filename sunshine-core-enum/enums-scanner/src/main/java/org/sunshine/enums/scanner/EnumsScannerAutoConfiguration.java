@@ -1,5 +1,11 @@
 package org.sunshine.enums.scanner;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.sunshine.enums.scanner.annotation.EnumScan;
 import org.sunshine.enums.scanner.cached.EnumCache;
 import org.sunshine.enums.scanner.context.EnumScanProperties;
@@ -8,12 +14,6 @@ import org.sunshine.enums.scanner.context.ResourcesScanner;
 import org.sunshine.enums.scanner.context.TypeFilterProvider;
 import org.sunshine.enums.scanner.handler.EnumScanHandler;
 import org.sunshine.enums.scanner.handler.EnumScanHandlerImpl;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.type.filter.AnnotationTypeFilter;
 
 import java.util.List;
 
@@ -22,8 +22,8 @@ import java.util.List;
  * @date: 2020/7/9 10:34
  * @description: starter 的自动装配类
  */
+@AutoConfiguration
 @EnableConfigurationProperties(EnumScanProperties.class)
-@Configuration
 public class EnumsScannerAutoConfiguration {
 
     @Bean

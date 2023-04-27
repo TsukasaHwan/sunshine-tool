@@ -15,6 +15,8 @@
         <module>enums-core</module>
     </modules>
 
+    <artifactId>sunshine-core-enum</artifactId>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -25,13 +27,5 @@
             <artifactId>spring-boot-starter-json</artifactId>
         </dependency>
     </dependencies>
-
-    <artifactId>sunshine-core-enum</artifactId>
-
-    <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 
 </project>
