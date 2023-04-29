@@ -42,6 +42,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <spring-boot.version>2.7.11</spring-boot.version>
+        <spring-security-oauth2-server.version>0.4.2</spring-security-oauth2-server.version>
         <guava.version>31.1-jre</guava.version>
 
         <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
@@ -58,8 +59,8 @@
         <jjwt.version>0.11.5</jjwt.version>
         <easyexcel.version>3.2.1</easyexcel.version>
         <transmittable-thread-local.version>2.14.2</transmittable-thread-local.version>
-        <google.autoservice.version>1.0-rc2</google.autoservice.version>
-        <javapoet.version>1.8.0</javapoet.version>
+        <google.autoservice.version>1.0.1</google.autoservice.version>
+        <javapoet.version>1.12.1</javapoet.version>
     </properties>
 
     <dependencyManagement>

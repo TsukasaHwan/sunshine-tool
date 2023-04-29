@@ -12,11 +12,6 @@
     <version>${parent.version}</version>
     <name>enums-scanner</name>
 
-    <properties>
-        <google.autoservice.version>1.0-rc2</google.autoservice.version>
-        <javapoet.version>1.8.0</javapoet.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.sunshine</groupId>
@@ -24,6 +19,5 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
-
 
 </project>

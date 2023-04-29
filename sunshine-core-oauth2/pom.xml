@@ -15,10 +15,6 @@
         <module>oauth2-server</module>
     </modules>
 
-    <properties>
-        <spring-security-oauth2-server.version>0.4.2</spring-security-oauth2-server.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.sunshine</groupId>

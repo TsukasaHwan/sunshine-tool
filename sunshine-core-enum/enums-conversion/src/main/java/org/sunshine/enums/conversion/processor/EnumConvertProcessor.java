@@ -24,7 +24,7 @@ import java.util.Set;
  */
 @AutoService(Processor.class)
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
-@SupportedAnnotationTypes("annotation.org.sunshine.enums.conversion.EnumAutoConverter")
+@SupportedAnnotationTypes("org.sunshine.enums.conversion.annotation.EnumAutoConverter")
 public class EnumConvertProcessor extends AbstractProcessor {
 
     private Filer filer;
