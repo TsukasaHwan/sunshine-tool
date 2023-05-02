@@ -1,5 +1,6 @@
 package org.sunshine.core.tool.util;
 
+import cn.hutool.core.bean.BeanUtil;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.BeansException;
@@ -207,9 +208,8 @@ public class BeanUtils extends org.springframework.beans.BeanUtils {
      * @param bean 源对象
      * @return {Map}
      */
-    @SuppressWarnings("unchecked")
     public static Map<String, Object> toMap(Object bean) {
-        return BeanMap.create(bean);
+        return BeanUtil.beanToMap(bean);
     }
 
     /**
@@ -221,9 +221,7 @@ public class BeanUtils extends org.springframework.beans.BeanUtils {
      * @return {T}
      */
     public static <T> T toBean(Map<String, ?> beanMap, Class<T> valueType) {
-        T bean = BeanUtils.newInstance(valueType);
-        BeanMap.create(bean).putAll(beanMap);
-        return bean;
+        return BeanUtil.toBean(beanMap, valueType);
     }
 
     /**
