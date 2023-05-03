@@ -513,13 +513,13 @@ public interface RedisClient {
     /**
      * 获取有关消费者组内给定Range的待处理messages的详细信息
      *
-     * @param stream Stream key
-     * @param group  组
-     * @param range  要在其中搜索的消息 ID 范围
-     * @param count  限制结果的数量
+     * @param stream   Stream key
+     * @param consumer 消费者
+     * @param range    要在其中搜索的消息 ID 范围
+     * @param count    限制结果的数量
      * @return 待办消息
      */
-    PendingMessages pending(String stream, String group, Range<?> range, long count);
+    PendingMessages pending(String stream, Consumer consumer, Range<?> range, long count);
 
     /**
      * Stream确认消息
