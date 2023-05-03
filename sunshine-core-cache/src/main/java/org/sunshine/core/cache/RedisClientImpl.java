@@ -333,7 +333,7 @@ public class RedisClientImpl implements RedisClient {
 
     @Override
     public <T> List<ObjectRecord<String, T>> streamRange(Class<T> clazz, String stream, Range<String> range) {
-        return redisTemplate.opsForStream().range(clazz, stream, Range.unbounded());
+        return redisTemplate.opsForStream().range(clazz, stream, range);
     }
 
     @Override
