@@ -1,6 +1,7 @@
 package org.sunshine.core.cache;
 
 import org.springframework.data.domain.Range;
+import org.springframework.data.redis.connection.RedisStreamCommands;
 import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.core.ZSetOperations;
 
@@ -499,7 +500,7 @@ public interface RedisClient {
      * @param group  组
      * @return PendingMessagesSummary
      */
-    Optional<PendingMessagesSummary> pending(String stream, String group);
+    Optional<PendingMessagesSummary> streamPending(String stream, String group);
 
     /**
      * 从指定Stream获取指定消费者待办消息
@@ -508,7 +509,7 @@ public interface RedisClient {
      * @param consumer 消费者
      * @return 待办消息
      */
-    PendingMessages pending(String stream, Consumer consumer);
+    PendingMessages streamPending(String stream, Consumer consumer);
 
     /**
      * 获取有关消费者组内给定Range的待处理messages的详细信息
@@ -519,7 +520,18 @@ public interface RedisClient {
      * @param count    限制结果的数量
      * @return 待办消息
      */
-    PendingMessages pending(String stream, Consumer consumer, Range<?> range, long count);
+    PendingMessages streamPending(String stream, Consumer consumer, Range<?> range, long count);
+
+    /**
+     * 批量将某一个consumer中的消息转到另外一个consumer中
+     *
+     * @param stream        Stream key
+     * @param consumerGroup 组
+     * @param newOwner      新消费者
+     * @param xClaimOptions RedisStreamCommands.XClaimOptions
+     * @return 声明的MapRecords List
+     */
+    List<MapRecord<String, Object, Object>> streamClaim(String stream, String consumerGroup, String newOwner, RedisStreamCommands.XClaimOptions xClaimOptions);
 
     /**
      * Stream确认消息

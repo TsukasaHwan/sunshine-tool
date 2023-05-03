@@ -1,6 +1,7 @@
 package org.sunshine.core.cache;
 
 import org.springframework.data.domain.Range;
+import org.springframework.data.redis.connection.RedisStreamCommands;
 import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
@@ -336,18 +337,23 @@ public class RedisClientImpl implements RedisClient {
     }
 
     @Override
-    public Optional<PendingMessagesSummary> pending(String stream, String group) {
+    public Optional<PendingMessagesSummary> streamPending(String stream, String group) {
         return Optional.ofNullable(redisTemplate.opsForStream().pending(stream, group));
     }
 
     @Override
-    public PendingMessages pending(String stream, Consumer consumer) {
+    public PendingMessages streamPending(String stream, Consumer consumer) {
         return redisTemplate.opsForStream().pending(stream, consumer);
     }
 
     @Override
-    public PendingMessages pending(String stream, Consumer consumer, Range<?> range, long count) {
+    public PendingMessages streamPending(String stream, Consumer consumer, Range<?> range, long count) {
         return redisTemplate.opsForStream().pending(stream, consumer, range, count);
+    }
+
+    @Override
+    public List<MapRecord<String, Object, Object>> streamClaim(String stream, String consumerGroup, String newOwner, RedisStreamCommands.XClaimOptions xClaimOptions) {
+        return redisTemplate.opsForStream().claim(stream, consumerGroup, newOwner, xClaimOptions);
     }
 
     @Override
