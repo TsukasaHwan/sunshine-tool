@@ -30,7 +30,7 @@
         </dependency>
         <dependency>
             <groupId>org.sunshine</groupId>
-            <artifactId>sunshine-core-security</artifactId>
+            <artifactId>security-jwt</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
