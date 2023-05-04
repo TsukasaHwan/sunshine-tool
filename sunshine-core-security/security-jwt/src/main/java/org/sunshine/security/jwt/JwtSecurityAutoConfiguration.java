@@ -9,7 +9,6 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
@@ -57,6 +56,7 @@ public class JwtSecurityAutoConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   UserDetailsService userDetailsService,
                                                    CorsConfigurationSource corsConfigurationSource,
                                                    PermitAllAnnotationSupport jwtPermitAllAnnotationSupport,
                                                    @Autowired(required = false) LogoutSuccessHandler logoutSuccessHandler) throws Exception {
@@ -85,12 +85,12 @@ public class JwtSecurityAutoConfiguration {
         AuthenticationEntryPoint authenticationEntryPoint = new JwtTokenAuthenticationEntryPoint();
         AuthenticationFailureHandler authenticationFailureHandler = new AuthenticationEntryPointFailureHandler(authenticationEntryPoint);
 
-        UserDetailsService userDetailsService = http.getSharedObject(AuthenticationManagerBuilder.class).getDefaultUserDetailsService();
-
         JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(userDetailsService, authenticationFailureHandler, jwtSecurityProperties);
         jwtAuthenticationFilter.setPermitAllAntPatterns(permitAllAntPatterns);
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        http.userDetailsService(userDetailsService);
 
         if (logoutSuccessHandler != null) {
             http.logout().logoutUrl(jwtSecurityProperties.getLogoutPath()).logoutSuccessHandler(logoutSuccessHandler);
