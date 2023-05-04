@@ -1,8 +1,9 @@
-package org.sunshine.core.cache.support.task;
+package org.sunshine.core.cache.support.scheduling;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sunshine.core.cache.redission.util.RedissionLockUtils;
+import org.sunshine.core.tool.util.Try;
 
 /**
  * 分布式定时任务接口
@@ -11,8 +12,9 @@ import org.sunshine.core.cache.redission.util.RedissionLockUtils;
  * @since 2021/11/10
  */
 @FunctionalInterface
-public interface ScheduledTask {
-    Logger log = LoggerFactory.getLogger(ScheduledTask.class);
+public interface DistributedTaskScheduling {
+
+    Logger log = LoggerFactory.getLogger(DistributedTaskScheduling.class);
 
     /**
      * 运行业务逻辑
@@ -27,16 +29,10 @@ public interface ScheduledTask {
      * @param lockKey 锁名称
      */
     default void executeLogic(String lockKey) {
-        boolean lock = false;
-        try {
-            lock = RedissionLockUtils.tryLock(lockKey);
+        RedissionLockUtils.tryLock(lockKey, Try.accept(lock -> {
             if (lock) {
                 this.taskLogic();
             }
-        } catch (Exception e) {
-            log.error("Execution of distributed task exception:", e);
-        } finally {
-            RedissionLockUtils.unlock(lock, lockKey);
-        }
+        }), throwable -> log.error(throwable.getMessage(), throwable));
     }
 }
