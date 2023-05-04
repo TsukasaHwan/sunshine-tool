@@ -9,7 +9,6 @@
     </parent>
 
     <artifactId>enums-conversion</artifactId>
-    <version>${parent.version}</version>
     <name>enums-conversion</name>
 
     <dependencies>
