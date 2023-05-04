@@ -22,6 +22,7 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.util.Assert;
+import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.sunshine.security.core.DefaultSecurityConfiguration;
 import org.sunshine.security.core.support.PermitAllAnnotationSupport;
@@ -56,7 +57,7 @@ public class JwtSecurityAutoConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                   UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource,
+                                                   CorsConfigurationSource corsConfigurationSource,
                                                    PermitAllAnnotationSupport jwtPermitAllAnnotationSupport,
                                                    @Autowired(required = false) LogoutSuccessHandler logoutSuccessHandler) throws Exception {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
@@ -106,6 +107,7 @@ public class JwtSecurityAutoConfiguration {
         // Prevent iframe content from being displayed
         http.headers().frameOptions().disable();
 
+        UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = (UrlBasedCorsConfigurationSource) corsConfigurationSource;
         urlBasedCorsConfigurationSource.getCorsConfigurations().forEach((s, configuration) -> {
             List<String> allowedHeaders = configuration.getAllowedHeaders();
             if (allowedHeaders != null && !allowedHeaders.contains(jwtSecurityProperties.getHeader())) {

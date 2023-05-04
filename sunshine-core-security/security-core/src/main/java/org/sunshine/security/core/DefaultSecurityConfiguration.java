@@ -47,8 +47,7 @@ public class DefaultSecurityConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(CorsConfigurationSource.class)
-    public UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource() {
+    public CorsConfigurationSource corsConfigurationSource() {
         List<String> allowMethod = Arrays.asList(
                 HttpMethod.GET.name(),
                 HttpMethod.HEAD.name(),
