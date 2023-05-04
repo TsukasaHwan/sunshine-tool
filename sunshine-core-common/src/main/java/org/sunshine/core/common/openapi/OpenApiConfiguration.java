@@ -13,8 +13,8 @@ import org.springdoc.core.customizers.OpenApiCustomiser;
 import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.util.Assert;
-import org.sunshine.core.security.util.JwtClaimsUtils;
 import org.sunshine.core.tool.api.code.CommonCode;
+import org.sunshine.security.jwt.util.JwtClaimsUtils;
 
 import java.util.Arrays;
 
