@@ -101,10 +101,8 @@ public class JwtSecurityAutoConfiguration {
                 .accessDeniedHandler(new JwtTokenAccessDeniedHandler())
         );
 
-        // Turn off csrf protection
         http.csrf().disable();
 
-        // Prevent iframe content from being displayed
         http.headers().frameOptions().disable();
 
         UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = (UrlBasedCorsConfigurationSource) corsConfigurationSource;
@@ -115,7 +113,6 @@ public class JwtSecurityAutoConfiguration {
             }
         });
 
-        // Turn on cross-domain support
         http.cors().configurationSource(urlBasedCorsConfigurationSource);
 
         return http.build();
