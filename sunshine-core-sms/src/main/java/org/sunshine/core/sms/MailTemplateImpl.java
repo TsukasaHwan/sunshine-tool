@@ -16,7 +16,7 @@ import java.util.Arrays;
  * @author Teamo
  * @since 2023/5/5
  */
-public class SimpleMailTemplate implements MailTemplate {
+public class MailTemplateImpl implements MailTemplate {
 
     private final JavaMailSender javaMailSender;
 
@@ -25,7 +25,7 @@ public class SimpleMailTemplate implements MailTemplate {
         System.setProperty("mail.mime.charset", "UTF-8");
     }
 
-    public SimpleMailTemplate(JavaMailSender javaMailSender) {
+    public MailTemplateImpl(JavaMailSender javaMailSender) {
         this.javaMailSender = javaMailSender;
     }
 

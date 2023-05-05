@@ -6,8 +6,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.sunshine.core.sms.MailTemplate;
-import org.sunshine.core.sms.SimpleMailTemplate;
 
 /**
  * @author Teamo
@@ -21,6 +19,6 @@ public class MailAutoConfiguration {
     @ConditionalOnBean(JavaMailSender.class)
     @ConditionalOnMissingBean(MailTemplate.class)
     public MailTemplate mailTemplate(JavaMailSender javaMailSender) {
-        return new SimpleMailTemplate(javaMailSender);
+        return new MailTemplateImpl(javaMailSender);
     }
 }
