@@ -58,7 +58,7 @@
         <aliyun.oss.version>3.16.0</aliyun.oss.version>
 
         <jjwt.version>0.11.5</jjwt.version>
-        <easyexcel.version>3.2.1</easyexcel.version>
+        <easyexcel.version>3.3.0</easyexcel.version>
         <transmittable-thread-local.version>2.14.2</transmittable-thread-local.version>
         <google.autoservice.version>1.0.1</google.autoservice.version>
         <javapoet.version>1.12.1</javapoet.version>
