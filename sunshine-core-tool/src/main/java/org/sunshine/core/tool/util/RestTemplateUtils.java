@@ -117,7 +117,7 @@ public class RestTemplateUtils {
      *
      * @param url          请求URL
      * @param responseType 返回对象类型
-     * @return
+     * @return ResponseEntity 响应对象封装类
      */
     public static <T> ResponseEntity<T> post(String url, Class<T> responseType) {
         return getRestTemplate().postForEntity(url, HttpEntity.EMPTY, responseType);
