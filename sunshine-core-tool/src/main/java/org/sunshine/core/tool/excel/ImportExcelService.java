@@ -21,14 +21,15 @@ public interface ImportExcelService<T> {
     /**
      * 读取excel
      *
-     * @param service 服务类class
-     * @param clazz   excel class
-     * @param files   导入的文件
+     * @param beanClass spring bean class
+     * @param clazz     excel class
+     * @param files     导入的文件
      * @throws IOException IOException
      */
-    default void doConvert(Class<? extends ImportExcelService<T>> service, Class<T> clazz, MultipartFile... files) throws IOException {
+    default void doConvert(Class<? extends ImportExcelService<T>> beanClass, Class<T> clazz, MultipartFile... files) throws IOException {
         Assert.notNull(files, "MultipartFile must not be null");
-        ImportExcelService<T> bean = SpringUtils.getBean(service);
+        ImportExcelService<T> bean = SpringUtils.getBean(beanClass);
+        Assert.notNull(bean, "ImportExcelService bean must not be null");
         ImportEventListener<T> importListener;
         InputStream inputStream;
         for (MultipartFile file : files) {
