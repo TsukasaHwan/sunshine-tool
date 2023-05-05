@@ -24,7 +24,7 @@ public class Fastjson2TypeHandler extends AbstractJsonTypeHandler<Object> {
 
     public Fastjson2TypeHandler(Class<?> type) {
         if (log.isTraceEnabled()) {
-            log.trace("FastjsonTypeHandler(" + type + ")");
+            log.trace("Fastjson2TypeHandler(" + type + ")");
         }
         Assert.notNull(type, "Type argument cannot be null");
         this.type = type;
