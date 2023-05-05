@@ -9,7 +9,7 @@ import org.sunshine.core.sms.model.SmsSender;
 public interface SmsTemplate {
 
     /**
-     * 发生短信
+     * 发送短信
      *
      * @param smsSender {@link SmsSender}
      * @return 是否成功
