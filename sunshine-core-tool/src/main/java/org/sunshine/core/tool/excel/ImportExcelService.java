@@ -2,7 +2,6 @@ package org.sunshine.core.tool.excel;
 
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.context.AnalysisContext;
-import com.alibaba.excel.read.builder.ExcelReaderBuilder;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 import org.sunshine.core.tool.util.SpringUtils;
@@ -35,8 +34,7 @@ public interface ImportExcelService<T> {
         for (MultipartFile file : files) {
             importListener = new ImportEventListener<>(bean);
             inputStream = new BufferedInputStream(file.getInputStream());
-            ExcelReaderBuilder builder = EasyExcel.read(inputStream, clazz, importListener);
-            builder.doReadAll();
+            EasyExcel.read(inputStream, clazz, importListener).doReadAll();
         }
     }
 
