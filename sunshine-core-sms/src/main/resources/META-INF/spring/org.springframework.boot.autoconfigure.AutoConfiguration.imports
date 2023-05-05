@@ -1,1 +1,2 @@
 org.sunshine.core.sms.AliSmsAutoConfiguration
+org.sunshine.core.sms.MailAutoConfiguration
