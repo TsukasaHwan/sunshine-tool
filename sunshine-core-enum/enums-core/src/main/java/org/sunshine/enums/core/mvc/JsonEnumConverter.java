@@ -2,10 +2,10 @@ package org.sunshine.enums.core.mvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import org.sunshine.enums.core.serializer.JsonEnumDeserializer;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.sunshine.enums.core.serializer.JsonEnumDeserializer;
 
 /**
  * @author: Teamo
@@ -14,7 +14,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
  */
 public class JsonEnumConverter implements ApplicationListener<ContextRefreshedEvent> {
 
-    private MappingJackson2HttpMessageConverter httpMessageConverter;
+    private final MappingJackson2HttpMessageConverter httpMessageConverter;
     private ObjectMapper objectMapper;
 
     public JsonEnumConverter(MappingJackson2HttpMessageConverter httpMessageConverter, ObjectMapper objectMapper) {
@@ -27,7 +27,7 @@ public class JsonEnumConverter implements ApplicationListener<ContextRefreshedEv
         SimpleModule simpleModule = new SimpleModule();
         simpleModule.addDeserializer(Enum.class, new JsonEnumDeserializer());
 
-        if (objectMapper != null){
+        if (objectMapper != null) {
             objectMapper.registerModule(simpleModule);
         }
 

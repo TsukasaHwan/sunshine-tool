@@ -35,7 +35,7 @@ public class ExtensionClassPathScanningCandidateComponentProvider extends ClassP
     /**
      * 上下文环境
      */
-    private ApplicationContext context;
+    private final ApplicationContext context;
 
 
     public ExtensionClassPathScanningCandidateComponentProvider(boolean useDefaultFilters,

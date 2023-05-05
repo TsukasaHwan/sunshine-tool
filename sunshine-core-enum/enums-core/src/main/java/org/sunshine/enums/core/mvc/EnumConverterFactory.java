@@ -14,24 +14,23 @@ import java.util.Map;
  **/
 public class EnumConverterFactory implements ConverterFactory<String, CodeEnum> {
 
-    private static final Map<Class<?>, Converter> converterMap = new HashMap<>();
+    private static final Map<Class<?>, Converter> CONVERTER_MAP = new HashMap<>();
 
     @Override
     public <T extends CodeEnum> Converter<String, T> getConverter(Class<T> aClass) {
-        Converter<String, T> converter = converterMap.get(aClass);
+        Converter<String, T> converter = CONVERTER_MAP.get(aClass);
         if (converter == null) {
             converter = new StringToEnumConverter<>(aClass);
-            converterMap.put(aClass, converter);
+            CONVERTER_MAP.put(aClass, converter);
         }
         return converter;
     }
-
 
 }
 
 class StringToEnumConverter<T extends CodeEnum> implements Converter<String, T> {
 
-    private Map<String, T> enumMap = new HashMap<>();
+    private final Map<String, T> enumMap = new HashMap<>();
 
     StringToEnumConverter(Class<T> enumType) {
         T[] enums = enumType.getEnumConstants();

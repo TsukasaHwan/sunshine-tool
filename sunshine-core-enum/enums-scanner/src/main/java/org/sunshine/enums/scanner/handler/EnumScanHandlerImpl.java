@@ -22,12 +22,12 @@ public class EnumScanHandlerImpl implements EnumScanHandler {
     /**
      * 码表缓存
      */
-    private EnumCache cache;
+    private final EnumCache cache;
 
     /**
      * 资源扫描器
      */
-    private ResourcesScanner<Class<?>> resourcesScanner;
+    private final ResourcesScanner<Class<?>> resourcesScanner;
 
 
     public EnumScanHandlerImpl(EnumCache cache, ResourcesScanner<Class<?>> resourcesScanner) {

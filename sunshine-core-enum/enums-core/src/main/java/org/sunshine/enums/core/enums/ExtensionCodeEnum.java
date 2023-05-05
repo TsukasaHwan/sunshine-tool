@@ -7,6 +7,7 @@ package org.sunshine.enums.core.enums;
  **/
 public interface ExtensionCodeEnum extends CodeEnum {
 
+    @Override
     default Integer code() {
         return getCode();
     }
@@ -16,6 +17,7 @@ public interface ExtensionCodeEnum extends CodeEnum {
      *
      * @return 枚举的值
      */
+    @Override
     default String value() {
         return getName();
     }

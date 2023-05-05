@@ -36,18 +36,18 @@ public interface EnumCache {
      */
     class DefaultMemoryEnumCache implements EnumCache {
 
-        private static Map<String, List<CodeTable>> cache = new ConcurrentHashMap<>();
+        private static final Map<String, List<CodeTable>> CACHE = new ConcurrentHashMap<>();
 
         private final static String ENUM_CACHE_KEY = "enum_cache_key_1219";
 
         @Override
         public void write(List<CodeTable> codeEnums) {
-            cache.put(ENUM_CACHE_KEY, codeEnums);
+            CACHE.put(ENUM_CACHE_KEY, codeEnums);
         }
 
         @Override
         public List<CodeTable> read() {
-            return cache.get(ENUM_CACHE_KEY);
+            return CACHE.get(ENUM_CACHE_KEY);
         }
     }
 }

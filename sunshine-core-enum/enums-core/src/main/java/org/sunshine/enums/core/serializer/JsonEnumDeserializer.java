@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
-import org.sunshine.enums.core.enums.CodeEnum;
 import org.springframework.util.StringUtils;
+import org.sunshine.enums.core.enums.CodeEnum;
 
 import java.io.IOException;
 import java.util.regex.Pattern;
@@ -17,6 +17,8 @@ import java.util.regex.Pattern;
  * @description: 枚举反序列化
  */
 public class JsonEnumDeserializer extends JsonDeserializer<Enum<?>> implements ContextualDeserializer {
+
+    private static final Pattern PATTERN = Pattern.compile("^[-\\+]?[\\d]*$");
 
     /**
      * 枚举类的class
@@ -34,7 +36,7 @@ public class JsonEnumDeserializer extends JsonDeserializer<Enum<?>> implements C
     @Override
     public Enum<?> deserialize(JsonParser p, DeserializationContext context) throws IOException {
 
-        if (!StringUtils.isEmpty(p.getText()) && CodeEnum.class.isAssignableFrom(clazz) && isInteger(p.getText())) {
+        if (StringUtils.hasText(p.getText()) && CodeEnum.class.isAssignableFrom(clazz) && isInteger(p.getText())) {
             return (Enum<?>) CodeEnum.valueOf(clazz, Integer.valueOf(p.getText()));
         }
 
@@ -64,8 +66,7 @@ public class JsonEnumDeserializer extends JsonDeserializer<Enum<?>> implements C
      * @return 是整数返回true, 否则返回false
      */
     public static boolean isInteger(String str) {
-        Pattern pattern = Pattern.compile("^[-\\+]?[\\d]*$");
-        return pattern.matcher(str).matches();
+        return PATTERN.matcher(str).matches();
     }
 
     public Class getClazz() {
