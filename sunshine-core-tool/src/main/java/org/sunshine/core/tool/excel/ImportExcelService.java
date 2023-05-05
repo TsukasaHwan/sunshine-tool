@@ -26,7 +26,7 @@ public interface ImportExcelService<T> {
      * @param files   导入的文件
      * @throws IOException IOException
      */
-    default void doRead(Class<? extends ImportExcelService<T>> service, Class<T> clazz, MultipartFile... files) throws IOException {
+    default void doConvert(Class<? extends ImportExcelService<T>> service, Class<T> clazz, MultipartFile... files) throws IOException {
         Assert.notNull(files, "MultipartFile must not be null");
         ImportExcelService<T> bean = SpringUtils.getBean(service);
         ImportEventListener<T> importListener;
