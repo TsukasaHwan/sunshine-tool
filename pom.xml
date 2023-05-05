@@ -32,6 +32,8 @@
         <module>sunshine-core-cache</module>
         <module>sunshine-core-mybatis</module>
         <module>sunshine-core-enum</module>
+        <module>sunshine-core-oss</module>
+        <module>sunshine-core-sms</module>
     </modules>
     <packaging>pom</packaging>
 
