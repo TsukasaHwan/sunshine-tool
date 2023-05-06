@@ -11,7 +11,7 @@ import java.util.Collection;
 public interface BaseService<T> extends IService<T> {
 
     /**
-     * 插入（批量）
+     * 插入（批量）仅适用于mysql
      *
      * @param entityList 实体对象集合
      * @return 是否成功
