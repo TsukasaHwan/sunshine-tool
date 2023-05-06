@@ -1,0 +1,20 @@
+package org.sunshine.core.mp.service;
+
+import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.Collection;
+
+/**
+ * @author Teamo
+ * @since 2023/5/6
+ */
+public interface BaseService<T> extends IService<T> {
+
+    /**
+     * 插入（批量）
+     *
+     * @param entityList 实体对象集合
+     * @return 是否成功
+     */
+    boolean saveBatchSomeColumn(Collection<T> entityList);
+}
