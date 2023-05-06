@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.sunshine.core.mp.extension.injector.InsertBatchSqlInjector;
 import org.sunshine.core.mp.extension.plugin.DynamicTableNameHandler;
 import org.sunshine.core.mp.extension.plugin.DynamicTableSuffixContextHolder;
 import org.sunshine.core.mp.handler.CreateModifyMetaObjectHandler;
@@ -40,5 +41,11 @@ public class MybatisPlusAutoConfiguration {
     @ConditionalOnMissingBean(MetaObjectHandler.class)
     public MetaObjectHandler metaObjectHandler() {
         return new CreateModifyMetaObjectHandler();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(InsertBatchSqlInjector.class)
+    public InsertBatchSqlInjector insertBatchSqlInjector() {
+        return new InsertBatchSqlInjector();
     }
 }
