@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.core.exceptions.MybatisPlusException;
 import com.baomidou.mybatisplus.generator.FastAutoGenerator;
 import com.baomidou.mybatisplus.generator.config.OutputFile;
+import com.baomidou.mybatisplus.generator.config.builder.Entity;
 import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
 import com.baomidou.mybatisplus.generator.fill.Column;
 import org.sunshine.core.tool.util.StringUtils;
@@ -34,26 +35,32 @@ public class MyBatisPlusFastAutoGenerator {
                 // 模板引擎配置
                 .templateEngine(new FreemarkerTemplateEngine())
                 // 策略配置
-                .strategyConfig((scanner, builder) -> builder
-                        .addTablePrefix(scanner.apply("表前缀："))
-                        .addInclude(getTables(scanner.apply("请输入表名，多个英文逗号分隔？所有输入 all：")))
-                        .entityBuilder()
-                        .enableLombok()
-                        .disableSerialVersionUID()
-                        .addTableFills(new Column(scanner.apply("创建时间字段名："), FieldFill.INSERT), new Column(scanner.apply("修改时间字段名："), FieldFill.INSERT_UPDATE))
-                        .logicDeleteColumnName(scanner.apply("逻辑删除字段名："))
-                        .enableFileOverride()
-                        .serviceBuilder()
-                        .formatServiceFileName("%sService")
-                        .formatServiceImplFileName("%sServiceImpl")
-                        .enableFileOverride()
-                        .mapperBuilder()
-                        .enableBaseResultMap()
-                        .enableBaseColumnList()
-                        .formatMapperFileName("%sMapper")
-                        .formatXmlFileName("%sMapper")
-                        .enableFileOverride()
-                        .build())
+                .strategyConfig((scanner, builder) -> {
+                    Entity.Builder entityBuilder = builder
+                            .addTablePrefix(scanner.apply("表前缀："))
+                            .addInclude(getTables(scanner.apply("请输入表名，多个英文逗号分隔？所有输入 all：")))
+                            .entityBuilder()
+                            .enableLombok()
+                            .disableSerialVersionUID()
+                            .addTableFills(new Column(scanner.apply("创建时间字段名："), FieldFill.INSERT), new Column(scanner.apply("修改时间字段名："), FieldFill.INSERT_UPDATE));
+
+                    String logicDeleteColumnName = scanner.apply("逻辑删除字段名：");
+                    entityBuilder.addTableFills(new Column(logicDeleteColumnName, FieldFill.INSERT));
+
+                    entityBuilder.logicDeleteColumnName(logicDeleteColumnName)
+                            .enableFileOverride()
+                            .serviceBuilder()
+                            .formatServiceFileName("%sService")
+                            .formatServiceImplFileName("%sServiceImpl")
+                            .enableFileOverride()
+                            .mapperBuilder()
+                            .enableBaseResultMap()
+                            .enableBaseColumnList()
+                            .formatMapperFileName("%sMapper")
+                            .formatXmlFileName("%sMapper")
+                            .enableFileOverride()
+                            .build();
+                })
                 .execute();
     }
 

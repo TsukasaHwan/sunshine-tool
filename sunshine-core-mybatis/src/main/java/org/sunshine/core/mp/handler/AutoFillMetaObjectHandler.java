@@ -11,7 +11,8 @@ import java.util.function.Supplier;
  * @author Teamo
  * @since 2020/6/8
  */
-public class CreateModifyMetaObjectHandler implements MetaObjectHandler {
+public class AutoFillMetaObjectHandler implements MetaObjectHandler {
+
     /**
      * 自动填充创建时间字段名
      */
@@ -22,6 +23,11 @@ public class CreateModifyMetaObjectHandler implements MetaObjectHandler {
      */
     private String modifyFiledName = "gmtModified";
 
+    /**
+     * 自动填充逻辑删除字段名
+     */
+    private String isDeleteFiledName = "isDelete";
+
     @Override
     public void insertFill(MetaObject metaObject) {
         if (metaObject.hasSetter(createFiledName)) {
@@ -29,6 +35,9 @@ public class CreateModifyMetaObjectHandler implements MetaObjectHandler {
         }
         if (metaObject.hasSetter(modifyFiledName)) {
             this.strictInsertFill(metaObject, modifyFiledName, LocalDateTime.class, LocalDateTime.now());
+        }
+        if (metaObject.hasSetter(isDeleteFiledName)) {
+            this.strictInsertFill(metaObject, isDeleteFiledName, Boolean.class, Boolean.FALSE);
         }
     }
 
@@ -54,5 +63,9 @@ public class CreateModifyMetaObjectHandler implements MetaObjectHandler {
 
     public void setModifyFiledName(String modifyFiledName) {
         this.modifyFiledName = modifyFiledName;
+    }
+
+    public void setIsDeleteFiledName(String isDeleteFiledName) {
+        this.isDeleteFiledName = isDeleteFiledName;
     }
 }
