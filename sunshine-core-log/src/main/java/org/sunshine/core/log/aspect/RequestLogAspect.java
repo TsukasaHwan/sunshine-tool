@@ -69,13 +69,14 @@ public class RequestLogAspect {
             }
             RequestBody requestBody = methodParameter.getParameterAnnotation(RequestBody.class);
             String parameterName = methodParameter.getParameterName();
+            RequestParam requestParam = methodParameter.getParameterAnnotation(RequestParam.class);
+            if (Objects.nonNull(requestParam) && StringUtils.isNotEmpty(requestParam.value())) {
+                parameterName = requestParam.value();
+            }
             Object value = args[i];
             if (Objects.nonNull(requestBody) && Objects.nonNull(value)) {
                 paramMap.putAll(BeanMap.create(value));
                 continue;
-            }
-            if (value instanceof List) {
-                value = ((List<?>) value).get(0);
             }
             if (value instanceof HttpServletRequest) {
                 paramMap.putAll(((HttpServletRequest) value).getParameterMap());
@@ -110,24 +111,18 @@ public class RequestLogAspect {
                 }
                 if (isSkip.get()) {
                     paramMap.put(parameterName, "此参数不能序列化为json");
+                } else {
+                    paramMap.put(parameterName, list);
                 }
             } else {
-                RequestParam requestParam = methodParameter.getParameterAnnotation(RequestParam.class);
-                String paraName;
-                if (Objects.nonNull(requestParam) && StringUtils.isNotEmpty(requestParam.value())) {
-                    paraName = requestParam.value();
-                } else {
-                    paraName = methodParameter.getParameterName();
-                }
-
                 Field field = null;
                 if (Objects.nonNull(value)) {
                     field = ReflectUtils.findField(value.getClass(), null, MultipartFile.class);
                 }
                 if (Objects.nonNull(field)) {
-                    paramMap.put(paraName, "此参数不能序列化为json");
+                    paramMap.put(parameterName, "此参数不能序列化为json");
                 } else {
-                    paramMap.put(paraName, value);
+                    paramMap.put(parameterName, value);
                 }
             }
         }
