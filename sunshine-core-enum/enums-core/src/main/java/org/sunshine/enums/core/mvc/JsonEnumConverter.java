@@ -31,9 +31,7 @@ public class JsonEnumConverter implements ApplicationListener<ContextRefreshedEv
             objectMapper.registerModule(simpleModule);
         }
 
-        if (httpMessageConverter != null) {
-            objectMapper = httpMessageConverter.getObjectMapper();
-        }
+        objectMapper = httpMessageConverter.getObjectMapper();
 
         objectMapper.registerModule(simpleModule);
         httpMessageConverter.setObjectMapper(objectMapper);

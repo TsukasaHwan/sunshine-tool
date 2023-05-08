@@ -2,6 +2,11 @@ package org.sunshine.enums.core.enums;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 /**
  * @author: Teamo
  * @date: 2020/1/13 13:43
@@ -25,21 +30,26 @@ public interface CodeEnum {
     String value();
 
     /**
-     * 通过code 获取枚举值
+     * 通过code获取枚举值
      *
      * @param enumType   默认的枚举查询转换方法
-     * @param i          枚举标识
+     * @param code       枚举标识
      * @param <EnumType> 枚举类型
      * @return 枚举
      */
-    static <EnumType extends CodeEnum> EnumType valueOf(Class<EnumType> enumType, Integer i) {
-        for (EnumType ele : enumType.getEnumConstants()) {
-            if (ele.code().equals(i)) {
-                return ele;
-            }
-        }
-        // 检索不到返回null值
-        return null;
+    static <EnumType extends CodeEnum> Optional<EnumType> valueOf(Class<EnumType> enumType, Integer code) {
+        return Arrays.stream(enumType.getEnumConstants()).filter(ele -> ele.code().equals(code)).findFirst();
     }
 
+    /**
+     * 通过value获取枚举值
+     *
+     * @param enumType   默认的枚举查询转换方法
+     * @param value      枚举的值
+     * @param <EnumType> 枚举类型
+     * @return 枚举列表
+     */
+    static <EnumType extends CodeEnum> List<EnumType> valueOf(Class<EnumType> enumType, String value) {
+        return Arrays.stream(enumType.getEnumConstants()).filter(ele -> ele.value().equals(value)).collect(Collectors.toList());
+    }
 }

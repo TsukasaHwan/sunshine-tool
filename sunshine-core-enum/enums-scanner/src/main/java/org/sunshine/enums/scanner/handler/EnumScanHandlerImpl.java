@@ -1,5 +1,7 @@
 package org.sunshine.enums.scanner.handler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sunshine.enums.core.enums.CodeEnum;
 import org.sunshine.enums.scanner.annotation.EnumScan;
 import org.sunshine.enums.scanner.cached.EnumCache;
@@ -18,6 +20,8 @@ import java.util.stream.Collectors;
  * @description: 使用码表扫描, 就需要创建一个EnumCache的实现类, 并设置为BEAN
  */
 public class EnumScanHandlerImpl implements EnumScanHandler {
+
+    public static final Logger log = LoggerFactory.getLogger(EnumScanHandlerImpl.class);
 
     /**
      * 码表缓存
@@ -63,7 +67,7 @@ public class EnumScanHandlerImpl implements EnumScanHandler {
                             clazz.getName()));
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error(e.getMessage(), e);
             }
         });
         cache.write(codeEnums);
