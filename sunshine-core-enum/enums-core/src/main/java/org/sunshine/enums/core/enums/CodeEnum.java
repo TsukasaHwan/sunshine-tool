@@ -49,7 +49,7 @@ public interface CodeEnum {
      * @param <EnumType> 枚举类型
      * @return 枚举列表
      */
-    static <EnumType extends CodeEnum> List<EnumType> valueOf(Class<EnumType> enumType, String value) {
+    static <EnumType extends CodeEnum> List<EnumType> of(Class<EnumType> enumType, String value) {
         return Arrays.stream(enumType.getEnumConstants()).filter(ele -> ele.value().equals(value)).collect(Collectors.toList());
     }
 }
