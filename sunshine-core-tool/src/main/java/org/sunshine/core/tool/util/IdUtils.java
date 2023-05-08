@@ -7,7 +7,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * @author Teamo
  * @since 2023/2/7
  */
-public class IdUtil {
+public class IdUtils {
 
     public static UUID fastUUID() {
         ThreadLocalRandom random = ThreadLocalRandom.current();

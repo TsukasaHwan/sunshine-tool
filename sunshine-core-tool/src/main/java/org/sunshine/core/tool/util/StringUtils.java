@@ -150,7 +150,7 @@ public class StringUtils extends org.springframework.util.StringUtils {
      * @return UUID
      */
     public static String randomUUID() {
-        return IdUtil.fastUUID().toString().replace(StringPool.DASH, StringPool.EMPTY);
+        return IdUtils.fastUUID().toString().replace(StringPool.DASH, StringPool.EMPTY);
     }
 
     /**
