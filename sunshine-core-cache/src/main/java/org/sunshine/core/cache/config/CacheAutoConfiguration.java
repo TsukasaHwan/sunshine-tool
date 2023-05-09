@@ -126,8 +126,12 @@ public class CacheAutoConfiguration {
         } else if (redisSerializer instanceof FastJsonRedisSerializer) {
             FastJsonRedisSerializer<?> fastJsonRedisSerializer = (FastJsonRedisSerializer<?>) redisSerializer;
             FastJsonConfig fastJsonConfig = fastJsonRedisSerializer.getFastJsonConfig();
-            fastJsonConfig.setReaderFeatures(JSONReader.Feature.FieldBased, JSONReader.Feature.SupportAutoType);
-            fastJsonConfig.setWriterFeatures(JSONWriter.Feature.WriteClassName);
+            fastJsonConfig.setReaderFeatures(
+                    JSONReader.Feature.FieldBased,
+                    JSONReader.Feature.SupportArrayToBean,
+                    JSONReader.Feature.SupportAutoType
+            );
+            fastJsonConfig.setWriterFeatures(JSONWriter.Feature.WriteClassName, JSONWriter.Feature.WriteMapNullValue);
         } else {
             log.warn("Did not find what you need RedisSerializer, please confirm the correctness of the RedisSerializer!");
         }

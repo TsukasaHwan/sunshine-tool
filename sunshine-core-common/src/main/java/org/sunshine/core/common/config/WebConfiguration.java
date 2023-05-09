@@ -59,12 +59,8 @@ public class WebConfiguration implements WebMvcConfigurer {
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         FastJsonHttpMessageConverter fastJsonConverter = new FastJsonHttpMessageConverter();
         FastJsonConfig config = new FastJsonConfig();
-        config.setReaderFeatures(JSONReader.Feature.FieldBased);
-        config.setWriterFeatures(
-                JSONWriter.Feature.WriteNullStringAsEmpty,
-                JSONWriter.Feature.WriteMapNullValue,
-                JSONWriter.Feature.WriteNullListAsEmpty
-        );
+        config.setReaderFeatures(JSONReader.Feature.FieldBased, JSONReader.Feature.SupportArrayToBean);
+        config.setWriterFeatures(JSONWriter.Feature.WriteMapNullValue);
         config.setWriterFilters(new DataMaskJsonFilter());
         //处理中文乱码问题
         List<MediaType> fastMediaTypes = new ArrayList<>(2);
