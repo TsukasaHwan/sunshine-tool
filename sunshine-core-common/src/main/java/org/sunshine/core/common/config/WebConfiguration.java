@@ -59,7 +59,7 @@ public class WebConfiguration implements WebMvcConfigurer {
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         FastJsonHttpMessageConverter fastJsonConverter = new FastJsonHttpMessageConverter();
         FastJsonConfig config = new FastJsonConfig();
-        config.setReaderFeatures(JSONReader.Feature.FieldBased, JSONReader.Feature.SupportArrayToBean);
+        config.setReaderFeatures(JSONReader.Feature.FieldBased);
         config.setWriterFeatures(
                 JSONWriter.Feature.WriteNullStringAsEmpty,
                 JSONWriter.Feature.WriteMapNullValue,
