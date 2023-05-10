@@ -8,8 +8,9 @@ public class SmsSender {
 
     /**
      * 电话号码
+     * 支持以逗号分隔的形式进行批量调用，批量上限为1000个手机号码
      */
-    private final String phone;
+    private final String[] phoneNumbers;
 
     /**
      * 签名名称
@@ -31,8 +32,8 @@ public class SmsSender {
      */
     private final String outId;
 
-    SmsSender(String phone, String signName, String templateCode, String templateParam, String outId) {
-        this.phone = phone;
+    SmsSender(String[] phoneNumbers, String signName, String templateCode, String templateParam, String outId) {
+        this.phoneNumbers = phoneNumbers;
         this.signName = signName;
         this.templateCode = templateCode;
         this.templateParam = templateParam;
@@ -43,8 +44,8 @@ public class SmsSender {
         return new Builder();
     }
 
-    public String getPhone() {
-        return phone;
+    public String[] getPhoneNumbers() {
+        return phoneNumbers;
     }
 
     public String getSignName() {
@@ -64,17 +65,22 @@ public class SmsSender {
     }
 
     public static class Builder {
-        private String phone;
+
+        private String[] phoneNumbers;
+
         private String signName;
+
         private String templateCode;
+
         private String templateParam;
+
         private String outId;
 
         Builder() {
         }
 
-        public Builder phone(String phone) {
-            this.phone = phone;
+        public Builder phoneNumbers(String... phoneNumbers) {
+            this.phoneNumbers = phoneNumbers;
             return this;
         }
 
@@ -99,7 +105,7 @@ public class SmsSender {
         }
 
         public SmsSender build() {
-            return new SmsSender(this.phone, this.signName, this.templateCode, this.templateParam, this.outId);
+            return new SmsSender(this.phoneNumbers, this.signName, this.templateCode, this.templateParam, this.outId);
         }
     }
 }

@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 import org.sunshine.core.sms.model.SmsSender;
+import org.sunshine.core.tool.util.StringPool;
 
 import java.util.Objects;
 
@@ -22,6 +23,8 @@ public class AliSmsTemplate implements SmsTemplate {
 
     private static final String OK = "OK";
 
+    private static final int PHONE_NUMBERS_LIMIT = 1000;
+
     private final Client client;
 
     public AliSmsTemplate(Client client) {
@@ -31,8 +34,14 @@ public class AliSmsTemplate implements SmsTemplate {
     @Override
     public boolean sendSms(SmsSender smsSender) {
         Assert.notNull(smsSender, "SmsSender must not be null!");
+        String[] phoneNumbers = smsSender.getPhoneNumbers();
+        Assert.notEmpty(phoneNumbers, "Phone numbers must not be null!");
+        if (phoneNumbers.length > PHONE_NUMBERS_LIMIT) {
+            throw new IllegalArgumentException("The number of mobile phone numbers cannot be greater than 1000");
+        }
+
         SendSmsRequest sendSmsRequest = new SendSmsRequest()
-                .setPhoneNumbers(smsSender.getPhone())
+                .setPhoneNumbers(String.join(StringPool.COMMA, phoneNumbers))
                 .setSignName(smsSender.getSignName())
                 .setTemplateCode(smsSender.getTemplateCode())
                 .setTemplateParam(smsSender.getTemplateParam())
