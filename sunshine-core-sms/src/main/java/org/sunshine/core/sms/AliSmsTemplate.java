@@ -61,7 +61,7 @@ public class AliSmsTemplate implements SmsTemplate {
         }
         String message = body.getMessage();
         if (!OK.equals(message)) {
-            log.info("Alibaba Cloud fails to send SMS:{}", JSON.toJSONString(body));
+            log.warn("Alibaba Cloud fails to send SMS:{}", JSON.toJSONString(body));
         }
         return OK.equals(message);
     }
