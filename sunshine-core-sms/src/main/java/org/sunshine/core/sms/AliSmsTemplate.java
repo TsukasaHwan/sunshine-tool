@@ -35,7 +35,7 @@ public class AliSmsTemplate implements SmsTemplate {
     public boolean sendSms(SmsSender smsSender) {
         Assert.notNull(smsSender, "SmsSender must not be null!");
         String[] phoneNumbers = smsSender.getPhoneNumbers();
-        Assert.notEmpty(phoneNumbers, "Phone numbers must not be null!");
+        Assert.notEmpty(phoneNumbers, "Phone numbers must not be empty!");
         if (phoneNumbers.length > PHONE_NUMBERS_LIMIT) {
             throw new IllegalArgumentException("The number of mobile phone numbers cannot be greater than 1000");
         }
