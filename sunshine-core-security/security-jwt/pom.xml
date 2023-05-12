@@ -10,7 +10,6 @@
     </parent>
 
     <artifactId>security-jwt</artifactId>
-    <version>${project.parent.version}</version>
 
     <dependencies>
         <dependency>
