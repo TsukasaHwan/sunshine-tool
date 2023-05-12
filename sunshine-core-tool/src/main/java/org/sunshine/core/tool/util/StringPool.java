@@ -12,6 +12,7 @@ public interface StringPool {
     String ASTERISK = "*";
     String STAR = ASTERISK;
     String SLASH = "/";
+    char CHAR_SLASH = '/';
     char BACK_SLASH = '\\';
     String DOUBLE_SLASH = "#//";
     String COLON = ":";
@@ -19,6 +20,7 @@ public interface StringPool {
     String DASH = "-";
     String DOLLAR = "$";
     String DOT = ".";
+    char CHAR_DOT = '.';
     String EMPTY = "";
     String EMPTY_JSON = "{}";
     String EQUALS = "=";

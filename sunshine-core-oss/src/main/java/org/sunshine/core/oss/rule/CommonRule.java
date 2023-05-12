@@ -1,7 +1,7 @@
 package org.sunshine.core.oss.rule;
 
-import cn.hutool.core.io.file.FileNameUtil;
 import org.sunshine.core.tool.util.DateUtils;
+import org.sunshine.core.tool.util.FileNameUtils;
 import org.sunshine.core.tool.util.StringPool;
 import org.sunshine.core.tool.util.StringUtils;
 
@@ -18,6 +18,6 @@ public class CommonRule implements OssRule {
 
     @Override
     public String fileName(String originalFilename) {
-        return "upload" + StringPool.SLASH + DateUtils.date().toString(DateUtils.SLASH_DATE_FORMAT) + StringPool.SLASH + StringUtils.randomUUID() + StringPool.DOT + FileNameUtil.extName(originalFilename);
+        return "upload" + StringPool.SLASH + DateUtils.format(DateUtils.date(), "yyyy/MM/dd") + StringPool.SLASH + StringUtils.randomUUID() + StringPool.DOT + FileNameUtils.extName(originalFilename);
     }
 }

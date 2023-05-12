@@ -15,6 +15,7 @@ import java.util.stream.Stream;
  * @since 2023/01/11
  */
 public class StringUtils extends org.springframework.util.StringUtils {
+
     public static final int INDEX_NOT_FOUND = -1;
 
     /**
@@ -1409,6 +1410,58 @@ public class StringUtils extends org.springframework.util.StringUtils {
         if (null == str) {
             return defaultValue;
         }
-        return String.valueOf(str);
+        return str.toString();
+    }
+
+    /**
+     * 是否以指定字符串结尾
+     *
+     * @param str    被监测字符串
+     * @param suffix 结尾字符串
+     * @return 是否以指定字符串结尾
+     */
+    public static boolean endWith(CharSequence str, CharSequence suffix) {
+        return endWith(str, suffix, false);
+    }
+
+    /**
+     * 是否以指定字符串结尾<br>
+     * 如果给定的字符串和开头字符串都为null则返回true，否则任意一个值为null返回false
+     *
+     * @param str        被监测字符串
+     * @param suffix     结尾字符串
+     * @param ignoreCase 是否忽略大小写
+     * @return 是否以指定字符串结尾
+     */
+    public static boolean endWith(CharSequence str, CharSequence suffix, boolean ignoreCase) {
+        return endWith(str, suffix, ignoreCase, false);
+    }
+
+    /**
+     * 是否以指定字符串结尾<br>
+     * 如果给定的字符串和开头字符串都为null则返回true，否则任意一个值为null返回false
+     *
+     * @param str          被监测字符串
+     * @param suffix       结尾字符串
+     * @param ignoreCase   是否忽略大小写
+     * @param ignoreEquals 是否忽略字符串相等的情况
+     * @return 是否以指定字符串结尾
+     */
+    public static boolean endWith(CharSequence str, CharSequence suffix, boolean ignoreCase, boolean ignoreEquals) {
+        if (null == str || null == suffix) {
+            if (ignoreEquals) {
+                return false;
+            }
+            return null == str && null == suffix;
+        }
+
+        final int strOffset = str.length() - suffix.length();
+        boolean isEndWith = str.toString()
+                .regionMatches(ignoreCase, strOffset, suffix.toString(), 0, suffix.length());
+
+        if (isEndWith) {
+            return (!ignoreEquals) || (!equals(str, suffix, ignoreCase));
+        }
+        return false;
     }
 }

@@ -1,6 +1,5 @@
 package org.sunshine.core.log.aspect;
 
-import cn.hutool.core.date.SystemClock;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -22,9 +21,9 @@ public class OperateLogAspect {
 
     @Around("@annotation(operateLog)")
     public Object doAfter(ProceedingJoinPoint point, OperateLog operateLog) throws Throwable {
-        long beginTime = SystemClock.now();
+        long beginTime = System.currentTimeMillis();
         Object proceed = point.proceed();
-        long time = SystemClock.now() - beginTime;
+        long time = System.currentTimeMillis() - beginTime;
         logExecutor.execute(point, operateLog, time);
         return proceed;
     }

@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
  * @author Teamo
  */
 public class RegexUtils {
+
     /**
      * 用户名
      */
@@ -76,6 +77,20 @@ public class RegexUtils {
     }
 
     /**
+     * 编译传入正则表达式在字符串中寻找，如果匹配到则为true
+     *
+     * @param pattern      正则
+     * @param beTestString 字符串
+     * @return {boolean}
+     */
+    public static boolean find(Pattern pattern, String beTestString) {
+        if (null == pattern || null == beTestString) {
+            return false;
+        }
+        return pattern.matcher(beTestString).find();
+    }
+
+    /**
      * 编译传入正则表达式在字符串中寻找，如果找到返回第一个结果
      * 找不到返回null
      *
@@ -107,4 +122,18 @@ public class RegexUtils {
         return regex.matcher(text).replaceAll(replacement);
     }
 
+    /**
+     * 删除匹配的全部内容
+     *
+     * @param pattern 正则
+     * @param content 被匹配的内容
+     * @return 删除后剩余的内容
+     */
+    public static String delAll(Pattern pattern, CharSequence content) {
+        if (null == pattern || StringUtils.isEmpty(content)) {
+            return StringUtils.toStr(content, null);
+        }
+
+        return pattern.matcher(content).replaceAll(StringPool.EMPTY);
+    }
 }
