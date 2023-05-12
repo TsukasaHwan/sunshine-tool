@@ -1,6 +1,5 @@
 package org.sunshine.core.oss;
 
-import cn.hutool.core.io.file.FileNameUtil;
 import com.alibaba.fastjson2.JSON;
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.common.utils.BinaryUtil;
@@ -15,6 +14,7 @@ import org.sunshine.core.oss.model.PutOssFile;
 import org.sunshine.core.oss.props.OssProperties;
 import org.sunshine.core.oss.rule.OssRule;
 import org.sunshine.core.tool.util.Exceptions;
+import org.sunshine.core.tool.util.FileNameUtils;
 import org.sunshine.core.tool.util.StringPool;
 
 import java.io.IOException;
@@ -137,7 +137,7 @@ public class AliOssTemplate implements OssTemplate {
 
     public PutOssFile put(String bucketName, InputStream stream, String key, boolean cover) {
         makeBucket(bucketName);
-        ObjectMetadata objectMetadata = getObjectMetadata(FileNameUtil.extName(key));
+        ObjectMetadata objectMetadata = getObjectMetadata(FileNameUtils.extName(key));
         String originalName = key;
         key = getFileName(key);
         // 覆盖上传

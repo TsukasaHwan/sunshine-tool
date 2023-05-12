@@ -49,7 +49,6 @@ public class FileNameUtils {
      *
      * @param file 文件
      * @return 文件名
-     * @since 4.1.13
      */
     public static String getName(File file) {
         return (null != file) ? file.getName() : null;
@@ -64,7 +63,6 @@ public class FileNameUtils {
      *
      * @param filePath 文件
      * @return 文件名
-     * @since 4.1.13
      */
     public static String getName(String filePath) {
         if (null == filePath) {
@@ -99,7 +97,6 @@ public class FileNameUtils {
      * @param file 文件
      * @return 扩展名
      * @see #extName(File)
-     * @since 5.3.8
      */
     public static String getSuffix(File file) {
         return extName(file);
@@ -111,7 +108,6 @@ public class FileNameUtils {
      * @param fileName 文件名
      * @return 扩展名
      * @see #extName(String)
-     * @since 5.3.8
      */
     public static String getSuffix(String fileName) {
         return extName(fileName);
@@ -123,7 +119,6 @@ public class FileNameUtils {
      * @param file 文件
      * @return 主文件名
      * @see #mainName(File)
-     * @since 5.3.8
      */
     public static String getPrefix(File file) {
         return mainName(file);
@@ -135,7 +130,6 @@ public class FileNameUtils {
      * @param fileName 完整文件名
      * @return 主文件名
      * @see #mainName(String)
-     * @since 5.3.8
      */
     public static String getPrefix(String fileName) {
         return mainName(fileName);
@@ -169,7 +163,6 @@ public class FileNameUtils {
             return fileName;
         }
 
-        //issue#2642，多级扩展名的主文件名
         for (final CharSequence specialSuffix : SPECIAL_SUFFIX) {
             if (StringUtils.endWith(fileName, "." + specialSuffix)) {
                 return StringUtils.subPre(fileName, len - specialSuffix.length() - 1);

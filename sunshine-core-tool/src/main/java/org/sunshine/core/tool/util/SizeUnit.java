@@ -1,5 +1,7 @@
 package org.sunshine.core.tool.util;
 
+import java.text.DecimalFormat;
+
 /**
  * Representation of basic size units，just like TimeUnit.
  * <p>
@@ -36,6 +38,8 @@ public enum SizeUnit {
      * Number of megabytes per gigabyte.
      */
     private final double MEGABYTES_PER_GIGABYTE = 1024.0;
+
+    public static final String[] UNIT_NAMES = new String[]{"B", "KB", "MB", "GB", "TB", "PB", "EB"};
 
     /**
      * Returns the number of bytes corresponding to the provided input for a particular unit of memory.
@@ -143,5 +147,21 @@ public enum SizeUnit {
                 throw new RuntimeException("No value '" + this + "' recognized for enum MemoryUnit.");
         }
         return gigabytes;
+    }
+
+    /**
+     * 可读的文件大小<br>
+     * 参考 <a href="http://stackoverflow.com/questions/3263892/format-file-size-as-mb-gb-etc"/>
+     *
+     * @param size Long类型大小
+     * @return 大小
+     */
+    public static String format(long size) {
+        if (size <= 0) {
+            return "0";
+        }
+        int digitGroups = Math.min(UNIT_NAMES.length - 1, (int) (Math.log10(size) / Math.log10(1024)));
+        return new DecimalFormat("#,##0.##")
+                       .format(size / Math.pow(1024, digitGroups)) + " " + UNIT_NAMES[digitGroups];
     }
 }
