@@ -9,9 +9,7 @@
     </parent>
 
     <artifactId>enums-core</artifactId>
-
-    <name>enums-core</name>
-    <description>core code from enum spring boot starter</description>
+    <version>${project.parent.version}</version>
 
     <dependencies>
         <dependency>

@@ -11,6 +11,7 @@
     </parent>
 
     <artifactId>sunshine-core-tool</artifactId>
+    <version>${project.parent.version}</version>
 
     <dependencies>
         <dependency>

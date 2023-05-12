@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>security-oauth2-server</artifactId>
+    <version>${project.parent.version}</version>
 
     <dependencies>
         <dependency>

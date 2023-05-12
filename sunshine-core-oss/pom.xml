@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>sunshine-core-oss</artifactId>
+    <version>${project.parent.version}</version>
 
     <dependencies>
         <dependency>

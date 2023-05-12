@@ -16,6 +16,7 @@
     </modules>
 
     <artifactId>sunshine-core-enum</artifactId>
+    <version>${project.parent.version}</version>
 
     <dependencies>
         <dependency>

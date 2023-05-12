@@ -11,6 +11,7 @@
     </parent>
 
     <artifactId>sunshine-core-security</artifactId>
+    <version>${project.parent.version}</version>
     <packaging>pom</packaging>
     <modules>
         <module>security-core</module>

@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>enums-scanner</artifactId>
-    <name>enums-scanner</name>
+    <version>${project.parent.version}</version>
 
     <dependencies>
         <dependency>

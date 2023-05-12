@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>security-core</artifactId>
+    <version>${project.parent.version}</version>
 
     <dependencies>
         <dependency>
