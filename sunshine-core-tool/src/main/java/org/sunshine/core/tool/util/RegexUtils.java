@@ -11,6 +11,11 @@ import java.util.regex.Pattern;
 public class RegexUtils {
 
     /**
+     * 中文
+     */
+    public static final String CHINESE = "[\\u4e00-\\u9fa5]+";
+
+    /**
      * 用户名
      */
     public static final String USER_NAME = "^[a-zA-Z\\u4E00-\\u9FA5][a-zA-Z0-9_\\u4E00-\\u9FA5]{1,11}$";
@@ -28,7 +33,7 @@ public class RegexUtils {
     /**
      * 手机号
      */
-    public static final String PHONE = "^1[3456789]\\d{9}$";
+    public static final String PHONE = "^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$";
 
     /**
      * 手机号或者邮箱
