@@ -3,6 +3,7 @@ package org.sunshine.core.tool.util;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Objects;
 
 /**
@@ -29,5 +30,11 @@ public class ReflectUtils extends ReflectionUtils {
         }
         field.setAccessible(true);
         return getField(field, obj);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T invokeMethod(Object obj, String methodName) {
+        Method method = findMethod(obj.getClass(), methodName);
+        return method == null ? null : (T) invokeMethod(method, obj);
     }
 }
