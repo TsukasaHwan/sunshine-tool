@@ -52,7 +52,7 @@ public class ObjectUtils extends org.springframework.util.ObjectUtils {
         T result = cloneArray(obj);
         if (null == result) {
             if (obj instanceof Cloneable) {
-                result = ReflectUtils.invokeMethod(obj, "clone");
+                result = ReflectionUtils.invokeMethod(obj, "clone");
             } else {
                 result = cloneByStream(obj);
             }

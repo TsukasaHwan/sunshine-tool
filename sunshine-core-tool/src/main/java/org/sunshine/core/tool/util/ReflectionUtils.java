@@ -1,7 +1,6 @@
 package org.sunshine.core.tool.util;
 
 import org.springframework.util.Assert;
-import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -11,7 +10,7 @@ import java.util.Objects;
  * @author Teamo
  * @since 2020/6/11
  */
-public class ReflectUtils extends ReflectionUtils {
+public class ReflectionUtils extends org.springframework.util.ReflectionUtils {
 
     /**
      * 查找对象的指定字段名称的属性值

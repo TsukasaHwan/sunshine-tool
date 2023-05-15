@@ -8,7 +8,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.util.Assert;
 import org.sunshine.core.cache.annotation.DistributedLock;
 import org.sunshine.core.cache.redission.util.RedissionLockUtils;
-import org.sunshine.core.tool.util.ReflectUtils;
+import org.sunshine.core.tool.util.ReflectionUtils;
 import org.sunshine.core.tool.util.StringUtils;
 
 import java.lang.reflect.Method;
@@ -83,7 +83,7 @@ public class DistributedLockAspect {
         if (StringUtils.isEmpty(param) || arg == null) {
             return null;
         }
-        return ReflectUtils.getPropertyValue(arg, param);
+        return ReflectionUtils.getPropertyValue(arg, param);
     }
 
     private Object lock(ProceedingJoinPoint pjp, final String lockName, DistributedLock distributedLock) throws Throwable {

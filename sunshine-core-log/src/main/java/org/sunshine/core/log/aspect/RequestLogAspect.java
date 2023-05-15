@@ -23,7 +23,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MultipartFile;
-import org.sunshine.core.tool.util.ReflectUtils;
+import org.sunshine.core.tool.util.ReflectionUtils;
 import org.sunshine.core.tool.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -117,7 +117,7 @@ public class RequestLogAspect {
             } else {
                 Field field = null;
                 if (Objects.nonNull(value)) {
-                    field = ReflectUtils.findField(value.getClass(), null, MultipartFile.class);
+                    field = ReflectionUtils.findField(value.getClass(), null, MultipartFile.class);
                 }
                 if (Objects.nonNull(field)) {
                     paramMap.put(parameterName, "此参数不能序列化为json");
