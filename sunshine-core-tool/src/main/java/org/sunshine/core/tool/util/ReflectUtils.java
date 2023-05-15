@@ -1,5 +1,6 @@
 package org.sunshine.core.tool.util;
 
+import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
@@ -32,9 +33,23 @@ public class ReflectUtils extends ReflectionUtils {
         return getField(field, obj);
     }
 
+    /**
+     * 执行对象中指定方法
+     *
+     * @param <T>        返回对象类型
+     * @param obj        方法所在对象
+     * @param methodName 方法名
+     * @param args       参数列表
+     * @return 执行结果
+     */
     @SuppressWarnings("unchecked")
-    public static <T> T invokeMethod(Object obj, String methodName) {
+    public static <T> T invokeMethod(Object obj, String methodName, Object... args) {
+        Assert.notNull(obj, "Object to get method must be not null!");
+        Assert.notNull(methodName, "Method name must be not blank!");
         Method method = findMethod(obj.getClass(), methodName);
-        return method == null ? null : (T) invokeMethod(method, obj);
+        if (method == null) {
+            throw new NullPointerException("No such method: [" + methodName + "] from [" + obj.getClass() + "]");
+        }
+        return (T) invokeMethod(method, obj, args);
     }
 }
