@@ -1,8 +1,12 @@
-package org.sunshine.core.mp.support;
+package org.sunshine.core.tool.support;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.SortBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.sunshine.core.tool.api.request.Query;
@@ -14,6 +18,7 @@ import org.sunshine.core.tool.util.StringUtils;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * 分页工具
@@ -34,10 +39,10 @@ public class Condition {
         String ascs = query.getAscs();
         String descs = query.getDescs();
         if (StringUtils.isNotBlank(ascs)) {
-            page.addOrder(OrderItem.ascs(getUnderlineColumns(ascs.split(StringPool.COMMA))));
+            page.addOrder(OrderItem.ascs(getUnderlineColumns(StringUtils.delimitedListToStringArray(ascs, StringPool.COMMA))));
         }
         if (StringUtils.isNotBlank(descs)) {
-            page.addOrder(OrderItem.descs(getUnderlineColumns(descs.split(StringPool.COMMA))));
+            page.addOrder(OrderItem.descs(getUnderlineColumns(StringUtils.delimitedListToStringArray(descs, StringPool.COMMA))));
         }
         return page;
     }
@@ -54,12 +59,38 @@ public class Condition {
         String ascs = query.getAscs();
         String descs = query.getDescs();
         if (StringUtils.isNotBlank(ascs)) {
-            pageRequest = pageRequest.withSort(Sort.Direction.ASC, getUnderlineColumns(ascs.split(StringPool.COMMA)));
+            pageRequest = pageRequest.withSort(Sort.Direction.ASC, getUnderlineColumns(StringUtils.delimitedListToStringArray(ascs, StringPool.COMMA)));
         }
         if (StringUtils.isNotBlank(descs)) {
-            pageRequest = pageRequest.withSort(Sort.Direction.DESC, getUnderlineColumns(descs.split(StringPool.COMMA)));
+            pageRequest = pageRequest.withSort(Sort.Direction.DESC, getUnderlineColumns(StringUtils.delimitedListToStringArray(descs, StringPool.COMMA)));
         }
         return pageRequest;
+    }
+
+    /**
+     * 转化成elasticsearch中的分页SearchSourceBuilder
+     *
+     * @param query 查询条件
+     * @return SearchSourceBuilder
+     */
+    public static SearchSourceBuilder getPageSearchSourceBuilder(Query query) {
+        checkQuery(query);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.from((query.getCurrent() - 1) * query.getSize());
+        searchSourceBuilder.size(query.getSize());
+        String ascs = query.getAscs();
+        String descs = query.getDescs();
+        if (StringUtils.isNotBlank(ascs)) {
+            String[] columns = StringUtils.delimitedListToStringArray(ascs, StringPool.COMMA);
+            List<SortBuilder<?>> sorts = Arrays.stream(columns).map(column -> SortBuilders.fieldSort(StringUtils.cleanIdentifier(column)).order(SortOrder.ASC)).collect(Collectors.toList());
+            searchSourceBuilder.sort(sorts);
+        }
+        if (StringUtils.isNotBlank(descs)) {
+            String[] columns = StringUtils.delimitedListToStringArray(descs, StringPool.COMMA);
+            List<SortBuilder<?>> sorts = Arrays.stream(columns).map(column -> SortBuilders.fieldSort(StringUtils.cleanIdentifier(column)).order(SortOrder.DESC)).collect(Collectors.toList());
+            searchSourceBuilder.sort(sorts);
+        }
+        return searchSourceBuilder;
     }
 
     /**
@@ -107,6 +138,6 @@ public class Condition {
      * @return 排序列表
      */
     private static String[] getUnderlineColumns(String[] columns) {
-        return Arrays.stream(columns).map(StringUtils::humpToUnderline).toArray(String[]::new);
+        return Arrays.stream(columns).map(column -> StringUtils.humpToUnderline(StringUtils.cleanIdentifier(column))).toArray(String[]::new);
     }
 }
