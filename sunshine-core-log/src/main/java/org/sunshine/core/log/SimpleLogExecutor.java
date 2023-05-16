@@ -35,8 +35,6 @@ public class SimpleLogExecutor implements LogExecutor {
 
         if (ObjectUtils.isNotEmpty(principal) && StringUtils.isNotEmpty(principal.getUsername())) {
             operateLog.setCreateBy(principal.getUsername());
-        } else {
-            operateLog.setCreateBy("anonymous");
         }
 
         LogAbstractUtils.addRequestInfoToLog(WebUtils.getRequest(), operateLog);
