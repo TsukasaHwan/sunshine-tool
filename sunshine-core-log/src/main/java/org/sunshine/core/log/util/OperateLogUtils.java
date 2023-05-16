@@ -13,7 +13,7 @@ import java.util.Map;
  * @author Teamo
  * @since 2023/5/16
  */
-public class LogUtils extends LogAbstractUtils {
+public class OperateLogUtils extends LogAbstractUtils {
 
     /**
      * 添加系统日志
