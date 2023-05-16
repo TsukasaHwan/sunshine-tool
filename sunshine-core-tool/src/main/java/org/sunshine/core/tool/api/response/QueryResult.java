@@ -1,13 +1,10 @@
 package org.sunshine.core.tool.api.response;
 
-import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.elasticsearch.search.SearchHits;
 import org.springframework.data.domain.Page;
 import org.sunshine.core.tool.api.request.Query;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -74,16 +71,6 @@ public class QueryResult<T> implements Response {
         this.total = page.getNumberOfElements();
     }
 
-    private QueryResult(Query query, SearchHits searchHits, Class<T> clazz) {
-        List<T> records = new ArrayList<>(searchHits.getHits().length);
-        searchHits.forEach(documentFields -> records.add(JSON.parseObject(documentFields.getSourceAsString(), clazz)));
-        this.records = records;
-        this.current = query.getCurrent();
-        this.size = query.getSize();
-        this.total = searchHits.getTotalHits().value;
-        this.pages = this.total % this.size == 0 ? (this.total / this.size) : (this.total / this.size + 1);
-    }
-
     /**
      * 返回空的QueryResult
      *
@@ -115,19 +102,6 @@ public class QueryResult<T> implements Response {
      */
     public static <T> QueryResult<T> newQueryResult(IPage<T> iPage) {
         return new QueryResult<>(iPage);
-    }
-
-    /**
-     * 返回QueryResult
-     *
-     * @param query      搜索条件
-     * @param searchHits 命中数据
-     * @param clazz      类class
-     * @param <T>        泛型
-     * @return QueryResult
-     */
-    public static <T> QueryResult<T> newQueryResult(Query query, SearchHits searchHits, Class<T> clazz) {
-        return new QueryResult<>(query, searchHits, clazz);
     }
 
     public List<T> getRecords() {
