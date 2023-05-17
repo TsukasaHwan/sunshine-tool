@@ -90,6 +90,7 @@ public class JwtClaimsUtils {
         // .deserializeJsonWith(new JacksonDeserializer(Maps.of(USER_INFO_KEY, UserInfo.class).build()))
         return Jwts.parserBuilder()
                 .setSigningKey(properties.getSecret().getPublicKey())
+                .setAllowedClockSkewSeconds(properties.getAllowedClockSkew().getSeconds())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
