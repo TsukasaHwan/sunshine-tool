@@ -46,7 +46,7 @@ public class SpringUtils implements ApplicationContextAware {
         if (clazz == null) {
             return null;
         }
-        return (T) context.getBean(beanName, clazz);
+        return context.getBean(beanName, clazz);
     }
 
     public static ApplicationContext getContext() {
@@ -63,7 +63,7 @@ public class SpringUtils implements ApplicationContextAware {
         try {
             context.publishEvent(event);
         } catch (Exception ex) {
-            log.error(ex.getMessage());
+            log.error(ex.getMessage(), ex);
         }
     }
 
