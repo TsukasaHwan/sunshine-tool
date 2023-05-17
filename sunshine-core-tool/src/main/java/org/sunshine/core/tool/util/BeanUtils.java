@@ -22,6 +22,7 @@ import java.util.function.Supplier;
  * @since 2020/7/3
  */
 public class BeanUtils extends org.springframework.beans.BeanUtils {
+
     /**
      * 集合数据的拷贝
      *

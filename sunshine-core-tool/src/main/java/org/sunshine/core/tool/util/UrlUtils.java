@@ -2,9 +2,13 @@ package org.sunshine.core.tool.util;
 
 import org.springframework.web.util.UriUtils;
 
+import java.io.IOException;
+import java.net.JarURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.jar.JarFile;
 
 /**
  * url处理工具类
@@ -51,4 +55,18 @@ public class UrlUtils extends UriUtils {
         return uri.getPath();
     }
 
+    /**
+     * 从URL中获取JarFile
+     *
+     * @param url URL
+     * @return JarFile
+     */
+    public static JarFile getJarFile(URL url) {
+        try {
+            JarURLConnection urlConnection = (JarURLConnection) url.openConnection();
+            return urlConnection.getJarFile();
+        } catch (IOException e) {
+            throw Exceptions.unchecked(e);
+        }
+    }
 }

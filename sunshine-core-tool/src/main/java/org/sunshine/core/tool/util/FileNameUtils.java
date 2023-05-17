@@ -10,19 +10,6 @@ import java.util.regex.Pattern;
 public class FileNameUtils {
 
     /**
-     * .java文件扩展名
-     */
-    public static final String EXT_JAVA = ".java";
-    /**
-     * .class文件扩展名
-     */
-    public static final String EXT_CLASS = ".class";
-    /**
-     * .jar文件扩展名
-     */
-    public static final String EXT_JAR = ".jar";
-
-    /**
      * 类Unix路径分隔符
      */
     public static final char UNIX_SEPARATOR = StringPool.CHAR_SLASH;
