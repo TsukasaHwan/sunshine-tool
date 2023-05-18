@@ -626,15 +626,15 @@ public class DateUtils {
      * @param seconds 秒数
      * @return 时间
      */
-    public static String secondToTime(int seconds) {
+    public static String secondToTime(long seconds) {
         if (seconds < 0) {
             throw new IllegalArgumentException("Seconds must be a positive number!");
         }
 
-        int hour = seconds / 3600;
-        int other = seconds % 3600;
-        int minute = other / 60;
-        int second = other % 60;
+        long hour = seconds / 3600;
+        long other = seconds % 3600;
+        long minute = other / 60;
+        long second = other % 60;
         final StringBuilder sb = new StringBuilder();
         if (hour < 10) {
             sb.append("0");
