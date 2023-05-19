@@ -2,13 +2,18 @@ package org.sunshine.security.core.util;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.sunshine.core.tool.util.SpringUtils;
+import org.sunshine.security.core.enums.RoleEnum;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * Security相关实用程序
@@ -17,6 +22,9 @@ import java.util.Collection;
  * @since 2023/3/14
  */
 public class SecurityUtils {
+
+    private SecurityUtils() {
+    }
 
     /**
      * 获取上下文
@@ -44,6 +52,15 @@ public class SecurityUtils {
     }
 
     /**
+     * 设置Authentication
+     *
+     * @param authentication Authentication
+     */
+    public static void setAuthentication(Authentication authentication) {
+        getContext().setAuthentication(authentication);
+    }
+
+    /**
      * 获取权限
      *
      * @return 权限集合
@@ -53,12 +70,16 @@ public class SecurityUtils {
     }
 
     /**
-     * 设置Authentication
+     * 获取权限
      *
-     * @param authentication Authentication
+     * @return 权限Set
      */
-    public static void setAuthentication(Authentication authentication) {
-        getContext().setAuthentication(authentication);
+    public static Set<String> getAuthoritySet() {
+        Collection<? extends GrantedAuthority> userAuthorities = getAuthorities();
+        if (userAuthorities == null) {
+            return Collections.emptySet();
+        }
+        return AuthorityUtils.authorityListToSet(userAuthorities);
     }
 
     /**
@@ -89,5 +110,75 @@ public class SecurityUtils {
     public static boolean matchPassword(String rawPassword, String encodedPassword) {
         PasswordEncoder encoder = SpringUtils.getBean(PasswordEncoder.class);
         return encoder.matches(rawPassword, encodedPassword);
+    }
+
+    /**
+     * 是否是系统管理员
+     *
+     * @return ture or false
+     */
+    public static boolean isAdmin() {
+        return hasRole(RoleEnum.RoleCode.ADMIN_ROLE_CODE);
+    }
+
+    /**
+     * 是否有权限
+     *
+     * @param authority 权限不带ROLE_前缀
+     * @return true or false
+     */
+    public final boolean hasAuthority(String authority) {
+        return hasAnyAuthority(authority);
+    }
+
+    /**
+     * 是否有权限
+     *
+     * @param authorities 权限不带ROLE_前缀
+     * @return true or false
+     */
+    public final boolean hasAnyAuthority(String... authorities) {
+        return hasAnyAuthorityName(null, authorities);
+    }
+
+    /**
+     * 是否有角色
+     *
+     * @param role 角色带ROLE_前缀
+     * @return true or false
+     */
+    public static boolean hasRole(String role) {
+        return hasAnyRole(role);
+    }
+
+    /**
+     * 是否有角色
+     *
+     * @param role 角色带ROLE_前缀
+     * @return true or false
+     */
+    public static boolean hasAnyRole(String... role) {
+        return hasAnyAuthorityName(RoleEnum.RoleCode.ROLE_PREFIX, role);
+    }
+
+    private static boolean hasAnyAuthorityName(String prefix, String... roles) {
+        Set<String> roleSet = getAuthoritySet();
+        return Arrays.stream(roles).anyMatch(role -> {
+            String defaultedRole = getRoleWithDefaultPrefix(prefix, role);
+            return roleSet.contains(defaultedRole);
+        });
+    }
+
+    private static String getRoleWithDefaultPrefix(String defaultRolePrefix, String role) {
+        if (role == null) {
+            return null;
+        }
+        if (defaultRolePrefix == null || defaultRolePrefix.length() == 0) {
+            return role;
+        }
+        if (role.startsWith(defaultRolePrefix)) {
+            return role;
+        }
+        return defaultRolePrefix + role;
     }
 }

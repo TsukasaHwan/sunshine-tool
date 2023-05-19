@@ -1,16 +1,17 @@
-package org.sunshine.security.jwt.enums;
+package org.sunshine.security.core.enums;
 
 /**
  * @author Teamo
  * @since 2020/11/14
  */
 public enum RoleEnum {
+
     /**
      * 管理员
      */
     ADMIN(1L, RoleCode.ADMIN_ROLE_CODE);
 
-    private final long id;
+    private final Long id;
 
     private final String roleName;
 
@@ -20,11 +21,11 @@ public enum RoleEnum {
     }
 
     public long getId() {
-        return id;
+        return this.id;
     }
 
     public String getRoleName() {
-        return roleName;
+        return this.roleName;
     }
 
     public static class RoleCode {
