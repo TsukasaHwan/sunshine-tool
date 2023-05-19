@@ -69,6 +69,18 @@ public class RegexUtils {
     }
 
     /**
+     * 编译传入正则表达式和字符串去匹配
+     *
+     * @param pattern      正则
+     * @param beTestString 字符串
+     * @return {boolean}
+     */
+    public static boolean match(Pattern pattern, String beTestString) {
+        Matcher matcher = pattern.matcher(beTestString);
+        return matcher.matches();
+    }
+
+    /**
      * 编译传入正则表达式在字符串中寻找，如果匹配到则为true
      *
      * @param regex        正则

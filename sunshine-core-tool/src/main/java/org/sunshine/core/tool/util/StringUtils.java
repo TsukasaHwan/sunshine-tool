@@ -1,11 +1,14 @@
 package org.sunshine.core.tool.util;
 
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.web.util.HtmlUtils;
 
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
@@ -1463,5 +1466,19 @@ public class StringUtils extends org.springframework.util.StringUtils {
             return (!ignoreEquals) || (!equals(str, suffix, ignoreCase));
         }
         return false;
+    }
+
+    /**
+     * 获取作为分隔列表的String并将其转换为ArrayList。
+     * 单个delimiter可能包含多个字符，但它仍将被视为单个定界符字符串，而不是一堆潜在的定界符字符，这与tokenizeToStringArray不同。
+     *
+     * @param str       输入String （可能为null或空）
+     * @param delimiter 元素之间的分隔符（这是单个分隔符，而不是一堆单独的分隔符）
+     * @return 数组
+     * @see #tokenizeToStringArray
+     */
+    public static List<String> delimitedListToArrayList(@Nullable String str, @Nullable String delimiter) {
+        String[] array = delimitedListToStringArray(str, delimiter);
+        return Arrays.asList(array);
     }
 }

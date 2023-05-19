@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * IoUtils
  *
- * @author L.cm
+ * @author Teamo
  */
 public class IoUtils extends StreamUtils {
 
@@ -56,14 +56,57 @@ public class IoUtils extends StreamUtils {
         }
     }
 
-    public static byte[] toByteArray(@Nullable InputStream input) {
+    /**
+     * 从流中读取bytes，读取完毕后关闭流
+     *
+     * @param input {@link InputStream}
+     * @return bytes
+     */
+    public static byte[] readBytes(@Nullable InputStream input) {
+        return readBytes(input, true);
+    }
+
+    /**
+     * 从流中读取bytes
+     *
+     * @param input   {@link InputStream}
+     * @param isClose 是否关闭输入流
+     * @return bytes
+     */
+    public static byte[] readBytes(@Nullable InputStream input, boolean isClose) {
         try {
             return copyToByteArray(input);
         } catch (IOException e) {
             throw Exceptions.unchecked(e);
         } finally {
-            closeQuietly(input);
+            if (isClose) {
+                closeQuietly(input);
+            }
         }
+    }
+
+    /**
+     * 读取指定长度的byte数组，不关闭流
+     *
+     * @param in     {@link InputStream}，为{@code null}返回{@code null}
+     * @param length 长度，小于等于0返回空byte数组
+     * @return bytes
+     */
+    public static byte[] readBytes(@Nullable InputStream in, int length) {
+        if (null == in) {
+            return null;
+        }
+        if (length <= 0) {
+            return new byte[0];
+        }
+
+        final ByteArrayOutputStream out = new ByteArrayOutputStream(length);
+        try {
+            copyRange(in, out, 0, length - 1);
+        } catch (IOException e) {
+            throw Exceptions.unchecked(e);
+        }
+        return out.toByteArray();
     }
 
     /**
