@@ -73,10 +73,7 @@ public abstract class SecurityUtils {
      */
     public static Set<String> getAuthoritySet() {
         Collection<? extends GrantedAuthority> userAuthorities = getAuthorities();
-        if (userAuthorities == null) {
-            return Collections.emptySet();
-        }
-        return AuthorityUtils.authorityListToSet(userAuthorities);
+        return userAuthorities == null ? Collections.emptySet() : AuthorityUtils.authorityListToSet(userAuthorities);
     }
 
     /**
