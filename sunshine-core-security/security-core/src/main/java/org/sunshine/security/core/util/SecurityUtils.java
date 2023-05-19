@@ -21,10 +21,7 @@ import java.util.Set;
  * @author Teamo
  * @since 2023/3/14
  */
-public class SecurityUtils {
-
-    private SecurityUtils() {
-    }
+public abstract class SecurityUtils {
 
     /**
      * 获取上下文
@@ -127,7 +124,7 @@ public class SecurityUtils {
      * @param authority 权限不带ROLE_前缀
      * @return true or false
      */
-    public final boolean hasAuthority(String authority) {
+    public static boolean hasAuthority(String authority) {
         return hasAnyAuthority(authority);
     }
 
@@ -137,7 +134,7 @@ public class SecurityUtils {
      * @param authorities 权限不带ROLE_前缀
      * @return true or false
      */
-    public final boolean hasAnyAuthority(String... authorities) {
+    public static boolean hasAnyAuthority(String... authorities) {
         return hasAnyAuthorityName(null, authorities);
     }
 
