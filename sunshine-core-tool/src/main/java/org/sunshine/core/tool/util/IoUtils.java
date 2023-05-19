@@ -100,7 +100,20 @@ public class IoUtils extends StreamUtils {
      */
     public static void write(@Nullable final String data, final OutputStream output, final Charset encoding) throws IOException {
         if (data != null) {
-            output.write(data.getBytes(encoding));
+            write(data.getBytes(encoding), output);
+        }
+    }
+
+    /**
+     * 将字节数组写到流中
+     *
+     * @param bytes  要写入的字节数组，忽略 null
+     * @param output 要写入的OutputStream
+     * @throws IOException 如果发生 I/O 错误
+     */
+    public static void write(@Nullable final byte[] bytes, final OutputStream output) throws IOException {
+        if (bytes != null) {
+            output.write(bytes);
         }
     }
 
