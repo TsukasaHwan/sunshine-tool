@@ -165,7 +165,6 @@ public class XmlUtils {
         return (NodeList) evalXPath(expression, null, XPathConstants.NODESET);
     }
 
-
     /**
      * 获取String
      *
