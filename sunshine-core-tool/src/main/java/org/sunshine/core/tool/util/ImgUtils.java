@@ -1691,7 +1691,6 @@ public class ImgUtils {
      * @param backgroundWidth  参考宽（背景宽）
      * @param backgroundHeight 参考高（背景高）
      * @return 修正后的{@link Point}
-     * @since 5.3.6
      */
     public static Point getPointBaseCentre(Rectangle rectangle, int backgroundWidth, int backgroundHeight) {
         return new Point(
@@ -1707,7 +1706,6 @@ public class ImgUtils {
      * @param colorSpace 颜色模式，如灰度等
      * @param image      被转换的图片
      * @return 转换后的图片
-     * @since 5.7.8
      */
     public static BufferedImage colorConvert(ColorSpace colorSpace, BufferedImage image) {
         return filter(new ColorConvertOp(colorSpace, null), image);
@@ -1720,7 +1718,6 @@ public class ImgUtils {
      * @param xform 2D仿射变换，它执行从 2D 坐标到其他 2D 坐标的线性映射，保留了线的“直线性”和“平行性”。
      * @param image 被转换的图片
      * @return 转换后的图片
-     * @since 5.7.8
      */
     public static BufferedImage transform(AffineTransform xform, BufferedImage image) {
         return filter(new AffineTransformOp(xform, null), image);
@@ -1732,7 +1729,6 @@ public class ImgUtils {
      * @param op    过滤操作实现，如二维转换可传入{@link AffineTransformOp}
      * @param image 原始图片
      * @return 过滤后的图片
-     * @since 5.7.8
      */
     public static BufferedImage filter(BufferedImageOp op, BufferedImage image) {
         return op.filter(image, null);
