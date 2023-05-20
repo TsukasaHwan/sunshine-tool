@@ -51,7 +51,7 @@ public class NumberUtils extends org.springframework.util.NumberUtils {
             return defaultValue;
         }
         try {
-            return Integer.valueOf(str);
+            return Integer.parseInt(str);
         } catch (final NumberFormatException nfe) {
             return defaultValue;
         }

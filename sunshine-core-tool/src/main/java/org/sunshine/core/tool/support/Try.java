@@ -1,4 +1,6 @@
-package org.sunshine.core.tool.util;
+package org.sunshine.core.tool.support;
+
+import org.sunshine.core.tool.util.Exceptions;
 
 import java.util.Objects;
 import java.util.function.Consumer;

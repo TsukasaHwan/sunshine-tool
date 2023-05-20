@@ -709,33 +709,23 @@ public class FileUtils extends FileCopyUtils {
     }
 
     /**
-     * 根据压缩包中的路径构建目录结构，在Win下直接构建，在Linux下拆分路径单独构建
+     * 判断文件是否存在，如果file为null，则返回false
      *
-     * @param outFile  最外部路径
-     * @param fileName 文件名，可以包含路径
-     * @return 文件或目录
+     * @param file 文件
+     * @return 如果存在返回true
      */
-    private static File buildFile(File outFile, String fileName) {
-        // 替换Windows路径分隔符为Linux路径分隔符，便于统一处理
-        fileName = fileName.replace('\\', '/');
-        if (!isWindows()
-            // 检查文件名中是否包含"/"，不考虑以"/"结尾的情况
-            && fileName.lastIndexOf(StringPool.SLASH, fileName.length() - 2) > 0) {
-            // 在Linux下多层目录创建存在问题，/会被当成文件名的一部分，此处做处理
-            // 使用/拆分路径（zip中无\），级联创建父目录
-            final List<String> pathParts = StringUtils.delimitedListToArrayList(fileName, "/");
-            //目录个数
-            final int lastPartIndex = pathParts.size() - 1;
-            for (int i = 0; i < lastPartIndex; i++) {
-                //由于路径拆分，slip不检查，在最后一步检查
-                outFile = new File(outFile, pathParts.get(i));
-            }
-            //noinspection ResultOfMethodCallIgnored
-            outFile.mkdirs();
-            // 最后一个部分如果非空，作为文件名
-            fileName = pathParts.get(lastPartIndex);
-        }
-        return new File(outFile, fileName);
+    public static boolean exist(File file) {
+        return (null != file) && file.exists();
+    }
+
+    /**
+     * 判断是否为目录，如果file为null，则返回false
+     *
+     * @param file 文件
+     * @return 如果为目录true
+     */
+    public static boolean isDirectory(File file) {
+        return (null != file) && file.isDirectory();
     }
 
     /**
@@ -745,7 +735,7 @@ public class FileUtils extends FileCopyUtils {
      * @return 是否存在
      */
     public static boolean exists(Path path) {
-        return exists(path, false);
+        return path != null && exists(path, false);
     }
 
     /**
@@ -784,5 +774,67 @@ public class FileUtils extends FileCopyUtils {
         }
         final LinkOption[] options = isFollowLinks ? new LinkOption[0] : new LinkOption[]{LinkOption.NOFOLLOW_LINKS};
         return Files.isDirectory(path, options);
+    }
+
+    /**
+     * 获得输入流
+     *
+     * @param file 文件
+     * @return 输入流
+     */
+    public static BufferedInputStream getInputStream(File file) {
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+            throw Exceptions.unchecked(e);
+        }
+        return new BufferedInputStream(fis);
+    }
+
+    /**
+     * 获得一个输出流对象
+     *
+     * @param file 文件
+     * @return 输出流对象
+     */
+    public static BufferedOutputStream getOutputStream(File file) {
+        final OutputStream out;
+        try {
+            out = Files.newOutputStream(touch(file).toPath());
+        } catch (final IOException e) {
+            throw Exceptions.unchecked(e);
+        }
+        return new BufferedOutputStream(out);
+    }
+
+    /**
+     * 根据压缩包中的路径构建目录结构，在Win下直接构建，在Linux下拆分路径单独构建
+     *
+     * @param outFile  最外部路径
+     * @param fileName 文件名，可以包含路径
+     * @return 文件或目录
+     */
+    private static File buildFile(File outFile, String fileName) {
+        // 替换Windows路径分隔符为Linux路径分隔符，便于统一处理
+        fileName = fileName.replace('\\', '/');
+        if (!isWindows()
+            // 检查文件名中是否包含"/"，不考虑以"/"结尾的情况
+            && fileName.lastIndexOf(StringPool.SLASH, fileName.length() - 2) > 0) {
+            // 在Linux下多层目录创建存在问题，/会被当成文件名的一部分，此处做处理
+            // 使用/拆分路径（zip中无\），级联创建父目录
+            final List<String> pathParts = StringUtils.delimitedListToArrayList(fileName, "/");
+            //目录个数
+            final int lastPartIndex = pathParts.size() - 1;
+            for (int i = 0; i < lastPartIndex; i++) {
+                //由于路径拆分，slip不检查，在最后一步检查
+                outFile = new File(outFile, pathParts.get(i));
+            }
+            //noinspection ResultOfMethodCallIgnored
+            outFile.mkdirs();
+            // 最后一个部分如果非空，作为文件名
+            fileName = pathParts.get(lastPartIndex);
+        }
+        return new File(outFile, fileName);
     }
 }
