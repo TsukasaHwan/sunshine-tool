@@ -12,6 +12,9 @@ import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -19,6 +22,7 @@ import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,10 +34,14 @@ import java.util.Map;
  *     http://www.w3school.com.cn/xpath/index.asp
  * </pre>
  *
- * @author L.cm
+ * @author L.cm, Teamo
  */
 public class XmlUtils {
+
+    private static final int INDENT_DEFAULT = 2;
+
     private final XPath path;
+
     private final Document doc;
 
     private XmlUtils(InputSource inputSource) throws ParserConfigurationException, SAXException, IOException {
@@ -51,6 +59,14 @@ public class XmlUtils {
         }
     }
 
+    public static Document createXml() {
+        try {
+            return getDocumentBuilderFactory().newDocumentBuilder().newDocument();
+        } catch (ParserConfigurationException e) {
+            throw Exceptions.unchecked(e);
+        }
+    }
+
     public static XmlUtils of(InputStream is) {
         InputSource inputSource = new InputSource(is);
         return create(inputSource);
@@ -61,6 +77,33 @@ public class XmlUtils {
             InputSource inputSource = new InputSource(sr);
             return create(inputSource);
         }
+    }
+
+    public static String toStr(Document doc) {
+        return toStr(doc, false);
+    }
+
+    public static String toStr(Document doc, boolean isPretty) {
+        DOMSource domSource = new DOMSource(doc);
+        StringWriter writer = StringUtils.getWriter();
+        StreamResult result = new StreamResult(writer);
+        Transformer transformer = null;
+        try {
+            transformer = TransformerFactory.newInstance().newTransformer();
+        } catch (TransformerConfigurationException e) {
+            throw Exceptions.unchecked(e);
+        }
+        if (isPretty) {
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", String.valueOf(INDENT_DEFAULT));
+        }
+        try {
+            transformer.transform(domSource, result);
+        } catch (TransformerException e) {
+            throw Exceptions.unchecked(e);
+        }
+        return writer.toString();
     }
 
     private Object evalXPath(String expression, @Nullable Object item, QName returnType) {
@@ -196,6 +239,14 @@ public class XmlUtils {
             }
         }
         return params;
+    }
+
+    public String toStr() {
+        return toStr(this.doc, false);
+    }
+
+    public String toStr(boolean isPretty) {
+        return toStr(this.doc, isPretty);
     }
 
     private static volatile boolean preventedXXE = false;

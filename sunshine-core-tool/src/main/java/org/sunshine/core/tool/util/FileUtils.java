@@ -1,6 +1,7 @@
 package org.sunshine.core.tool.util;
 
 import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.util.PatternMatchUtils;
@@ -254,9 +255,9 @@ public class FileUtils extends FileCopyUtils {
      * @param multipartFile MultipartFile
      * @param file          File
      */
-    public static void toFile(MultipartFile multipartFile, final File file) {
+    public static void writeToFile(MultipartFile multipartFile, final File file) {
         try {
-            FileUtils.toFile(multipartFile.getInputStream(), file);
+            FileUtils.writeToFile(multipartFile.getInputStream(), file);
         } catch (IOException e) {
             throw Exceptions.unchecked(e);
         }
@@ -268,7 +269,7 @@ public class FileUtils extends FileCopyUtils {
      * @param in   InputStream
      * @param file File
      */
-    public static void toFile(InputStream in, final File file) throws IOException {
+    public static void writeToFile(InputStream in, final File file) {
         try (OutputStream out = openOutputStream(file)) {
             FileUtils.copy(in, out);
         } catch (IOException e) {
@@ -311,7 +312,7 @@ public class FileUtils extends FileCopyUtils {
                 }
             }
         }
-        return append ? new FileOutputStream(file, true) : Files.newOutputStream(file.toPath());
+        return append ? new FileOutputStream(file, true) : getOutputStream(file);
     }
 
     /**
@@ -673,9 +674,7 @@ public class FileUtils extends FileCopyUtils {
      * @return File
      */
     public static File file(File parent, String path) {
-        if (StringUtils.isBlank(path)) {
-            throw new NullPointerException("File path is blank!");
-        }
+        Assert.isTrue(StringUtils.isNotBlank(path), "File path is blank!");
         return checkSlip(parent, buildFile(parent, path));
     }
 
@@ -689,7 +688,7 @@ public class FileUtils extends FileCopyUtils {
      * @return 子文件或目录
      * @throws IllegalArgumentException 检查创建的子文件不在父目录中抛出此异常
      */
-    public static File checkSlip(File parentFile, File file) throws IllegalArgumentException {
+    public static File checkSlip(File parentFile, File file) {
         if (null != parentFile && null != file) {
             String parentCanonicalPath;
             String canonicalPath;
@@ -701,9 +700,7 @@ public class FileUtils extends FileCopyUtils {
                 parentCanonicalPath = parentFile.getAbsolutePath();
                 canonicalPath = file.getAbsolutePath();
             }
-            if (!canonicalPath.startsWith(parentCanonicalPath)) {
-                throw new IllegalArgumentException("New file is outside of the parent dir: " + file.getName());
-            }
+            Assert.isTrue(!canonicalPath.startsWith(parentCanonicalPath), "New file is outside of the parent dir: " + file.getName());
         }
         return file;
     }
