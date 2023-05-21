@@ -2,6 +2,7 @@ package org.sunshine.core.log.filter;
 
 import org.slf4j.MDC;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.sunshine.core.tool.util.IdUtils;
 import org.sunshine.core.tool.util.StringUtils;
 
 import javax.servlet.FilterChain;
@@ -26,7 +27,7 @@ public class TraceFilter extends OncePerRequestFilter {
         } else if (StringUtils.isNotBlank(MDC.get(TRACE_ID))) {
             MDC.put(TRACE_ID, MDC.get(TRACE_ID));
         } else {
-            MDC.put(TRACE_ID, StringUtils.randomUUID());
+            MDC.put(TRACE_ID, IdUtils.simpleUUID());
         }
 
         filterChain.doFilter(request, response);

@@ -1,9 +1,9 @@
 package org.sunshine.core.log.mdc;
 
-import org.sunshine.core.log.filter.TraceFilter;
 import org.slf4j.MDC;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.sunshine.core.tool.util.StringUtils;
+import org.sunshine.core.log.filter.TraceFilter;
+import org.sunshine.core.tool.util.IdUtils;
 
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -32,7 +32,7 @@ public class ThreadPoolExecutorMdcWrapper extends ThreadPoolTaskExecutor {
 
     public static void setTraceIdIfAbsent() {
         if (MDC.get(TraceFilter.TRACE_ID) == null) {
-            MDC.put(TraceFilter.TRACE_ID, StringUtils.randomUUID());
+            MDC.put(TraceFilter.TRACE_ID, IdUtils.simpleUUID());
         }
     }
 
