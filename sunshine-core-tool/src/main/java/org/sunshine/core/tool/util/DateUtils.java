@@ -5,14 +5,10 @@ import org.springframework.util.Assert;
 import java.text.ParseException;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalQuery;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
+import java.time.temporal.*;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Teamo
@@ -601,13 +597,90 @@ public class DateUtils {
     }
 
     /**
+     * 获取某周开始时间
+     *
+     * @param date Date
+     * @return Date
+     */
+    public static Date beginOfWeek(Date date) {
+        return toDate(beginOfWeek(fromDate(date)));
+    }
+
+    /**
+     * 获取某周结束时间
+     *
+     * @param date Date
+     * @return Date
+     */
+    public static Date endOfWeek(Date date) {
+        return toDate(endOfWeek(fromDate(date)));
+    }
+
+    /**
+     * 获取某月开始时间
+     *
+     * @param date Date
+     * @return Date
+     */
+    public static Date beginOfMonth(Date date) {
+        return toDate(beginOfMonth(fromDate(date)));
+    }
+
+    /**
+     * 获取某月结束时间
+     *
+     * @param date Date
+     * @return Date
+     */
+    public static Date endOfMonth(Date date) {
+        return toDate(endOfMonth(fromDate(date)));
+    }
+
+    /**
+     * 获取某年开始时间
+     *
+     * @param date Date
+     * @return Date
+     */
+    public static Date beginOfYear(Date date) {
+        return toDate(beginOfYear(fromDate(date)));
+    }
+
+    /**
+     * 获取某年结束时间
+     *
+     * @param date Date
+     * @return Date
+     */
+    public static Date endOfYear(Date date) {
+        return toDate(endOfYear(fromDate(date)));
+    }
+
+    /**
+     * 获取指定日期范围
+     *
+     * @param start 起始日期时间（包括）
+     * @param end   结束日期时间
+     * @param unit  步进单位 {@link ChronoUnit}
+     * @return List<LocalDateTime>
+     */
+    public static List<Date> range(Date start, Date end, ChronoUnit unit) {
+        LocalDateTime startLocalDateTime = fromDate(start);
+        long between = unit.between(startLocalDateTime, fromDate(end));
+        return Stream.iterate(startLocalDateTime, date -> unit.addTo(date, 1))
+                .limit(between + 1)
+                .map(DateUtils::toDate)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * 获取某天开始时间
      *
      * @param localDateTime LocalDateTime
      * @return LocalDateTime
      */
     public static LocalDateTime beginOfDay(LocalDateTime localDateTime) {
-        return LocalDateTime.of(localDateTime.toLocalDate(), LocalTime.MIN);
+        return localDateTime.toLocalDate().atStartOfDay();
     }
 
     /**
@@ -618,6 +691,87 @@ public class DateUtils {
      */
     public static LocalDateTime endOfDay(LocalDateTime localDateTime) {
         return LocalDateTime.of(localDateTime.toLocalDate(), LocalTime.MAX);
+    }
+
+    /**
+     * 获取某周开始时间
+     *
+     * @param localDateTime localDateTime
+     * @return LocalDateTime
+     */
+    public static LocalDateTime beginOfWeek(LocalDateTime localDateTime) {
+        LocalDateTime beginOfWeek = localDateTime.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        return beginOfDay(beginOfWeek);
+    }
+
+    /**
+     * 获取某周结束时间
+     *
+     * @param localDateTime localDateTime
+     * @return LocalDateTime
+     */
+    public static LocalDateTime endOfWeek(LocalDateTime localDateTime) {
+        LocalDateTime beginOfWeek = localDateTime.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
+        return endOfDay(beginOfWeek);
+    }
+
+    /**
+     * 获取某月开始时间
+     *
+     * @param localDateTime localDateTime
+     * @return LocalDateTime
+     */
+    public static LocalDateTime beginOfMonth(LocalDateTime localDateTime) {
+        LocalDateTime beginOfMonth = localDateTime.with(TemporalAdjusters.firstDayOfMonth());
+        return beginOfDay(beginOfMonth);
+    }
+
+    /**
+     * 获取某月结束时间
+     *
+     * @param localDateTime localDateTime
+     * @return LocalDateTime
+     */
+    public static LocalDateTime endOfMonth(LocalDateTime localDateTime) {
+        LocalDateTime beginOfMonth = localDateTime.with(TemporalAdjusters.lastDayOfMonth());
+        return endOfDay(beginOfMonth);
+    }
+
+    /**
+     * 获取某年开始时间
+     *
+     * @param localDateTime localDateTime
+     * @return LocalDateTime
+     */
+    public static LocalDateTime beginOfYear(LocalDateTime localDateTime) {
+        LocalDateTime beginOfYear = localDateTime.with(TemporalAdjusters.firstDayOfYear());
+        return beginOfDay(beginOfYear);
+    }
+
+    /**
+     * 获取某年结束时间
+     *
+     * @param localDateTime localDateTime
+     * @return LocalDateTime
+     */
+    public static LocalDateTime endOfYear(LocalDateTime localDateTime) {
+        LocalDateTime beginOfYear = localDateTime.with(TemporalAdjusters.lastDayOfYear());
+        return endOfDay(beginOfYear);
+    }
+
+    /**
+     * 获取指定日期范围
+     *
+     * @param start 起始日期时间（包括）
+     * @param end   结束日期时间
+     * @param unit  步进单位 {@link ChronoUnit}
+     * @return List<LocalDateTime>
+     */
+    public static List<LocalDateTime> range(LocalDateTime start, LocalDateTime end, ChronoUnit unit) {
+        long between = unit.between(start, end);
+        return Stream.iterate(start, date -> unit.addTo(date, 1))
+                .limit(between + 1)
+                .collect(Collectors.toList());
     }
 
     /**
