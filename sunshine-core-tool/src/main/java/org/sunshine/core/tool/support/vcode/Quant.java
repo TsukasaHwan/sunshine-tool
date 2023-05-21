@@ -1,4 +1,4 @@
-package org.sunshine.core.tool.util.vcode;
+package org.sunshine.core.tool.support.vcode;
 
 /**
  * 不知道是个啥

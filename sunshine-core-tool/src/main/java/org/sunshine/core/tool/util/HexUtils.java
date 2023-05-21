@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
  *
  * @author Teamo
  */
-public class HexUtil {
+public class HexUtils {
 
     public static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 

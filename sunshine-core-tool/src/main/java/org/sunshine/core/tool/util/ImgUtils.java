@@ -96,7 +96,7 @@ public class ImgUtils {
     public static String getImgTypeByStream(InputStream is) {
         Assert.notNull(is, "Image InputStream must be not null!");
         //读取文件前几个字节来判断图片格式
-        String type = HexUtil.encodeToString(IoUtils.readBytes(is, 4), false);
+        String type = HexUtils.encodeToString(IoUtils.readBytes(is, 4), false);
         if (type.contains(JPG_HEX)) {
             return IMAGE_TYPE_JPG;
         } else if (type.contains(PNG_HEX)) {
@@ -1270,7 +1270,7 @@ public class ImgUtils {
      * @return Base64的字符串表现形式
      */
     public static String toBase64(Image image, String imageType) {
-        return Base64.getEncoder().encodeToString(toBytes(image, imageType));
+        return Base64Utils.encodeToString(toBytes(image, imageType));
     }
 
     /**
