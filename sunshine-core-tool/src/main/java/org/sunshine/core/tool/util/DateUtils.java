@@ -577,6 +577,23 @@ public class DateUtils {
     }
 
     /**
+     * 当前日期是否在日期指定范围内<br>
+     * 起始日期和结束日期可以互换
+     *
+     * @param date      被检查的日期
+     * @param beginDate 起始日期（包含）
+     * @param endDate   结束日期（包含）
+     * @return 是否在范围内
+     */
+    public static boolean isIn(Date date, Date beginDate, Date endDate) {
+        long beginMills = beginDate.getTime();
+        long endMills = endDate.getTime();
+        long thisMills = date.getTime();
+
+        return thisMills >= Math.min(beginMills, endMills) && thisMills <= Math.max(beginMills, endMills);
+    }
+
+    /**
      * 获取某天开始时间
      *
      * @param date Date
@@ -772,6 +789,19 @@ public class DateUtils {
         return Stream.iterate(start, date -> unit.addTo(date, 1))
                 .limit(between + 1)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 当前日期是否在日期指定范围内<br>
+     * 起始日期和结束日期可以互换
+     *
+     * @param localDateTime 被检查的日期
+     * @param begin         起始日期（包含）
+     * @param end           结束日期（包含）
+     * @return 是否在范围内
+     */
+    public static boolean isIn(LocalDateTime localDateTime, LocalDateTime begin, LocalDateTime end) {
+        return (localDateTime.isAfter(begin) || localDateTime.isEqual(begin)) && (localDateTime.isBefore(end) || localDateTime.isEqual(end));
     }
 
     /**
