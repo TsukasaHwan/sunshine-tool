@@ -23,8 +23,9 @@ public interface ImportExcelHandler<T> {
     /**
      * 读取excel
      *
-     * @param clazz  excel class
-     * @param inputs 流
+     * @param clazz      excel class
+     * @param batchCount 插入数量
+     * @param inputs     流
      */
     default void doConvert(Class<T> clazz, int batchCount, InputStream... inputs) {
         Assert.notNull(inputs, "InputStream must not be null");
