@@ -29,12 +29,12 @@ public interface ImportExcelHandler<T> {
      */
     default void doConvert(Class<T> clazz, int batchCount, InputStream... inputs) {
         Assert.notNull(inputs, "InputStream must not be null");
-        ImportEventListener<T> importListener;
+        ImportExcelEventListener<T> listener;
         InputStream inputStream;
         for (InputStream is : inputs) {
             inputStream = is instanceof BufferedInputStream ? is : new BufferedInputStream(is);
-            importListener = new ImportEventListener<>(this, batchCount);
-            EasyExcel.read(inputStream, clazz, importListener).doReadAll();
+            listener = new ImportExcelEventListener<>(this, batchCount);
+            EasyExcel.read(inputStream, clazz, listener).doReadAll();
         }
     }
 

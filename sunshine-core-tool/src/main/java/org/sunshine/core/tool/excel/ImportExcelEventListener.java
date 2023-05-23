@@ -10,7 +10,7 @@ import java.util.List;
  * @author Teamo
  * @since 2022/08/24
  */
-public class ImportEventListener<T> extends AnalysisEventListener<T> {
+public class ImportExcelEventListener<T> extends AnalysisEventListener<T> {
 
     private int batchCount;
 
@@ -18,7 +18,7 @@ public class ImportEventListener<T> extends AnalysisEventListener<T> {
 
     private final ImportExcelHandler<T> handler;
 
-    public ImportEventListener(ImportExcelHandler<T> handler, int batchCount) {
+    public ImportExcelEventListener(ImportExcelHandler<T> handler, int batchCount) {
         this.handler = handler;
         this.batchCount = batchCount;
     }
