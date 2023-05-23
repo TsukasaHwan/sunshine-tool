@@ -45,7 +45,7 @@ public class InviteCodeUtils {
      *
      * @param codeLength 邀请码长度，必须大于或等于6
      */
-    public static InviteCodeUtils ofLength(Integer codeLength) {
+    public static InviteCodeUtils of(Integer codeLength) {
         Assert.notNull(codeLength, "The codeLength must not be null!");
         Assert.isTrue(codeLength >= 6, "The codeLength must be greater than or equal 6!");
         return new InviteCodeUtils(codeLength);
