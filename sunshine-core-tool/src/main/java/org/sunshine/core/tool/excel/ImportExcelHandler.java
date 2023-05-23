@@ -27,7 +27,7 @@ public interface ImportExcelHandler<T> {
      * @param batchCount 插入数量
      * @param inputs     流
      */
-    default void convert(Class<T> clazz, int batchCount, InputStream... inputs) {
+    default void doConvert(Class<T> clazz, int batchCount, InputStream... inputs) {
         Assert.notNull(inputs, "InputStream must not be null");
         ImportEventListener<T> importListener;
         InputStream inputStream;
@@ -48,7 +48,7 @@ public interface ImportExcelHandler<T> {
     default void doConvert(Class<T> clazz, int batchCount, MultipartFile... files) {
         Assert.notNull(files, "InputStream must not be null");
         InputStream[] inputs = Arrays.stream(files).map(Try.apply(MultipartFile::getInputStream)).toArray(InputStream[]::new);
-        convert(clazz, batchCount, inputs);
+        doConvert(clazz, batchCount, inputs);
     }
 
     /**
@@ -61,7 +61,7 @@ public interface ImportExcelHandler<T> {
     default void doConvert(Class<T> clazz, int batchCount, File... files) {
         Assert.notNull(files, "InputStream must not be null");
         InputStream[] inputs = Arrays.stream(files).map(FileUtils::getInputStream).toArray(InputStream[]::new);
-        convert(clazz, batchCount, inputs);
+        doConvert(clazz, batchCount, inputs);
     }
 
     /**
@@ -71,7 +71,7 @@ public interface ImportExcelHandler<T> {
      * @param inputs 流
      */
     default void doConvert(Class<T> clazz, InputStream... inputs) {
-        convert(clazz, 3000, inputs);
+        doConvert(clazz, 3000, inputs);
     }
 
     /**
