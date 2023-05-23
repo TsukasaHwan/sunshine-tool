@@ -12,21 +12,22 @@ import java.util.List;
  */
 public class ImportEventListener<T> extends AnalysisEventListener<T> {
 
-    private int batchCount = 3000;
+    private int batchCount;
 
     private List<T> dataList = new ArrayList<>();
 
-    private final ImportExcelService<T> importExcelService;
+    private final ImportExcelHandler<T> handler;
 
-    public ImportEventListener(ImportExcelService<T> importExcelService) {
-        this.importExcelService = importExcelService;
+    public ImportEventListener(ImportExcelHandler<T> handler, int batchCount) {
+        this.handler = handler;
+        this.batchCount = batchCount;
     }
 
     @Override
     public void invoke(T data, AnalysisContext context) {
         dataList.add(data);
         if (dataList.size() >= batchCount) {
-            importExcelService.handle(dataList, context);
+            handler.handle(dataList, context);
             dataList.clear();
         }
     }
@@ -35,7 +36,7 @@ public class ImportEventListener<T> extends AnalysisEventListener<T> {
     public void doAfterAllAnalysed(AnalysisContext context) {
         if (!dataList.isEmpty()) {
             if (dataList.size() < batchCount) {
-                importExcelService.handle(dataList, context);
+                handler.handle(dataList, context);
             }
             // 存储完成清理list
             dataList.clear();
@@ -56,9 +57,5 @@ public class ImportEventListener<T> extends AnalysisEventListener<T> {
 
     public void setDataList(List<T> dataList) {
         this.dataList = dataList;
-    }
-
-    public ImportExcelService<T> getImportExcel() {
-        return importExcelService;
     }
 }
