@@ -11,51 +11,6 @@ import java.util.regex.Pattern;
 public class RegexUtils {
 
     /**
-     * 中文
-     */
-    public static final String CHINESE = "[\\u4e00-\\u9fa5]+";
-
-    /**
-     * 用户名
-     */
-    public static final String USER_NAME = "^[a-zA-Z\\u4E00-\\u9FA5][a-zA-Z0-9_\\u4E00-\\u9FA5]{1,11}$";
-
-    /**
-     * 密码
-     */
-    public static final String USER_PASSWORD = "^.{6,32}$";
-
-    /**
-     * 邮箱
-     */
-    public static final String EMAIL = "^\\w+([-+.]*\\w+)*@([\\da-z](-[\\da-z])?)+(\\.{1,2}[a-z]+)+$";
-
-    /**
-     * 手机号
-     */
-    public static final String PHONE = "^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$";
-
-    /**
-     * 手机号或者邮箱
-     */
-    public static final String EMAIL_OR_PHONE = EMAIL + "|" + PHONE;
-
-    /**
-     * URL路径
-     */
-    public static final String URL = "^(https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})(:[\\d]+)?([\\/\\w\\.-]*)*\\/?$";
-
-    /**
-     * 身份证校验，初级校验，具体规则有一套算法
-     */
-    public static final String ID_CARD = "^\\d{15}$|^\\d{17}([0-9]|X)$";
-
-    /**
-     * 域名校验
-     */
-    public static final String DOMAIN = "^[0-9a-zA-Z]+[0-9a-zA-Z\\.-]*\\.[a-zA-Z]{2,4}$";
-
-    /**
      * 编译传入正则表达式和字符串去匹配,忽略大小写
      *
      * @param regex        正则
@@ -132,9 +87,9 @@ public class RegexUtils {
      * @param replacement 要替换为每个匹配项的字符串
      * @return 处理过任何替换的文本，如果为null则为 null String 输入
      */
-    public static String replaceAll(final String text, final Pattern regex, final String replacement) {
+    public static String replaceAll(final CharSequence text, final Pattern regex, final String replacement) {
         if (ObjectUtils.hasEmpty(text, regex, replacement)) {
-            return text;
+            return StringUtils.toStr(text, null);
         }
         return regex.matcher(text).replaceAll(replacement);
     }
@@ -147,10 +102,6 @@ public class RegexUtils {
      * @return 删除后剩余的内容
      */
     public static String delAll(Pattern pattern, CharSequence content) {
-        if (null == pattern || StringUtils.isEmpty(content)) {
-            return StringUtils.toStr(content, null);
-        }
-
-        return pattern.matcher(content).replaceAll(StringPool.EMPTY);
+        return replaceAll(content.toString(), pattern, StringPool.EMPTY);
     }
 }

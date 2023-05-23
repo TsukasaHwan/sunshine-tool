@@ -1173,6 +1173,68 @@ public class StringUtils extends org.springframework.util.StringUtils {
     }
 
     /**
+     * 替换指定字符串的指定区间内字符为"*"
+     * 俗称：脱敏功能
+     *
+     * <pre>
+     * StringUtils.hide(null,*,*)=null
+     * StringUtils.hide("",0,*)=""
+     * StringUtils.hide("jackduan@163.com",-1,4)   ****duan@163.com
+     * StringUtils.hide("jackduan@163.com",2,3)    ja*kduan@163.com
+     * StringUtils.hide("jackduan@163.com",3,2)    jackduan@163.com
+     * StringUtils.hide("jackduan@163.com",16,16)  jackduan@163.com
+     * StringUtils.hide("jackduan@163.com",16,17)  jackduan@163.com
+     * </pre>
+     *
+     * @param str          字符串
+     * @param startInclude 开始位置（包含）
+     * @param endExclude   结束位置（不包含）
+     * @return 替换后的字符串
+     */
+    public static String hide(CharSequence str, int startInclude, int endExclude) {
+        return replace(str, startInclude, endExclude, '*');
+    }
+
+    /**
+     * 替换指定字符串的指定区间内字符为固定字符<br>
+     * 此方法使用{@link String#codePoints()}完成拆分替换
+     *
+     * @param str          字符串
+     * @param startInclude 开始位置（包含）
+     * @param endExclude   结束位置（不包含）
+     * @param replacedChar 被替换的字符
+     * @return 替换后的字符串
+     */
+    public static String replace(CharSequence str, int startInclude, int endExclude, char replacedChar) {
+        if (isEmpty(str)) {
+            return toStr(str, null);
+        }
+        final String originalStr = toStr(str, null);
+        int[] strCodePoints = originalStr.codePoints().toArray();
+        final int strLength = strCodePoints.length;
+        if (startInclude > strLength) {
+            return originalStr;
+        }
+        if (endExclude > strLength) {
+            endExclude = strLength;
+        }
+        if (startInclude > endExclude) {
+            // 如果起始位置大于结束位置，不替换
+            return originalStr;
+        }
+
+        final StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < strLength; i++) {
+            if (i >= startInclude && i < endExclude) {
+                stringBuilder.append(replacedChar);
+            } else {
+                stringBuilder.append(new String(strCodePoints, i, 1));
+            }
+        }
+        return stringBuilder.toString();
+    }
+
+    /**
      * 创建StringBuilder对象
      *
      * @return StringBuilder对象
@@ -1405,58 +1467,6 @@ public class StringUtils extends org.springframework.util.StringUtils {
             return defaultValue;
         }
         return str.toString();
-    }
-
-    /**
-     * 是否以指定字符串结尾
-     *
-     * @param str    被监测字符串
-     * @param suffix 结尾字符串
-     * @return 是否以指定字符串结尾
-     */
-    public static boolean endWith(CharSequence str, CharSequence suffix) {
-        return endWith(str, suffix, false);
-    }
-
-    /**
-     * 是否以指定字符串结尾<br>
-     * 如果给定的字符串和开头字符串都为null则返回true，否则任意一个值为null返回false
-     *
-     * @param str        被监测字符串
-     * @param suffix     结尾字符串
-     * @param ignoreCase 是否忽略大小写
-     * @return 是否以指定字符串结尾
-     */
-    public static boolean endWith(CharSequence str, CharSequence suffix, boolean ignoreCase) {
-        return endWith(str, suffix, ignoreCase, false);
-    }
-
-    /**
-     * 是否以指定字符串结尾<br>
-     * 如果给定的字符串和开头字符串都为null则返回true，否则任意一个值为null返回false
-     *
-     * @param str          被监测字符串
-     * @param suffix       结尾字符串
-     * @param ignoreCase   是否忽略大小写
-     * @param ignoreEquals 是否忽略字符串相等的情况
-     * @return 是否以指定字符串结尾
-     */
-    public static boolean endWith(CharSequence str, CharSequence suffix, boolean ignoreCase, boolean ignoreEquals) {
-        if (null == str || null == suffix) {
-            if (ignoreEquals) {
-                return false;
-            }
-            return null == str && null == suffix;
-        }
-
-        final int strOffset = str.length() - suffix.length();
-        boolean isEndWith = str.toString()
-                .regionMatches(ignoreCase, strOffset, suffix.toString(), 0, suffix.length());
-
-        if (isEndWith) {
-            return (!ignoreEquals) || (!equals(str, suffix, ignoreCase));
-        }
-        return false;
     }
 
     /**

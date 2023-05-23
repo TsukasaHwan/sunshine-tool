@@ -691,6 +691,21 @@ public class DateUtils {
     }
 
     /**
+     * 计算相对于dateToCompare的年龄，常用于计算指定生日在某年的年龄
+     *
+     * @param birthday      生日
+     * @param dateToCompare 需要对比的日期
+     * @return 年龄
+     */
+    public static int age(Date birthday, Date dateToCompare) {
+        Assert.notNull(birthday, "Birthday can not be null !");
+        if (null == dateToCompare) {
+            dateToCompare = date();
+        }
+        return age(birthday.getTime(), dateToCompare.getTime());
+    }
+
+    /**
      * 获取某天开始时间
      *
      * @param localDateTime LocalDateTime
@@ -805,6 +820,21 @@ public class DateUtils {
     }
 
     /**
+     * 计算相对于dateToCompare的年龄，常用于计算指定生日在某年的年龄
+     *
+     * @param birthday      生日
+     * @param dateToCompare 需要对比的日期
+     * @return 年龄
+     */
+    public static int age(LocalDateTime birthday, LocalDateTime dateToCompare) {
+        Assert.notNull(birthday, "Birthday can not be null !");
+        if (null == dateToCompare) {
+            dateToCompare = LocalDateTime.now();
+        }
+        return age(toMilliseconds(birthday), toMilliseconds(dateToCompare));
+    }
+
+    /**
      * 将秒数转换为日时分秒
      *
      * @param seconds 秒数
@@ -835,5 +865,49 @@ public class DateUtils {
         }
         sb.append(second);
         return sb.toString();
+    }
+
+    /**
+     * 计算相对于dateToCompare的年龄，常用于计算指定生日在某年的年龄
+     *
+     * @param birthday      生日
+     * @param dateToCompare 需要对比的日期
+     * @return 年龄
+     */
+    private static int age(long birthday, long dateToCompare) {
+        if (birthday > dateToCompare) {
+            throw new IllegalArgumentException("Birthday is after dateToCompare!");
+        }
+
+        final Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(dateToCompare);
+
+        final int year = cal.get(Calendar.YEAR);
+        final int month = cal.get(Calendar.MONTH);
+        final int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
+        final boolean isLastDayOfMonth = dayOfMonth == cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+
+        cal.setTimeInMillis(birthday);
+        int age = year - cal.get(Calendar.YEAR);
+
+        final int monthBirth = cal.get(Calendar.MONTH);
+
+        //当前日期，则为0岁
+        if (age == 0) {
+            return 0;
+        } else if (month == monthBirth) {
+
+            final int dayOfMonthBirth = cal.get(Calendar.DAY_OF_MONTH);
+            final boolean isLastDayOfMonthBirth = dayOfMonthBirth == cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+            if ((!isLastDayOfMonth || !isLastDayOfMonthBirth) && dayOfMonth <= dayOfMonthBirth) {
+                // 如果生日在当月，但是未超过生日当天的日期，年龄减一
+                age--;
+            }
+        } else if (month < monthBirth) {
+            // 如果当前月份未达到生日的月份，年龄计算减一
+            age--;
+        }
+
+        return age;
     }
 }

@@ -142,6 +142,21 @@ public class INetUtils {
     /**
      * ping 主机
      *
+     * @param host    主机地址
+     * @param timeout 超时时间（毫秒）
+     */
+    public static boolean tryPing(String host, int timeout) {
+        try {
+            InetAddress address = InetAddress.getByName(host);
+            return address.isReachable(timeout);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * ping 主机
+     *
      * @param host     主机地址
      * @param timeout  超时时间（毫秒）
      * @param consumer 消费者
@@ -151,7 +166,7 @@ public class INetUtils {
             InetAddress address = InetAddress.getByName(host);
             consumer.accept(address.isReachable(timeout));
         } catch (Exception e) {
-            e.printStackTrace();
+            consumer.accept(Boolean.FALSE);
         }
     }
 }

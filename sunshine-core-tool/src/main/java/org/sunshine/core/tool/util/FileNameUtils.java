@@ -151,7 +151,7 @@ public class FileNameUtils {
         }
 
         for (final CharSequence specialSuffix : SPECIAL_SUFFIX) {
-            if (StringUtils.endWith(fileName, "." + specialSuffix)) {
+            if (fileName.endsWith("." + specialSuffix)) {
                 return StringUtils.subPre(fileName, len - specialSuffix.length() - 1);
             }
         }
