@@ -40,18 +40,18 @@ public class CodeEnumTypeHelper<T extends CodeEnum> extends BaseTypeHandler<T> {
     @Override
     public T getNullableResult(ResultSet resultSet, String columnName) throws SQLException {
         int s = resultSet.getInt(columnName);
-        return CodeEnum.valueOf(this.type, s).get();
+        return CodeEnum.of(this.type, s).get();
     }
 
     @Override
     public T getNullableResult(ResultSet resultSet, int columnIndex) throws SQLException {
         int s = resultSet.getInt(columnIndex);
-        return CodeEnum.valueOf(this.type, s).get();
+        return CodeEnum.of(this.type, s).get();
     }
 
     @Override
     public T getNullableResult(CallableStatement callableStatement, int columnIndex) throws SQLException {
         int s = callableStatement.getInt(columnIndex);
-        return CodeEnum.valueOf(this.type, s).get();
+        return CodeEnum.of(this.type, s).get();
     }
 }

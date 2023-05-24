@@ -37,7 +37,7 @@ public interface CodeEnum {
      * @param <EnumType> 枚举类型
      * @return 枚举
      */
-    static <EnumType extends CodeEnum> Optional<EnumType> valueOf(Class<EnumType> enumType, Integer code) {
+    static <EnumType extends CodeEnum> Optional<EnumType> of(Class<EnumType> enumType, Integer code) {
         return Arrays.stream(enumType.getEnumConstants()).filter(ele -> ele.code().equals(code)).findFirst();
     }
 

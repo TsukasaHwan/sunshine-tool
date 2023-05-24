@@ -38,7 +38,7 @@ public class JsonEnumDeserializer extends JsonDeserializer<Enum<?>> implements C
     public Enum<?> deserialize(JsonParser p, DeserializationContext context) throws IOException {
 
         if (StringUtils.hasText(p.getText()) && CodeEnum.class.isAssignableFrom(clazz) && isInteger(p.getText())) {
-            Optional optional = CodeEnum.valueOf(clazz, Integer.valueOf(p.getText()));
+            Optional optional = CodeEnum.of(clazz, Integer.valueOf(p.getText()));
             if (optional.isPresent()) {
                 return (Enum<?>) optional.get();
             }
