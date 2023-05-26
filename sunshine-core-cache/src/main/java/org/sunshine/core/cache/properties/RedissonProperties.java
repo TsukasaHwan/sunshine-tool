@@ -8,8 +8,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties("spring.redis.redisson")
 public class RedissonProperties {
+
     /**
-     * whether to enable
+     * Whether to enable
      */
     private boolean enable;
 
