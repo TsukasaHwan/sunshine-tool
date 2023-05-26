@@ -47,7 +47,7 @@ public abstract class AbstractRedisStreamConfiguration {
      * @param <T>            泛型 T
      * @return 完整配置的消息监听容器
      */
-    protected <T> StreamMessageListenerContainer<String, ObjectRecord<String, T>> createConsumerListener(RedisStreamKey redisStreamKey,
+    protected <T> StreamMessageListenerContainer<String, ObjectRecord<String, T>> applyListenerContainer(RedisStreamKey redisStreamKey,
                                                                                                          Duration pollTimeout,
                                                                                                          int batchSize,
                                                                                                          Class<T> clazz,
