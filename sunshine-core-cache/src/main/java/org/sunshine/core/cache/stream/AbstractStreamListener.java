@@ -1,5 +1,7 @@
 package org.sunshine.core.cache.stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.stream.StreamListener;
@@ -15,6 +17,8 @@ import java.util.Optional;
  * @since 2023/5/26
  */
 public abstract class AbstractStreamListener<T> implements StreamListener<String, ObjectRecord<String, T>> {
+
+    private final static Logger log = LoggerFactory.getLogger(AbstractStreamListener.class);
 
     private final Class<T> clazz;
 
@@ -94,6 +98,7 @@ public abstract class AbstractStreamListener<T> implements StreamListener<String
             List<ObjectRecord<String, T>> result = redisClient.streamRange(clazz, redisStreamKey().stream(), Range.just(recordId.getValue()));
             // 重试消息
             ObjectRecord<String, T> objectRecord = result.get(0);
+            log.info("RedisStream消息重试:流:{},组:{},消费者:{},消息ID:{}", redisStreamKey().stream(), redisStreamKey().group(), redisStreamKey().consumer(), recordId);
             onMessage(objectRecord);
         }
     }
