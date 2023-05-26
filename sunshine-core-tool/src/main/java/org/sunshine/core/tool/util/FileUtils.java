@@ -700,7 +700,7 @@ public class FileUtils extends FileCopyUtils {
                 parentCanonicalPath = parentFile.getAbsolutePath();
                 canonicalPath = file.getAbsolutePath();
             }
-            Assert.isTrue(!canonicalPath.startsWith(parentCanonicalPath), "New file is outside of the parent dir: " + file.getName());
+            Assert.isTrue(canonicalPath.startsWith(parentCanonicalPath), "New file is outside of the parent dir: " + file.getName());
         }
         return file;
     }
