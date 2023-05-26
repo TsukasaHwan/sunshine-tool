@@ -1,5 +1,7 @@
 package org.sunshine.core.tool.util;
 
+import org.springframework.util.SerializationUtils;
+
 import java.io.Serializable;
 import java.lang.reflect.Array;
 
@@ -102,6 +104,32 @@ public class ObjectUtils extends org.springframework.util.ObjectUtils {
         if (!(obj instanceof Serializable)) {
             return null;
         }
-        return IoUtils.deserialize(IoUtils.serialize(obj));
+        return deserialize(serialize(obj));
     }
+
+    /**
+     * 序列化<br>
+     * 对象必须实现Serializable接口
+     *
+     * @param <T> 对象类型
+     * @param obj 要被序列化的对象
+     * @return 序列化后的字节码
+     */
+    public static <T> byte[] serialize(T obj) {
+        return SerializationUtils.serialize(obj);
+    }
+
+    /**
+     * 反序列化<br>
+     * 对象必须实现Serializable接口
+     *
+     * @param <T>   对象类型
+     * @param bytes 反序列化的字节码
+     * @return 反序列化后的对象
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T deserialize(byte[] bytes) {
+        return (T) SerializationUtils.deserialize(bytes);
+    }
+
 }

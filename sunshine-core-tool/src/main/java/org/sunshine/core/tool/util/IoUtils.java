@@ -196,33 +196,4 @@ public class IoUtils extends StreamUtils {
             }
         }
     }
-
-    /**
-     * 序列化<br>
-     * 对象必须实现Serializable接口
-     *
-     * @param <T> 对象类型
-     * @param obj 要被序列化的对象
-     * @return 序列化后的字节码
-     */
-    public static <T> byte[] serialize(T obj) {
-        if (!(obj instanceof Serializable)) {
-            return null;
-        }
-        final ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-        writeObjects(byteOut, false, (Serializable) obj);
-        return byteOut.toByteArray();
-    }
-
-    /**
-     * 反序列化<br>
-     * 对象必须实现Serializable接口
-     *
-     * @param <T>   对象类型
-     * @param bytes 反序列化的字节码
-     * @return 反序列化后的对象
-     */
-    public static <T> T deserialize(byte[] bytes) {
-        return readObj(new ByteArrayInputStream(bytes));
-    }
 }
