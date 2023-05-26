@@ -1,6 +1,8 @@
 package org.sunshine.core.cache.stream;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.stream.Consumer;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
@@ -13,7 +15,6 @@ import org.springframework.data.redis.stream.StreamMessageListenerContainer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.Assert;
 import org.sunshine.core.cache.RedisClient;
-import org.sunshine.core.tool.util.SpringUtils;
 
 import java.time.Duration;
 
@@ -21,7 +22,11 @@ import java.time.Duration;
  * @author Teamo
  * @since 2023/5/26
  */
+@EnableConfigurationProperties(RedisProperties.class)
 public abstract class AbstractRedisStreamConfiguration {
+
+    @Autowired
+    private RedisProperties redisProperties;
 
     protected final RedisConnectionFactory redisConnectionFactory;
 
@@ -52,7 +57,6 @@ public abstract class AbstractRedisStreamConfiguration {
                                                                                                          int batchSize,
                                                                                                          Class<T> clazz,
                                                                                                          AbstractStreamListener<T> streamListener) {
-        RedisProperties redisProperties = SpringUtils.getBean(RedisProperties.class);
         Assert.notNull(pollTimeout, "Poll timeout must not be null!");
         Assert.isTrue(pollTimeout.compareTo(redisProperties.getTimeout()) < 0, "Poll timeout must be smaller than 'spring.redis.timeout'!");
 
