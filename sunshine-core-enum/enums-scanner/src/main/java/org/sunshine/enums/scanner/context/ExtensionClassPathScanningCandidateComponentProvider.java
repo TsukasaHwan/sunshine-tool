@@ -68,13 +68,13 @@ public class ExtensionClassPathScanningCandidateComponentProvider extends ClassP
         properties.getScanPackages().forEach(x -> candidateComponents.addAll(findCandidateComponents(x)));
 
         return candidateComponents.stream().map(x -> {
-            try {
-                return Class.forName(x.getBeanClassName());
-            } catch (ClassNotFoundException e) {
-                log.error("扫描资源, 执行 class 加载异常", e);
-            }
-            return null;
-        }).filter(Objects::nonNull)
+                    try {
+                        return Class.forName(x.getBeanClassName());
+                    } catch (ClassNotFoundException e) {
+                        log.error("扫描资源, 执行 class 加载异常", e);
+                    }
+                    return null;
+                }).filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
     }

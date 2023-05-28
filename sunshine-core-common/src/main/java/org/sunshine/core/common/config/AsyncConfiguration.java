@@ -1,6 +1,5 @@
 package org.sunshine.core.common.config;
 
-import org.sunshine.core.log.mdc.ThreadPoolExecutorMdcWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
@@ -8,6 +7,7 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.sunshine.core.log.mdc.ThreadPoolExecutorMdcWrapper;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;

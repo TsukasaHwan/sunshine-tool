@@ -2,8 +2,8 @@ package org.sunshine.enums.conversion.processor;
 
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
-import org.sunshine.enums.conversion.converter.AbstractJsonConverter;
 import org.sunshine.enums.conversion.annotation.JsonAutoConverter;
+import org.sunshine.enums.conversion.converter.AbstractJsonConverter;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;

@@ -1,10 +1,9 @@
 # spring-boot-starter-enums-scanner
 
-
-
 ## 使用说明
 
 #### 1. 项目中的枚举类 实现 CodeEnum 接口,并重写获取 code 和 value 的方法,并加上枚举扫描的注解 @EnumScan
+
 ```java
 /**
  * @author: Teamo
@@ -38,7 +37,6 @@ public enum CompanyType implements CodeEnum {
   }
 }
 ```
-
 
 #### 2. 获取所有枚举值, 在容器中注入 枚举处理接口 EnumScanHandler,调用其codeTables,即可获取所有枚举值
 
