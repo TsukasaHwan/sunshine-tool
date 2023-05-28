@@ -1,4 +1,4 @@
-package org.sunshine.core.common.exception;
+package org.sunshine.core.tool.exception;
 
 import org.sunshine.core.tool.api.response.Result;
 

@@ -25,9 +25,6 @@ public enum CommonCode implements ResultCode {
     //操作失败
     FAIL(HttpServletResponse.SC_BAD_REQUEST, "操作失败"),
 
-    //请勿频繁操作
-    FREQUENT_OPERATION(HttpServletResponse.SC_BAD_REQUEST, "请勿频繁操作"),
-
     //非法参数
     INVALID_PARAM(HttpServletResponse.SC_BAD_REQUEST, "非法参数"),
 

@@ -5,21 +5,22 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.scripting.support.ResourceScriptSource;
 import org.springframework.util.Assert;
 import org.sunshine.core.cache.annotation.RequestRateLimit;
+import org.sunshine.core.cache.enums.LimitKeyType;
 import org.sunshine.core.cache.enums.LimitType;
+import org.sunshine.core.tool.exception.CustomException;
 import org.sunshine.core.tool.util.StringPool;
 import org.sunshine.core.tool.util.StringUtils;
 import org.sunshine.core.tool.util.WebUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Teamo
@@ -28,17 +29,14 @@ import java.lang.reflect.Method;
 @Aspect
 public class RequestRateLimitAspect {
 
-    private final static Logger log = LoggerFactory.getLogger(RequestRateLimitAspect.class);
+    private final static ResourceScriptSource FIX_RATE_LIMIT_SCRIPT = new ResourceScriptSource(new ClassPathResource("scripts/fix_window_limit.lua"));
 
-    private final static ResourceScriptSource RATE_LIMIT_SCRIPT = new ResourceScriptSource(new ClassPathResource("scripts/rate_limit_lua.lua"));
+    private final static ResourceScriptSource SLIDE_RATE_LIMIT_SCRIPT = new ResourceScriptSource(new ClassPathResource("scripts/slide_window_limit.lua"));
 
     private final RedisTemplate<String, Object> redisTemplate;
 
-    private final RuntimeException throwException;
-
-    public RequestRateLimitAspect(RedisTemplate<String, Object> redisTemplate, RuntimeException throwException) {
+    public RequestRateLimitAspect(RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
-        this.throwException = throwException;
     }
 
     @Around("@annotation(requestRateLimit)")
@@ -48,25 +46,43 @@ public class RequestRateLimitAspect {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method signatureMethod = signature.getMethod();
         String key = requestRateLimit.key();
-        LimitType limitType = requestRateLimit.limitType();
         if (StringUtils.isBlank(key)) {
-            if (limitType == LimitType.DEFAULT) {
-                // 默认取方法名为key
+            LimitKeyType limitKeyType = requestRateLimit.limitKeyType();
+            if (limitKeyType.equals(LimitKeyType.METHOD)) {
+                // 取方法名为key
                 key = signatureMethod.getName();
-            } else if (limitType == LimitType.IP) {
+            } else if (limitKeyType.equals(LimitKeyType.IP)) {
                 // 取ip为key
                 key = WebUtils.getIP();
             }
         }
         ImmutableList<String> keys = ImmutableList.of(requestRateLimit.prefix() + key + StringPool.COLON + request.getRequestURI());
-        DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>();
-        redisScript.setResultType(Long.class);
-        redisScript.setScriptSource(RATE_LIMIT_SCRIPT);
-        Long result = redisTemplate.execute(redisScript, keys, requestRateLimit.count(), requestRateLimit.period());
+        Long result = selectLimitType(keys, requestRateLimit);
         if (result == null || result.equals(0L)) {
-            throw throwException;
+            throw new CustomException(requestRateLimit.msg());
         }
-        log.info("限流key为 [{}]，描述为 [{}] 的接口", keys, requestRateLimit.name());
         return joinPoint.proceed();
+    }
+
+    private Long selectLimitType(ImmutableList<String> keys, RequestRateLimit requestRateLimit) {
+        Long result = null;
+        LimitType limitType = requestRateLimit.limitType();
+        DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>();
+        TimeUnit unit = requestRateLimit.unit();
+        redisScript.setResultType(Long.class);
+        if (limitType.equals(LimitType.FIXED_WINDOW)) {
+            // 固定窗口
+            redisScript.setScriptSource(FIX_RATE_LIMIT_SCRIPT);
+            // 强转int，由于FastJson序列化时会将long类型的字节数组带上L
+            result = redisTemplate.execute(redisScript, keys, requestRateLimit.limit(), (int) unit.toSeconds(requestRateLimit.expire()));
+        } else if (limitType.equals(LimitType.SLIDE_WINDOW)) {
+            // 滑动窗口
+            long score = System.currentTimeMillis();
+            // 强转int，由于FastJson序列化时会将long类型的字节数组带上L
+            int windowTime = (int) (score - unit.toMillis(requestRateLimit.expire()));
+            redisScript.setScriptSource(SLIDE_RATE_LIMIT_SCRIPT);
+            result = redisTemplate.execute(redisScript, keys, windowTime, (int) score, requestRateLimit.limit(), (int) score);
+        }
+        return result;
     }
 }

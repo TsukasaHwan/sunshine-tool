@@ -1,9 +1,11 @@
 package org.sunshine.core.cache.annotation;
 
+import org.sunshine.core.cache.enums.LimitKeyType;
 import org.sunshine.core.cache.enums.LimitType;
 import org.sunshine.core.tool.util.StringPool;
 
 import java.lang.annotation.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 限流注解
@@ -15,13 +17,6 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RequestRateLimit {
-
-    /**
-     * 资源名称
-     *
-     * @return String
-     */
-    String name() default StringPool.EMPTY;
 
     /**
      * key前缀
@@ -38,23 +33,44 @@ public @interface RequestRateLimit {
     String key() default StringPool.EMPTY;
 
     /**
-     * 时间周期
+     * 请求数
      *
      * @return int
      */
-    int period();
+    int limit();
 
     /**
-     * 请求次数
+     * 过期时间
      *
-     * @return int
+     * @return long
      */
-    int count();
+    long expire();
 
     /**
-     * 限制类型
+     * 时间单位
      *
-     * @return LimitType
+     * @return {@link TimeUnit}
      */
-    LimitType limitType() default LimitType.DEFAULT;
+    TimeUnit unit() default TimeUnit.SECONDS;
+
+    /**
+     * 提示消息
+     *
+     * @return String
+     */
+    String msg() default "请勿频繁操作";
+
+    /**
+     * 限制key类型
+     *
+     * @return {@link LimitKeyType}
+     */
+    LimitKeyType limitKeyType() default LimitKeyType.METHOD;
+
+    /**
+     * 限流类型
+     *
+     * @return {@link LimitType}
+     */
+    LimitType limitType() default LimitType.FIXED_WINDOW;
 }

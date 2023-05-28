@@ -33,7 +33,6 @@ import org.sunshine.core.cache.RedisClient;
 import org.sunshine.core.cache.RedisClientImpl;
 import org.sunshine.core.cache.aspect.DistributedLockAspect;
 import org.sunshine.core.cache.aspect.RequestRateLimitAspect;
-import org.sunshine.core.cache.exception.RequestRateLimitException;
 import org.sunshine.core.cache.support.CustomCacheManager;
 
 import java.time.Duration;
@@ -146,6 +145,6 @@ public class CacheAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(RequestRateLimitAspect.class)
     public RequestRateLimitAspect rateLimitAspect(RedisTemplate<String, Object> redisTemplate) {
-        return new RequestRateLimitAspect(redisTemplate, new RequestRateLimitException("Request upper limit! Please see the log for details"));
+        return new RequestRateLimitAspect(redisTemplate);
     }
 }

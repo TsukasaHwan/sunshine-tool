@@ -12,10 +12,10 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.sunshine.core.cache.exception.RequestRateLimitException;
 import org.sunshine.core.tool.api.code.CommonCode;
 import org.sunshine.core.tool.api.code.ResultCode;
 import org.sunshine.core.tool.api.response.Result;
+import org.sunshine.core.tool.exception.CustomException;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -44,7 +44,6 @@ public class ResponseExceptionHandler {
     static {
         BUILDER.put(HttpMessageNotReadableException.class, CommonCode.INVALID_PARAM);
         BUILDER.put(HttpRequestMethodNotSupportedException.class, CommonCode.REQUEST_NOT_SUPPORTED);
-        BUILDER.put(RequestRateLimitException.class, CommonCode.FREQUENT_OPERATION);
         BUILDER.put(AccessDeniedException.class, CommonCode.UNAUTHORIZED);
     }
 

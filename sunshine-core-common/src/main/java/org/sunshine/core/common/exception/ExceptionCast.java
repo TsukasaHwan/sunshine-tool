@@ -1,6 +1,7 @@
 package org.sunshine.core.common.exception;
 
 import org.sunshine.core.tool.api.response.Result;
+import org.sunshine.core.tool.exception.CustomException;
 
 /**
  * @author Teamo
