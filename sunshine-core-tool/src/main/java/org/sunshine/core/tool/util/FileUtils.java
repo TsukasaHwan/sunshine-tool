@@ -297,22 +297,7 @@ public class FileUtils extends FileCopyUtils {
      * @throws IOException IOException
      */
     public static OutputStream openOutputStream(final File file, final boolean append) throws IOException {
-        if (file.exists()) {
-            if (file.isDirectory()) {
-                throw new IOException("File '" + file + "' exists but is a directory");
-            }
-            if (!file.canWrite()) {
-                throw new IOException("File '" + file + "' cannot be written to");
-            }
-        } else {
-            final File parent = file.getParentFile();
-            if (parent != null) {
-                if (!parent.mkdirs() && !parent.isDirectory()) {
-                    throw new IOException("Directory '" + parent + "' could not be created");
-                }
-            }
-        }
-        return append ? new FileOutputStream(file, true) : getOutputStream(file);
+        return append ? new FileOutputStream(touch(file), true) : getOutputStream(touch(file));
     }
 
     /**
