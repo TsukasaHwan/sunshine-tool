@@ -1,4 +1,4 @@
-package org.sunshine.core.sms;
+package org.sunshine.core.sms.config;
 
 import com.aliyun.dysmsapi20170525.Client;
 import com.aliyun.teaopenapi.models.Config;
@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.sunshine.core.sms.AliSmsTemplate;
 import org.sunshine.core.sms.props.AliSmsProperties;
 
 /**
