@@ -9,7 +9,7 @@ import java.security.interfaces.RSAPublicKey;
  * @author Teamo
  * @since 2023/4/26
  */
-@ConfigurationProperties("oauth2.server")
+@ConfigurationProperties("spring.oauth2.server")
 public class OAuth2ServerProperties {
 
     /**
