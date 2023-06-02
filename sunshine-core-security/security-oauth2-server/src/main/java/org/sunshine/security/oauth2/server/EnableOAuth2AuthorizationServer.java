@@ -14,5 +14,5 @@ import java.lang.annotation.*;
 @Documented
 @Import({OAuth2ServerConfiguration.class, WebSecurityConfiguration.class})
 @Configuration
-public @interface EnableOAuth2Server {
+public @interface EnableOAuth2AuthorizationServer {
 }
