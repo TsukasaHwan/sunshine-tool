@@ -12,7 +12,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Documented
-@Import({OAuth2ServerConfiguration.class, WebSecurityConfiguration.class})
+@Import({OAuth2ServerConfiguration.class, OAuth2WebSecurityConfiguration.class})
 @Configuration
 public @interface EnableOAuth2AuthorizationServer {
 }

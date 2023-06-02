@@ -33,11 +33,11 @@ import java.util.Set;
 @Import(DefaultSecurityConfiguration.class)
 @EnableConfigurationProperties(OAuth2ServerProperties.class)
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
-public class WebSecurityConfiguration {
+public class OAuth2WebSecurityConfiguration {
 
     private final OAuth2ServerProperties properties;
 
-    public WebSecurityConfiguration(OAuth2ServerProperties properties) {
+    public OAuth2WebSecurityConfiguration(OAuth2ServerProperties properties) {
         this.properties = properties;
     }
 
