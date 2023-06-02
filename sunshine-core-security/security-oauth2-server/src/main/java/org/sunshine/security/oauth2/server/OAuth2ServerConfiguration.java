@@ -6,18 +6,16 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
@@ -43,6 +41,7 @@ import org.sunshine.security.oauth2.server.authorization.OAuth2ClientRepository;
 import org.sunshine.security.oauth2.server.entity.OAuth2Auth;
 import org.sunshine.security.oauth2.server.entity.OAuth2AuthConsent;
 import org.sunshine.security.oauth2.server.entity.OAuth2Client;
+import org.sunshine.security.oauth2.server.handler.OAuth2AuthenticationEntryPoint;
 import org.sunshine.security.oauth2.server.properties.OAuth2ServerProperties;
 
 import java.util.Arrays;
@@ -51,15 +50,14 @@ import java.util.Arrays;
  * @author Teamo
  * @since 2023/4/26
  */
-@AutoConfiguration(before = SecurityAutoConfiguration.class)
+@Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(OAuth2ServerProperties.class)
-@ConditionalOnProperty(value = "spring.oauth2.server.enable", havingValue = "true")
-public class OAuth2ServerAutoConfiguration {
+public class OAuth2ServerConfiguration {
 
-    private final OAuth2ServerProperties oAuth2ServerProperties;
+    private final OAuth2ServerProperties properties;
 
-    public OAuth2ServerAutoConfiguration(OAuth2ServerProperties oAuth2ServerProperties) {
-        this.oAuth2ServerProperties = oAuth2ServerProperties;
+    public OAuth2ServerConfiguration(OAuth2ServerProperties properties) {
+        this.properties = properties;
     }
 
     /**
@@ -73,12 +71,15 @@ public class OAuth2ServerAutoConfiguration {
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http,
                                                                       OAuth2PasswordAuthenticationProvider passwordAuthenticationProvider) throws Exception {
+
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
         OAuth2AuthorizationServerConfigurer authorizationServerConfigurer =
                 new OAuth2AuthorizationServerConfigurer();
 
-        if (oAuth2ServerProperties.getConsentPageUri() != null) {
+        if (properties.getConsentPageUri() != null) {
             authorizationServerConfigurer.authorizationEndpoint(authorizationEndpoint ->
-                    authorizationEndpoint.consentPage(oAuth2ServerProperties.getConsentPageUri()));
+                    authorizationEndpoint.consentPage(properties.getConsentPageUri()));
         }
 
         authorizationServerConfigurer.tokenEndpoint(tokenEndpoint -> tokenEndpoint.accessTokenRequestConverter(
@@ -97,15 +98,18 @@ public class OAuth2ServerAutoConfiguration {
 
         http
                 .requestMatcher(endpointsMatcher)
-                .authorizeHttpRequests(authorize ->
-                        authorize.anyRequest().authenticated()
-                )
+                .authorizeHttpRequests().anyRequest().authenticated()
+                .and()
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
                 .apply(authorizationServerConfigurer);
 
-        http.formLogin(Customizer.withDefaults());
-
         http.authenticationProvider(passwordAuthenticationProvider);
+
+        http.exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(new OAuth2AuthenticationEntryPoint()));
+
+        http.csrf().disable();
+
+        http.headers().frameOptions().disable();
 
         return http.build();
     }
@@ -155,7 +159,7 @@ public class OAuth2ServerAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(JWKSource.class)
     public JWKSource<SecurityContext> jwkSource() {
-        OAuth2ServerProperties.Secret secret = oAuth2ServerProperties.getSecret();
+        OAuth2ServerProperties.Secret secret = properties.getSecret();
         Assert.notNull(secret.getPublicKey(), "RSAPublicKey must not be null!");
         Assert.notNull(secret.getPrivateKey(), "RSAPrivateKey must not be null!");
 
@@ -209,14 +213,15 @@ public class OAuth2ServerAutoConfiguration {
 
     /**
      * 认证端点
-     * <p>
-     * authorizationEndpoint("/oauth2/authorize")
-     * tokenEndpoint("/oauth2/token")
-     * jwkSetEndpoint("/oauth2/jwks")
-     * tokenRevocationEndpoint("/oauth2/revoke")
-     * tokenIntrospectionEndpoint("/oauth2/introspect")
-     * oidcClientRegistrationEndpoint("/connect/register")
-     * oidcUserInfoEndpoint("/userinfo")
+     * <pre>
+     * authorizationEndpoint("/oauth2/authorize");
+     * tokenEndpoint("/oauth2/token");
+     * jwkSetEndpoint("/oauth2/jwks");
+     * tokenRevocationEndpoint("/oauth2/revoke");
+     * tokenIntrospectionEndpoint("/oauth2/introspect");
+     * oidcClientRegistrationEndpoint("/connect/register");
+     * oidcUserInfoEndpoint("/userinfo");
+     * </pre>
      *
      * @return AuthorizationServerSettings
      */
@@ -226,10 +231,18 @@ public class OAuth2ServerAutoConfiguration {
         return AuthorizationServerSettings.builder().build();
     }
 
+    /**
+     * OAuth2.1添加password模式支持
+     *
+     * @param authenticationManager {@link AuthenticationManager}
+     * @param authorizationService  {@link OAuth2ServerConfiguration#authorizationService(BaseMapper, RegisteredClientRepository)}
+     * @param tokenGenerator        {@link OAuth2ServerConfiguration#tokenGenerator(JwtEncoder)}
+     * @return OAuth2PasswordAuthenticationProvider
+     */
     @Bean
     public OAuth2PasswordAuthenticationProvider passwordAuthenticationProvider(AuthenticationManager authenticationManager,
-                                                                               OAuth2AuthorizationService oAuth2AuthorizationService,
-                                                                               OAuth2TokenGenerator<?> oAuth2TokenGenerator) {
-        return new OAuth2PasswordAuthenticationProvider(authenticationManager, oAuth2AuthorizationService, oAuth2TokenGenerator);
+                                                                               OAuth2AuthorizationService authorizationService,
+                                                                               OAuth2TokenGenerator<?> tokenGenerator) {
+        return new OAuth2PasswordAuthenticationProvider(authenticationManager, authorizationService, tokenGenerator);
     }
 }

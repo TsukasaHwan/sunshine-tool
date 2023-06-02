@@ -4,23 +4,36 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Teamo
  * @since 2023/4/26
  */
-@ConfigurationProperties("spring.oauth2.server")
+@ConfigurationProperties("oauth2.server")
 public class OAuth2ServerProperties {
-
-    /**
-     * Whether to enable OAuth2 Server.
-     */
-    private boolean enable = false;
 
     /**
      * Consent page uri
      */
     private String consentPageUri;
+
+    /**
+     * Accessible resource path.
+     */
+    private List<String> permitAllPaths = Arrays.asList(
+            "/",
+            "/*.html",
+            "/*/*.html",
+            "/*/*.css",
+            "/*/*.js",
+            "/profile/**",
+            "/favicon.ico",
+            "/swagger-resources/**",
+            "/webjars/**",
+            "/*/api-docs/**"
+    );
 
     /**
      * secret
@@ -69,20 +82,20 @@ public class OAuth2ServerProperties {
         }
     }
 
-    public boolean isEnable() {
-        return enable;
-    }
-
-    public void setEnable(boolean enable) {
-        this.enable = enable;
-    }
-
     public String getConsentPageUri() {
         return consentPageUri;
     }
 
     public void setConsentPageUri(String consentPageUri) {
         this.consentPageUri = consentPageUri;
+    }
+
+    public List<String> getPermitAllPaths() {
+        return permitAllPaths;
+    }
+
+    public void setPermitAllPaths(List<String> permitAllPaths) {
+        this.permitAllPaths = permitAllPaths;
     }
 
     public Secret getSecret() {

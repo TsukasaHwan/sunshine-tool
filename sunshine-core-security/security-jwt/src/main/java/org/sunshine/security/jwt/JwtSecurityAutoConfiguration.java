@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -24,10 +25,10 @@ import org.springframework.util.Assert;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.sunshine.security.core.DefaultSecurityConfiguration;
+import org.sunshine.security.core.handler.CommonAccessDeniedHandler;
 import org.sunshine.security.core.support.PermitAllAnnotationSupport;
 import org.sunshine.security.jwt.filter.JwtAuthenticationFilter;
 import org.sunshine.security.jwt.handler.JwtLogoutSuccessHandler;
-import org.sunshine.security.jwt.handler.JwtTokenAccessDeniedHandler;
 import org.sunshine.security.jwt.handler.JwtTokenAuthenticationEntryPoint;
 import org.sunshine.security.jwt.properties.JwtSecurityProperties;
 import org.sunshine.security.jwt.userdetails.JwtUserDetailsService;
@@ -41,6 +42,7 @@ import java.util.Set;
  * @author Teamo
  * @since 2023/03/14
  */
+@EnableWebSecurity
 @AutoConfiguration(before = SecurityAutoConfiguration.class)
 @EnableConfigurationProperties(JwtSecurityProperties.class)
 @ConditionalOnProperty(value = "jwt.security.enable", havingValue = "true")
@@ -58,7 +60,7 @@ public class JwtSecurityAutoConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    UserDetailsService userDetailsService,
                                                    CorsConfigurationSource corsConfigurationSource,
-                                                   PermitAllAnnotationSupport jwtPermitAllAnnotationSupport,
+                                                   PermitAllAnnotationSupport permitAllAnnotationSupport,
                                                    @Autowired(required = false) LogoutSuccessHandler logoutSuccessHandler) throws Exception {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
@@ -71,7 +73,7 @@ public class JwtSecurityAutoConfiguration {
         }
 
         AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry = http.authorizeHttpRequests();
-        jwtPermitAllAnnotationSupport.getAntPatterns().forEach((httpMethod, antPatterns) -> {
+        permitAllAnnotationSupport.getAntPatterns().forEach((httpMethod, antPatterns) -> {
             Set<String> antPatternsSet = new LinkedHashSet<>(antPatterns);
             antPatternsSet.removeIf(permitAllPaths::contains);
             if (!antPatternsSet.isEmpty()) {
@@ -98,7 +100,7 @@ public class JwtSecurityAutoConfiguration {
 
         http.exceptionHandling((exceptions) -> exceptions
                 .authenticationEntryPoint(authenticationEntryPoint)
-                .accessDeniedHandler(new JwtTokenAccessDeniedHandler())
+                .accessDeniedHandler(new CommonAccessDeniedHandler())
         );
 
         http.csrf().disable();

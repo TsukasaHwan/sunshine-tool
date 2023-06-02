@@ -1,4 +1,4 @@
-package org.sunshine.security.jwt.handler;
+package org.sunshine.security.core.handler;
 
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -17,7 +17,7 @@ import java.io.IOException;
  * @author Teamo
  * @since 2023/3/13
  */
-public class JwtTokenAccessDeniedHandler implements AccessDeniedHandler {
+public class CommonAccessDeniedHandler implements AccessDeniedHandler {
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
