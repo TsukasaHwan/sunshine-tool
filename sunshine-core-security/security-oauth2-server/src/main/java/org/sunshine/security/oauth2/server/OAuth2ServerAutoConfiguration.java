@@ -14,6 +14,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -26,9 +28,15 @@ import org.springframework.security.oauth2.server.authorization.config.annotatio
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.token.*;
+import org.springframework.security.oauth2.server.authorization.web.authentication.DelegatingAuthenticationConverter;
+import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2AuthorizationCodeAuthenticationConverter;
+import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2ClientCredentialsAuthenticationConverter;
+import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2RefreshTokenAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.Assert;
+import org.sunshine.security.oauth2.server.authentication.OAuth2PasswordAuthenticationConverter;
+import org.sunshine.security.oauth2.server.authentication.OAuth2PasswordAuthenticationProvider;
 import org.sunshine.security.oauth2.server.authorization.OAuth2AuthConsentServiceImpl;
 import org.sunshine.security.oauth2.server.authorization.OAuth2AuthServiceImpl;
 import org.sunshine.security.oauth2.server.authorization.OAuth2ClientRepository;
@@ -36,6 +44,8 @@ import org.sunshine.security.oauth2.server.entity.OAuth2Auth;
 import org.sunshine.security.oauth2.server.entity.OAuth2AuthConsent;
 import org.sunshine.security.oauth2.server.entity.OAuth2Client;
 import org.sunshine.security.oauth2.server.properties.OAuth2ServerProperties;
+
+import java.util.Arrays;
 
 /**
  * @author Teamo
@@ -61,7 +71,8 @@ public class OAuth2ServerAutoConfiguration {
      */
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
-    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http,
+                                                                      OAuth2PasswordAuthenticationProvider passwordAuthenticationProvider) throws Exception {
         OAuth2AuthorizationServerConfigurer authorizationServerConfigurer =
                 new OAuth2AuthorizationServerConfigurer();
 
@@ -69,6 +80,17 @@ public class OAuth2ServerAutoConfiguration {
             authorizationServerConfigurer.authorizationEndpoint(authorizationEndpoint ->
                     authorizationEndpoint.consentPage(oAuth2ServerProperties.getConsentPageUri()));
         }
+
+        authorizationServerConfigurer.tokenEndpoint(tokenEndpoint -> tokenEndpoint.accessTokenRequestConverter(
+                new DelegatingAuthenticationConverter(
+                        Arrays.asList(
+                                new OAuth2AuthorizationCodeAuthenticationConverter(),
+                                new OAuth2RefreshTokenAuthenticationConverter(),
+                                new OAuth2ClientCredentialsAuthenticationConverter(),
+                                new OAuth2PasswordAuthenticationConverter()
+                        )
+                )
+        ));
 
         RequestMatcher endpointsMatcher = authorizationServerConfigurer
                 .getEndpointsMatcher();
@@ -80,6 +102,10 @@ public class OAuth2ServerAutoConfiguration {
                 )
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
                 .apply(authorizationServerConfigurer);
+
+        http.formLogin(Customizer.withDefaults());
+
+        http.authenticationProvider(passwordAuthenticationProvider);
 
         return http.build();
     }
@@ -198,5 +224,12 @@ public class OAuth2ServerAutoConfiguration {
     @ConditionalOnMissingBean(AuthorizationServerSettings.class)
     public AuthorizationServerSettings authorizationServerSettings() {
         return AuthorizationServerSettings.builder().build();
+    }
+
+    @Bean
+    public OAuth2PasswordAuthenticationProvider passwordAuthenticationProvider(AuthenticationManager authenticationManager,
+                                                                               OAuth2AuthorizationService oAuth2AuthorizationService,
+                                                                               OAuth2TokenGenerator<?> oAuth2TokenGenerator) {
+        return new OAuth2PasswordAuthenticationProvider(authenticationManager, oAuth2AuthorizationService, oAuth2TokenGenerator);
     }
 }
