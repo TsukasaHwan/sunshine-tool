@@ -13,15 +13,21 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.token.*;
@@ -42,8 +48,11 @@ import org.sunshine.oauth2.authorization.server.entity.OAuth2AuthConsent;
 import org.sunshine.oauth2.authorization.server.entity.OAuth2Client;
 import org.sunshine.oauth2.authorization.server.properties.OAuth2AuthorizationServerProperties;
 import org.sunshine.security.core.handler.CommonAuthenticationEntryPoint;
+import org.sunshine.security.core.oauth2.TokenConstant;
 
 import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Teamo
@@ -51,11 +60,11 @@ import java.util.Arrays;
  */
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(OAuth2AuthorizationServerProperties.class)
-public class OAuth2AuthorizationServerConfiguration {
+public class AuthorizationServerConfiguration {
 
     private final OAuth2AuthorizationServerProperties properties;
 
-    public OAuth2AuthorizationServerConfiguration(OAuth2AuthorizationServerProperties properties) {
+    public AuthorizationServerConfiguration(OAuth2AuthorizationServerProperties properties) {
         this.properties = properties;
     }
 
@@ -191,23 +200,46 @@ public class OAuth2AuthorizationServerConfiguration {
     @Bean
     @ConditionalOnMissingBean(JwtDecoder.class)
     public JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwkSource) {
-        return org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
+        return OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
     }
 
     /**
      * token生成器
      *
-     * @param jwtEncoder JwtEncoder
+     * @param jwtEncoder    JwtEncoder
+     * @param jwtCustomizer OAuth2TokenCustomizer<JwtEncodingContext>
      * @return OAuth2TokenGenerator<?>
      */
     @Bean
     @ConditionalOnMissingBean(OAuth2TokenGenerator.class)
-    public OAuth2TokenGenerator<?> tokenGenerator(JwtEncoder jwtEncoder) {
+    public OAuth2TokenGenerator<?> tokenGenerator(JwtEncoder jwtEncoder,
+                                                  OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer) {
         JwtGenerator jwtGenerator = new JwtGenerator(jwtEncoder);
+        jwtGenerator.setJwtCustomizer(jwtCustomizer);
         OAuth2AccessTokenGenerator accessTokenGenerator = new OAuth2AccessTokenGenerator();
         OAuth2RefreshTokenGenerator refreshTokenGenerator = new OAuth2RefreshTokenGenerator();
         return new DelegatingOAuth2TokenGenerator(
                 jwtGenerator, accessTokenGenerator, refreshTokenGenerator);
+    }
+
+    /**
+     * 自定义token
+     *
+     * @return OAuth2TokenCustomizer<JwtEncodingContext>
+     */
+    @Bean
+    @ConditionalOnMissingBean(OAuth2TokenCustomizer.class)
+    public OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer() {
+        return context -> {
+            if (context.getAuthorizationGrantType().getValue().equals(AuthorizationGrantType.PASSWORD.getValue())) {
+                Authentication authentication = context.getPrincipal();
+                if (authentication instanceof UsernamePasswordAuthenticationToken && authentication.getPrincipal() instanceof UserDetails) {
+                    UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+                    Set<String> authorities = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
+                    context.getClaims().claim(TokenConstant.AUTHORITIES, authorities);
+                }
+            }
+        };
     }
 
     /**
@@ -234,8 +266,8 @@ public class OAuth2AuthorizationServerConfiguration {
      * OAuth2.1添加password模式支持
      *
      * @param authenticationManager {@link AuthenticationManager}
-     * @param authorizationService  {@link OAuth2AuthorizationServerConfiguration#authorizationService(BaseMapper, RegisteredClientRepository)}
-     * @param tokenGenerator        {@link OAuth2AuthorizationServerConfiguration#tokenGenerator(JwtEncoder)}
+     * @param authorizationService  {@link AuthorizationServerConfiguration#authorizationService(BaseMapper, RegisteredClientRepository)}
+     * @param tokenGenerator        {@link AuthorizationServerConfiguration#tokenGenerator(JwtEncoder, OAuth2TokenCustomizer)}
      * @return OAuth2PasswordAuthenticationProvider
      */
     @Bean

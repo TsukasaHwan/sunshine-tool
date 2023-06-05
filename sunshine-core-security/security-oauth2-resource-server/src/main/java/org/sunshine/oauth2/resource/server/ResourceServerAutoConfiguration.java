@@ -19,9 +19,9 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import org.springframework.security.web.SecurityFilterChain;
 import org.sunshine.oauth2.resource.server.properties.OAuth2ResourceServerProperties;
 import org.sunshine.security.core.SecurityComponentConfiguration;
-import org.sunshine.security.core.enums.RoleEnum;
 import org.sunshine.security.core.handler.CommonAccessDeniedHandler;
 import org.sunshine.security.core.handler.CommonAuthenticationEntryPoint;
+import org.sunshine.security.core.oauth2.TokenConstant;
 import org.sunshine.security.core.support.PermitAllAnnotationSupport;
 
 import java.util.LinkedHashSet;
@@ -37,11 +37,11 @@ import java.util.Set;
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 @EnableConfigurationProperties(OAuth2ResourceServerProperties.class)
 @Import(SecurityComponentConfiguration.class)
-public class OAuth2ResourceServerConfiguration {
+public class ResourceServerAutoConfiguration {
 
     private final OAuth2ResourceServerProperties properties;
 
-    public OAuth2ResourceServerConfiguration(OAuth2ResourceServerProperties properties) {
+    public ResourceServerAutoConfiguration(OAuth2ResourceServerProperties properties) {
         this.properties = properties;
     }
 
@@ -89,8 +89,8 @@ public class OAuth2ResourceServerConfiguration {
     @ConditionalOnMissingBean(JwtAuthenticationConverter.class)
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        jwtGrantedAuthoritiesConverter.setAuthorityPrefix(RoleEnum.RoleCode.ROLE_PREFIX);
-        jwtGrantedAuthoritiesConverter.setAuthoritiesClaimName("authorities");
+        jwtGrantedAuthoritiesConverter.setAuthoritiesClaimName(TokenConstant.AUTHORITIES);
+        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
 
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
