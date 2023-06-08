@@ -14,7 +14,6 @@ import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.util.Assert;
 import org.sunshine.core.tool.api.code.CommonCode;
-import org.sunshine.security.jwt.util.JwtClaimsUtils;
 
 import java.util.Arrays;
 
@@ -91,7 +90,8 @@ public interface OpenApiConfiguration {
     @Bean
     default OperationCustomizer operationCustomizer() {
         return (operation, handlerMethod) -> {
-            Schema stringSchema = new StringSchema()._default(JwtClaimsUtils.ACCESS_TOKEN_PREFIX).name("Authorization").description("请求接口Authorization");
+            // TODO
+            Schema stringSchema = new StringSchema()._default("Bearer ").name("Authorization").description("请求接口Authorization");
             Parameter headerParameter = new HeaderParameter().name("Authorization").description("请求接口Authorization").schema(stringSchema);
             return operation.addParametersItem(headerParameter);
         };
