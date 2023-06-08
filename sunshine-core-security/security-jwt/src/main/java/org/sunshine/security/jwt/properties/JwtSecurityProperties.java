@@ -17,11 +17,6 @@ import java.util.List;
 public class JwtSecurityProperties {
 
     /**
-     * Whether to enable Jwt Security.
-     */
-    private boolean enable = false;
-
-    /**
      * Token Custom Request Header.
      */
     private String header = HttpHeaders.AUTHORIZATION;
@@ -104,14 +99,6 @@ public class JwtSecurityProperties {
         public void setPrivateKey(RSAPrivateKey privateKey) {
             this.privateKey = privateKey;
         }
-    }
-
-    public boolean isEnable() {
-        return enable;
-    }
-
-    public void setEnable(boolean enable) {
-        this.enable = enable;
     }
 
     public String getHeader() {

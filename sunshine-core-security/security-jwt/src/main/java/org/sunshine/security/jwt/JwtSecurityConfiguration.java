@@ -1,13 +1,11 @@
 package org.sunshine.security.jwt;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -43,16 +41,15 @@ import java.util.Set;
  * @since 2023/03/14
  */
 @EnableWebSecurity
-@AutoConfiguration(before = SecurityAutoConfiguration.class)
+@Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(JwtSecurityProperties.class)
-@ConditionalOnProperty(value = "jwt.security.enable", havingValue = "true")
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 @Import(DefaultSecurityConfiguration.class)
-public class JwtSecurityAutoConfiguration {
+public class JwtSecurityConfiguration {
 
     private final JwtSecurityProperties jwtSecurityProperties;
 
-    public JwtSecurityAutoConfiguration(JwtSecurityProperties jwtSecurityProperties) {
+    public JwtSecurityConfiguration(JwtSecurityProperties jwtSecurityProperties) {
         this.jwtSecurityProperties = jwtSecurityProperties;
     }
 
