@@ -37,11 +37,11 @@ import java.util.Set;
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 @EnableConfigurationProperties(OAuth2ResourceServerProperties.class)
 @Import(SecurityComponentConfiguration.class)
-public class ResourceServerAutoConfiguration {
+public class ResourceServerConfiguration {
 
     private final OAuth2ResourceServerProperties properties;
 
-    public ResourceServerAutoConfiguration(OAuth2ResourceServerProperties properties) {
+    public ResourceServerConfiguration(OAuth2ResourceServerProperties properties) {
         this.properties = properties;
     }
 
@@ -49,12 +49,12 @@ public class ResourceServerAutoConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    PermitAllAnnotationSupport permitAllAnnotationSupport,
                                                    Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter) throws Exception {
-
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry = http.authorizeHttpRequests();
         List<String> permitAllPaths = properties.getPermitAllPaths();
         if (!permitAllPaths.isEmpty()) {
-            http.authorizeHttpRequests().antMatchers(permitAllPaths.toArray(new String[0])).permitAll();
+            registry.antMatchers(permitAllPaths.toArray(new String[0])).permitAll();
         }
-        AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry = http.authorizeHttpRequests();
         permitAllAnnotationSupport.getAntPatterns().forEach((httpMethod, antPatterns) -> {
             Set<String> antPatternsSet = new LinkedHashSet<>(antPatterns);
             antPatternsSet.removeIf(permitAllPaths::contains);
@@ -63,12 +63,9 @@ public class ResourceServerAutoConfiguration {
             }
         });
 
-        http.authorizeHttpRequests().anyRequest().authenticated();
+        registry.anyRequest().authenticated();
 
-        http
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .csrf().disable();
+        http.csrf().disable();
 
         http.oauth2ResourceServer()
                 .jwt()

@@ -23,6 +23,9 @@ public class Result<T> implements Response {
     @Schema(description = "数据")
     private T data;
 
+    public Result() {
+    }
+
     private Result(int code, String msg, T data) {
         this.code = code;
         this.msg = msg;
