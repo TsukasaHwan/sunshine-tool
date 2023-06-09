@@ -1,16 +1,21 @@
 package org.sunshine.oauth2.client;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.reactive.CorsConfigurationSource;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import org.sunshine.core.tool.util.CollectionUtils;
 import org.sunshine.oauth2.client.properties.OAuth2ClientProperties;
-import org.sunshine.security.core.DefaultSecurityConfiguration;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -20,7 +25,6 @@ import java.util.List;
 @EnableWebFluxSecurity
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(OAuth2ClientProperties.class)
-@Import(DefaultSecurityConfiguration.class)
 public class OAuth2ClientConfiguration {
 
     private final OAuth2ClientProperties properties;
@@ -43,5 +47,38 @@ public class OAuth2ClientConfiguration {
                 // 禁用csrf token安全校验
                 .csrf().disable();
         return http.build();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(CorsConfigurationSource.class)
+    public CorsConfigurationSource corsConfigurationSource() {
+        List<String> allowMethod = Arrays.asList(
+                HttpMethod.GET.name(),
+                HttpMethod.HEAD.name(),
+                HttpMethod.POST.name(),
+                HttpMethod.PUT.name(),
+                HttpMethod.PATCH.name(),
+                HttpMethod.DELETE.name(),
+                HttpMethod.OPTIONS.name()
+        );
+
+        List<String> allowHeader = Arrays.asList(
+                HttpHeaders.AUTHORIZATION,
+                HttpHeaders.ORIGIN,
+                HttpHeaders.CONTENT_TYPE,
+                HttpHeaders.ACCEPT,
+                "X-Requested-With"
+        );
+
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        corsConfiguration.addAllowedOriginPattern(CorsConfiguration.ALL);
+        corsConfiguration.setAllowedMethods(allowMethod);
+        corsConfiguration.setAllowedHeaders(allowHeader);
+        corsConfiguration.setAllowCredentials(Boolean.TRUE);
+        corsConfiguration.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", corsConfiguration);
+        return source;
     }
 }
