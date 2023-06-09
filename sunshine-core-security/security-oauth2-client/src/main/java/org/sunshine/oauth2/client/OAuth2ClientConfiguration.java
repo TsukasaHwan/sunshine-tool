@@ -13,6 +13,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import org.sunshine.core.tool.util.CollectionUtils;
+import org.sunshine.oauth2.client.handler.WebFluxAuthenticationEntryPoint;
 import org.sunshine.oauth2.client.properties.OAuth2ClientProperties;
 
 import java.util.Arrays;
@@ -43,6 +44,9 @@ public class OAuth2ClientConfiguration {
         authorizeExchangeSpec
                 // 放行交由资源服务器进行认证鉴权
                 .anyExchange().permitAll()
+                .and()
+                .exceptionHandling()
+                .authenticationEntryPoint(new WebFluxAuthenticationEntryPoint())
                 .and()
                 // 禁用csrf token安全校验
                 .csrf().disable();
