@@ -3,11 +3,13 @@ package org.sunshine.oauth2.client;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.sunshine.core.tool.util.CollectionUtils;
 import org.sunshine.oauth2.client.properties.OAuth2ClientProperties;
+import org.sunshine.security.core.DefaultSecurityConfiguration;
 
 import java.util.List;
 
@@ -18,6 +20,7 @@ import java.util.List;
 @EnableWebFluxSecurity
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(OAuth2ClientProperties.class)
+@Import(DefaultSecurityConfiguration.class)
 public class OAuth2ClientConfiguration {
 
     private final OAuth2ClientProperties properties;
