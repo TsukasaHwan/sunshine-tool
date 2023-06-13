@@ -56,13 +56,8 @@ public class OAuth2ClientRepository implements RegisteredClientRepository {
     }
 
     private void updateClient(RegisteredClient registeredClient) {
-        List<String> clientAuthenticationMethods = new ArrayList<>(registeredClient.getClientAuthenticationMethods().size());
-        registeredClient.getClientAuthenticationMethods().forEach(clientAuthenticationMethod ->
-                clientAuthenticationMethods.add(clientAuthenticationMethod.getValue()));
-
-        List<String> authorizationGrantTypes = new ArrayList<>(registeredClient.getAuthorizationGrantTypes().size());
-        registeredClient.getAuthorizationGrantTypes().forEach(authorizationGrantType ->
-                authorizationGrantTypes.add(authorizationGrantType.getValue()));
+        List<String> clientAuthenticationMethods = getClientAuthenticationMethods(registeredClient);
+        List<String> authorizationGrantTypes = getAuthorizationGrantTypes(registeredClient);
 
         LambdaUpdateWrapper<OAuth2Client> updateWrapper = Wrappers.lambdaUpdate();
         updateWrapper
@@ -87,13 +82,8 @@ public class OAuth2ClientRepository implements RegisteredClientRepository {
         if (ObjectUtils.isNotEmpty(registeredClient.getClientSecretExpiresAt())) {
             oAuth2Client.setClientSecretExpiresAt(LocalDateTime.ofInstant(registeredClient.getClientSecretExpiresAt(), ZoneId.systemDefault()));
         }
-        List<String> clientAuthenticationMethods = new ArrayList<>(registeredClient.getClientAuthenticationMethods().size());
-        registeredClient.getClientAuthenticationMethods().forEach(clientAuthenticationMethod ->
-                clientAuthenticationMethods.add(clientAuthenticationMethod.getValue()));
-
-        List<String> authorizationGrantTypes = new ArrayList<>(registeredClient.getAuthorizationGrantTypes().size());
-        registeredClient.getAuthorizationGrantTypes().forEach(authorizationGrantType ->
-                authorizationGrantTypes.add(authorizationGrantType.getValue()));
+        List<String> clientAuthenticationMethods = getClientAuthenticationMethods(registeredClient);
+        List<String> authorizationGrantTypes = getAuthorizationGrantTypes(registeredClient);
 
         oAuth2Client.setClientAuthenticationMethods(StringUtils.collectionToCommaDelimitedString(clientAuthenticationMethods));
         oAuth2Client.setAuthorizationGrantTypes(StringUtils.collectionToCommaDelimitedString(authorizationGrantTypes));
@@ -102,6 +92,20 @@ public class OAuth2ClientRepository implements RegisteredClientRepository {
         oAuth2Client.setClientSettings(writeMap(registeredClient.getClientSettings().getSettings()));
         oAuth2Client.setTokenSettings(writeMap(registeredClient.getTokenSettings().getSettings()));
         oAuth2ClientMapper.insert(oAuth2Client);
+    }
+
+    private List<String> getClientAuthenticationMethods(RegisteredClient registeredClient) {
+        List<String> clientAuthenticationMethods = new ArrayList<>(registeredClient.getClientAuthenticationMethods().size());
+        registeredClient.getClientAuthenticationMethods().forEach(clientAuthenticationMethod ->
+                clientAuthenticationMethods.add(clientAuthenticationMethod.getValue()));
+        return clientAuthenticationMethods;
+    }
+
+    private List<String> getAuthorizationGrantTypes(RegisteredClient registeredClient) {
+        List<String> authorizationGrantTypes = new ArrayList<>(registeredClient.getAuthorizationGrantTypes().size());
+        registeredClient.getAuthorizationGrantTypes().forEach(authorizationGrantType ->
+                authorizationGrantTypes.add(authorizationGrantType.getValue()));
+        return authorizationGrantTypes;
     }
 
     private void assertUniqueIdentifiers(RegisteredClient registeredClient) {
