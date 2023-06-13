@@ -9,7 +9,7 @@ import javax.servlet.http.HttpSession;
 /**
  * @author Teamo
  */
-public class BaseController {
+public abstract class BaseController {
 
     protected HttpServletRequest request;
 
