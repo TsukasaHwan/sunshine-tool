@@ -19,12 +19,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.sunshine.core.common.exception.ResponseExceptionHandler;
 import org.sunshine.core.tool.datamask.DataMaskJsonFilter;
 import org.sunshine.core.tool.enums.WebFilterOrderEnum;
+import org.sunshine.core.tool.util.DateUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,20 +35,14 @@ import java.util.List;
 @AutoConfiguration
 public class WebConfiguration implements WebMvcConfigurer {
 
-    private final Converter<String, LocalDateTime> localDateTimeConverter = (StringToLocalDateTimeConverter) source -> {
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        return LocalDateTime.parse(source, df);
-    };
+    private final Converter<String, LocalDateTime> localDateTimeConverter = (StringToLocalDateTimeConverter) source ->
+            LocalDateTime.parse(source, DateUtils.DATETIME_FORMATTER);
 
-    private final Converter<String, LocalDate> localDateConverter = (StringToLocalDateConverter) source -> {
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        return LocalDate.parse(source, df);
-    };
+    private final Converter<String, LocalDate> localDateConverter = (StringToLocalDateConverter) source ->
+            LocalDate.parse(source, DateUtils.DATE_FORMATTER);
 
-    private final Converter<String, LocalTime> localTimeConverter = (StringToLocalTimeConverter) source -> {
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("HH:mm:ss");
-        return LocalTime.parse(source, df);
-    };
+    private final Converter<String, LocalTime> localTimeConverter = (StringToLocalTimeConverter) source ->
+            LocalTime.parse(source, DateUtils.TIME_FORMATTER);
 
     /**
      * 集成fastJson
