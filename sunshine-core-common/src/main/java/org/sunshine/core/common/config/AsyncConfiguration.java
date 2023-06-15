@@ -1,8 +1,7 @@
 package org.sunshine.core.common.config;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
+import org.springframework.aop.interceptor.SimpleAsyncUncaughtExceptionHandler;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -19,8 +18,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 @EnableAsync
 @AutoConfiguration
 public class AsyncConfiguration implements AsyncConfigurer {
-
-    private final static Logger log = LoggerFactory.getLogger(AsyncConfiguration.class);
 
     @Override
     public Executor getAsyncExecutor() {
@@ -49,6 +46,6 @@ public class AsyncConfiguration implements AsyncConfigurer {
 
     @Override
     public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
-        return ((throwable, method, objects) -> log.error("方法名称:{}", method.getName(), throwable));
+        return new SimpleAsyncUncaughtExceptionHandler();
     }
 }
