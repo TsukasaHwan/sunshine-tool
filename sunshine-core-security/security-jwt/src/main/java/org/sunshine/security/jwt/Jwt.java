@@ -8,42 +8,57 @@ import java.io.Serializable;
  */
 public class Jwt implements Serializable {
 
-    private String accessToken;
+    private final String accessToken;
 
-    private String refreshToken;
+    private final String refreshToken;
 
-    private Long expiresIn;
+    private final Long expiresIn;
 
-    public Jwt() {
-    }
-
-    public Jwt(String accessToken, String refreshToken, Long expiresIn) {
+    Jwt(String accessToken, String refreshToken, Long expiresIn) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.expiresIn = expiresIn;
+    }
+
+    public static class Builder {
+        private String accessToken;
+
+        private String refreshToken;
+
+        private Long expiresIn;
+
+        Builder() {
+        }
+
+        public Builder accessToken(String accessToken) {
+            this.accessToken = accessToken;
+            return this;
+        }
+
+        public Builder refreshToken(String refreshToken) {
+            this.refreshToken = refreshToken;
+            return this;
+        }
+
+        public Builder expiresIn(Long expiresIn) {
+            this.expiresIn = expiresIn;
+            return this;
+        }
+
+        public Jwt build() {
+            return new Jwt(this.accessToken, this.refreshToken, this.expiresIn);
+        }
     }
 
     public String getAccessToken() {
         return accessToken;
     }
 
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
-
     public String getRefreshToken() {
         return refreshToken;
     }
 
-    public void setRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
-    }
-
     public Long getExpiresIn() {
         return expiresIn;
-    }
-
-    public void setExpiresIn(Long expiresIn) {
-        this.expiresIn = expiresIn;
     }
 }
