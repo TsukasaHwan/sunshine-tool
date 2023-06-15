@@ -19,8 +19,8 @@ import org.sunshine.core.cloud.header.FeignRequestInterceptor;
 import org.sunshine.core.cloud.properties.FeignHeadersProperties;
 import org.sunshine.core.tool.api.response.Result;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 
 /**
  * @author Teamo
@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 @AutoConfiguration(before = SentinelFeignAutoConfiguration.class)
 @EnableConfigurationProperties(FeignHeadersProperties.class)
-@ConditionalOnClass({HttpServletRequest.class, HttpServletResponse.class})
+@ConditionalOnClass({ServletRequest.class, ServletResponse.class})
 public class CloudAutoConfiguration {
 
     private final FeignHeadersProperties feignHeadersProperties;
