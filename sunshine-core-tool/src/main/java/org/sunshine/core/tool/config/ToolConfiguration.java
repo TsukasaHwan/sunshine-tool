@@ -37,9 +37,9 @@ public class ToolConfiguration implements WebMvcConfigurer {
                 //是否自动重连
                 .retryOnConnectionFailure(true)
                 //连接池
-                .connectionPool(new ConnectionPool(300, 20, TimeUnit.SECONDS))
+                .connectionPool(new ConnectionPool(200, 900L, TimeUnit.SECONDS))
                 //设置连接超时
-                .connectTimeout(20, TimeUnit.SECONDS)
+                .connectTimeout(2, TimeUnit.SECONDS)
                 //设置读超时
                 .readTimeout(30, TimeUnit.SECONDS)
                 //设置写超时
