@@ -20,6 +20,22 @@ public class Jwt implements Serializable {
         this.expiresIn = expiresIn;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public Long getExpiresIn() {
+        return expiresIn;
+    }
+
     public static class Builder {
         private String accessToken;
 
@@ -48,17 +64,5 @@ public class Jwt implements Serializable {
         public Jwt build() {
             return new Jwt(this.accessToken, this.refreshToken, this.expiresIn);
         }
-    }
-
-    public String getAccessToken() {
-        return accessToken;
-    }
-
-    public String getRefreshToken() {
-        return refreshToken;
-    }
-
-    public Long getExpiresIn() {
-        return expiresIn;
     }
 }
