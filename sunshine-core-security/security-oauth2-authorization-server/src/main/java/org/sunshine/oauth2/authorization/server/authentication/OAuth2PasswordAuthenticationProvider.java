@@ -30,6 +30,8 @@ import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.sunshine.oauth2.authorization.server.authentication.OAuth2AuthenticationProviderUtils.getAuthenticatedClientElseThrowInvalidClient;
+
 /**
  * @author Teamo
  * @since 2023/5/31
@@ -65,7 +67,8 @@ public class OAuth2PasswordAuthenticationProvider implements AuthenticationProvi
 
         OAuth2PasswordAuthenticationToken passwordAuthenticationToken = (OAuth2PasswordAuthenticationToken) authentication;
 
-        OAuth2ClientAuthenticationToken clientPrincipal = getAuthenticatedClientElseThrowInvalidClient(passwordAuthenticationToken);
+        OAuth2ClientAuthenticationToken clientPrincipal =
+                getAuthenticatedClientElseThrowInvalidClient(passwordAuthenticationToken);
 
         RegisteredClient registeredClient = clientPrincipal.getRegisteredClient();
 
@@ -166,7 +169,8 @@ public class OAuth2PasswordAuthenticationProvider implements AuthenticationProvi
             // @formatter:off
             tokenContext = tokenContextBuilder
                     .tokenType(ID_TOKEN_TOKEN_TYPE)
-                    .authorization(authorizationBuilder.build())	// ID token customizer may need access to the access token and/or refresh token
+                    // ID token customizer may need access to the access token and/or refresh token
+                    .authorization(authorizationBuilder.build())
                     .build();
             // @formatter:on
             OAuth2Token generatedIdToken = this.tokenGenerator.generate(tokenContext);
@@ -224,20 +228,5 @@ public class OAuth2PasswordAuthenticationProvider implements AuthenticationProvi
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(username, password);
 
         return authenticationManager.authenticate(usernamePasswordAuthenticationToken);
-    }
-
-    private OAuth2ClientAuthenticationToken getAuthenticatedClientElseThrowInvalidClient(Authentication authentication) {
-
-        OAuth2ClientAuthenticationToken clientPrincipal = null;
-
-        if (OAuth2ClientAuthenticationToken.class.isAssignableFrom(authentication.getPrincipal().getClass())) {
-            clientPrincipal = (OAuth2ClientAuthenticationToken) authentication.getPrincipal();
-        }
-
-        if (clientPrincipal != null && clientPrincipal.isAuthenticated()) {
-            return clientPrincipal;
-        }
-
-        throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_CLIENT);
     }
 }
