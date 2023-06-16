@@ -1,10 +1,9 @@
 package org.sunshine.security.core.support;
 
+import jakarta.annotation.security.PermitAll;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.sunshine.core.tool.util.ClassUtils;
-
-import javax.annotation.security.PermitAll;
 
 /**
  * @author Teamo

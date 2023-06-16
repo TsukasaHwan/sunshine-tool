@@ -6,7 +6,7 @@
 
     <groupId>org.sunshine</groupId>
     <artifactId>sunshine-tool</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>2.0-SNAPSHOT</version>
     <name>sunshine-tool</name>
     <description>
         Talk is cheap, show me the code.
@@ -39,14 +39,13 @@
     <packaging>pom</packaging>
 
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <spring-boot.version>2.7.11</spring-boot.version>
-        <spring-cloud.version>2021.0.5</spring-cloud.version>
-        <spring-cloud-alibaba.version>2021.0.5.0</spring-cloud-alibaba.version>
-        <spring-security-oauth2-server.version>0.4.2</spring-security-oauth2-server.version>
+        <spring-boot.version>3.1.0</spring-boot.version>
+        <spring-cloud.version>2022.0.3</spring-cloud.version>
+        <spring-cloud-alibaba.version>2022.0.0.0-RC2</spring-cloud-alibaba.version>
         <guava.version>31.1-jre</guava.version>
 
         <mybatis-plus.version>3.5.3.1</mybatis-plus.version>

@@ -1,7 +1,7 @@
 package org.sunshine.core.common.group;
 
-import javax.validation.GroupSequence;
-import javax.validation.groups.Default;
+import jakarta.validation.GroupSequence;
+import jakarta.validation.groups.Default;
 
 /**
  * @author Teamo

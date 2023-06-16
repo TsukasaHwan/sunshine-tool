@@ -1,6 +1,7 @@
 package org.sunshine.core.cache.aspect;
 
 import com.google.common.collect.ImmutableList;
+import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -18,7 +19,6 @@ import org.sunshine.core.tool.util.StringPool;
 import org.sunshine.core.tool.util.StringUtils;
 import org.sunshine.core.tool.util.WebUtils;
 
-import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 

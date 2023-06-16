@@ -22,27 +22,28 @@ public class Ognl {
     /**
      * 可以用于判断Optional,CharSequence,Map,Collection,Array是否为空
      *
-     * @param o 对象
+     * @param obj 对象
      * @return 是否为空
      */
-    public static boolean isEmpty(Object o) {
-        if (o == null) {
+    public static boolean isEmpty(Object obj) {
+        if (obj == null) {
             return true;
         }
-        if (o instanceof Optional) {
-            return !((Optional<?>) o).isPresent();
+
+        if (obj instanceof Optional<?> optional) {
+            return optional.isEmpty();
         }
-        if (o instanceof CharSequence) {
-            return ((CharSequence) o).length() == 0;
+        if (obj instanceof CharSequence charSequence) {
+            return charSequence.length() == 0;
         }
-        if (o.getClass().isArray()) {
-            return Array.getLength(o) == 0;
+        if (obj.getClass().isArray()) {
+            return Array.getLength(obj) == 0;
         }
-        if (o instanceof Collection) {
-            return ((Collection<?>) o).isEmpty();
+        if (obj instanceof Collection<?> collection) {
+            return collection.isEmpty();
         }
-        if (o instanceof Map) {
-            return ((Map<?, ?>) o).isEmpty();
+        if (obj instanceof Map<?, ?> map) {
+            return map.isEmpty();
         }
         return false;
     }

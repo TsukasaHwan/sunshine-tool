@@ -3,14 +3,17 @@ package org.sunshine.core.cloud;
 import com.alibaba.fastjson2.JSONReader;
 import com.alibaba.fastjson2.JSONWriter;
 import com.alibaba.fastjson2.support.config.FastJsonConfig;
-import com.alibaba.fastjson2.support.spring.http.converter.FastJsonHttpMessageConverter;
+import com.alibaba.fastjson2.support.spring6.http.converter.FastJsonHttpMessageConverter;
+import okhttp3.ConnectionPool;
+import okhttp3.OkHttpClient;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
-import org.springframework.cloud.commons.httpclient.OkHttpClientConnectionPoolFactory;
-import org.springframework.cloud.commons.httpclient.OkHttpClientFactory;
+import org.springframework.cloud.openfeign.FeignAutoConfiguration;
 import org.springframework.cloud.openfeign.support.FeignHttpClientProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
@@ -23,7 +26,11 @@ import org.sunshine.core.cloud.http.LbRestTemplate;
 import org.sunshine.core.cloud.http.RestTemplateHeaderInterceptor;
 import org.sunshine.core.cloud.properties.FeignHeadersProperties;
 
+import javax.net.ssl.*;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -39,6 +46,8 @@ import java.util.concurrent.TimeUnit;
 @EnableConfigurationProperties(FeignHeadersProperties.class)
 public class RestTemplateAutoConfiguration {
 
+    private static final Log LOG = LogFactory.getLog(FeignAutoConfiguration.class);
+
     private final FeignHeadersProperties feignHeadersProperties;
 
     public RestTemplateAutoConfiguration(FeignHeadersProperties feignHeadersProperties) {
@@ -48,25 +57,21 @@ public class RestTemplateAutoConfiguration {
     /**
      * okhttp3 链接池配置
      *
-     * @param connectionPoolFactory 链接池配置
-     * @param httpClientProperties  httpClient配置
+     * @param httpClientProperties httpClient配置
      * @return okhttp3.ConnectionPool
      */
     @Bean
     @ConditionalOnMissingBean(okhttp3.ConnectionPool.class)
-    public okhttp3.ConnectionPool httpClientConnectionPool(
-            FeignHttpClientProperties httpClientProperties,
-            OkHttpClientConnectionPoolFactory connectionPoolFactory) {
+    public okhttp3.ConnectionPool httpClientConnectionPool(FeignHttpClientProperties httpClientProperties) {
         int maxTotalConnections = httpClientProperties.getMaxConnections();
         long timeToLive = httpClientProperties.getTimeToLive();
         TimeUnit ttlUnit = httpClientProperties.getTimeToLiveUnit();
-        return connectionPoolFactory.create(maxTotalConnections, timeToLive, ttlUnit);
+        return new ConnectionPool(maxTotalConnections, timeToLive, ttlUnit);
     }
 
     /**
      * 配置OkHttpClient
      *
-     * @param httpClientFactory    httpClient 工厂
      * @param connectionPool       链接池配置
      * @param httpClientProperties httpClient配置
      * @return OkHttpClient
@@ -74,12 +79,15 @@ public class RestTemplateAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(okhttp3.OkHttpClient.class)
     public okhttp3.OkHttpClient httpClient(
-            OkHttpClientFactory httpClientFactory,
             okhttp3.ConnectionPool connectionPool,
             FeignHttpClientProperties httpClientProperties) {
         boolean followRedirects = httpClientProperties.isFollowRedirects();
         int connectTimeout = httpClientProperties.getConnectionTimeout();
-        return httpClientFactory.createBuilder(httpClientProperties.isDisableSslValidation())
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        if (httpClientProperties.isDisableSslValidation()) {
+            disableSsl(builder);
+        }
+        return builder
                 .connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
                 .writeTimeout(30, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
@@ -122,6 +130,53 @@ public class RestTemplateAutoConfiguration {
         lbRestTemplate.setInterceptors(Collections.singletonList(interceptor));
         configMessageConverters(lbRestTemplate.getMessageConverters());
         return lbRestTemplate;
+    }
+
+    private void disableSsl(okhttp3.OkHttpClient.Builder builder) {
+        try {
+            X509TrustManager disabledTrustManager = new DisableValidationTrustManager();
+            TrustManager[] trustManagers = new TrustManager[1];
+            trustManagers[0] = disabledTrustManager;
+            SSLContext sslContext = SSLContext.getInstance("SSL");
+            sslContext.init(null, trustManagers, new java.security.SecureRandom());
+            SSLSocketFactory disabledSSLSocketFactory = sslContext.getSocketFactory();
+            builder.sslSocketFactory(disabledSSLSocketFactory, disabledTrustManager);
+            builder.hostnameVerifier(new TrustAllHostnames());
+        } catch (NoSuchAlgorithmException | KeyManagementException e) {
+            LOG.warn("Error setting SSLSocketFactory in OKHttpClient", e);
+        }
+    }
+
+    /**
+     * A {@link X509TrustManager} that does not validate SSL certificates.
+     */
+    static class DisableValidationTrustManager implements X509TrustManager {
+
+        @Override
+        public void checkClientTrusted(X509Certificate[] x509Certificates, String s) {
+        }
+
+        @Override
+        public void checkServerTrusted(X509Certificate[] x509Certificates, String s) {
+        }
+
+        @Override
+        public X509Certificate[] getAcceptedIssuers() {
+            return new X509Certificate[0];
+        }
+
+    }
+
+    /**
+     * A {@link HostnameVerifier} that does not validate any hostnames.
+     */
+    static class TrustAllHostnames implements HostnameVerifier {
+
+        @Override
+        public boolean verify(String s, SSLSession sslSession) {
+            return true;
+        }
+
     }
 
     private void configMessageConverters(List<HttpMessageConverter<?>> converters) {

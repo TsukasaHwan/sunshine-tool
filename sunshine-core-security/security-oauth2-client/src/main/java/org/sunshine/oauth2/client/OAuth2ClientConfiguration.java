@@ -37,19 +37,16 @@ public class OAuth2ClientConfiguration {
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         List<String> forbiddenPaths = properties.getForbiddenPaths();
-        ServerHttpSecurity.AuthorizeExchangeSpec authorizeExchangeSpec = http.authorizeExchange();
-        if (CollectionUtils.isNotEmpty(forbiddenPaths)) {
-            authorizeExchangeSpec.pathMatchers(forbiddenPaths.toArray(new String[0])).denyAll();
-        }
-        authorizeExchangeSpec
-                // 放行交由资源服务器进行认证鉴权
-                .anyExchange().permitAll()
-                .and()
-                .exceptionHandling()
-                .authenticationEntryPoint(new WebFluxAuthenticationEntryPoint())
-                .and()
-                // 禁用csrf token安全校验
-                .csrf().disable();
+        http.authorizeExchange(authorize -> {
+            if (CollectionUtils.isNotEmpty(forbiddenPaths)) {
+                authorize.pathMatchers(forbiddenPaths.toArray(new String[0])).denyAll();
+            }
+            // 放行交由资源服务器进行认证鉴权
+            authorize.anyExchange().permitAll();
+        });
+        http.exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(new WebFluxAuthenticationEntryPoint()));
+        // 禁用csrf token安全校验
+        http.csrf(ServerHttpSecurity.CsrfSpec::disable);
         return http.build();
     }
 

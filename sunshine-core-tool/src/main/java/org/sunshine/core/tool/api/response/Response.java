@@ -1,6 +1,7 @@
 package org.sunshine.core.tool.api.response;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.Serializable;
 
 /**

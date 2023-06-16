@@ -2,6 +2,7 @@ package org.sunshine.enums.conversion.processor;
 
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
+import jakarta.persistence.Converter;
 import org.sunshine.enums.conversion.annotation.JsonAutoConverter;
 import org.sunshine.enums.conversion.converter.AbstractJsonConverter;
 
@@ -12,7 +13,6 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
-import javax.persistence.Converter;
 import javax.tools.Diagnostic;
 import java.io.IOException;
 import java.util.List;

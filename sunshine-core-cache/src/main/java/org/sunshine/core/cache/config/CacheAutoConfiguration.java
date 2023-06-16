@@ -3,7 +3,7 @@ package org.sunshine.core.cache.config;
 import com.alibaba.fastjson2.JSONReader;
 import com.alibaba.fastjson2.JSONWriter;
 import com.alibaba.fastjson2.support.config.FastJsonConfig;
-import com.alibaba.fastjson2.support.spring.data.redis.FastJsonRedisSerializer;
+import com.alibaba.fastjson2.support.spring6.data.redis.FastJsonRedisSerializer;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -115,15 +115,13 @@ public class CacheAutoConfiguration {
      */
     private RedisSerializer<?> getRedisSerializer(RedisSerializer<?> redisSerializer) {
         Assert.notNull(redisSerializer, "RedisSerializer must not be null!");
-        if (redisSerializer instanceof Jackson2JsonRedisSerializer) {
-            Jackson2JsonRedisSerializer<?> jackson2JsonRedisSerializer = (Jackson2JsonRedisSerializer<?>) redisSerializer;
+        if (redisSerializer instanceof Jackson2JsonRedisSerializer<?>) {
             ObjectMapper om = new ObjectMapper();
             om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
             om.activateDefaultTyping(om.getPolymorphicTypeValidator(), ObjectMapper.DefaultTyping.NON_FINAL);
             om.findAndRegisterModules();
-            jackson2JsonRedisSerializer.setObjectMapper(om);
-        } else if (redisSerializer instanceof FastJsonRedisSerializer) {
-            FastJsonRedisSerializer<?> fastJsonRedisSerializer = (FastJsonRedisSerializer<?>) redisSerializer;
+            redisSerializer = new Jackson2JsonRedisSerializer<>(om, Object.class);
+        } else if (redisSerializer instanceof FastJsonRedisSerializer<?> fastJsonRedisSerializer) {
             FastJsonConfig fastJsonConfig = fastJsonRedisSerializer.getFastJsonConfig();
             fastJsonConfig.setReaderFeatures(
                     JSONReader.Feature.FieldBased,

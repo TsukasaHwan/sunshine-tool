@@ -1,8 +1,7 @@
 package org.sunshine.core.tool.api.code;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.sunshine.core.tool.api.response.Response;
-
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Teamo

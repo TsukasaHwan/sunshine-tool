@@ -1,6 +1,8 @@
 package org.sunshine.core.common.exception;
 
 import com.google.common.collect.ImmutableMap;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -17,8 +19,6 @@ import org.sunshine.core.tool.api.code.ResultCode;
 import org.sunshine.core.tool.api.response.Result;
 import org.sunshine.core.tool.exception.CustomException;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;

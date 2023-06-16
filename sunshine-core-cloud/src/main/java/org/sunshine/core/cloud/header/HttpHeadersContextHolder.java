@@ -1,5 +1,6 @@
 package org.sunshine.core.cloud.header;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.NamedThreadLocal;
 import org.springframework.http.HttpHeaders;
 import org.springframework.lang.Nullable;
@@ -8,7 +9,6 @@ import org.sunshine.core.tool.util.CollectionUtils;
 import org.sunshine.core.tool.util.StringUtils;
 import org.sunshine.core.tool.util.WebUtils;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Enumeration;
 import java.util.List;
 

@@ -1,14 +1,14 @@
 package org.sunshine.security.core.handler;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.sunshine.core.tool.api.code.CommonCode;
 import org.sunshine.core.tool.api.response.Result;
 import org.sunshine.core.tool.util.WebUtils;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**

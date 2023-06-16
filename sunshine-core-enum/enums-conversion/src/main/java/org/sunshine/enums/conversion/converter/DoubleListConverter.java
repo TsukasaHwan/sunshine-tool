@@ -1,6 +1,7 @@
 package org.sunshine.enums.conversion.converter;
 
-import javax.persistence.Converter;
+import jakarta.persistence.Converter;
+
 import java.util.List;
 
 /**

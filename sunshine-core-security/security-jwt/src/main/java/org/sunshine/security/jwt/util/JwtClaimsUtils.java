@@ -3,9 +3,9 @@ package org.sunshine.security.jwt.util;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
+import jakarta.servlet.http.HttpServletRequest;
 import org.sunshine.security.jwt.properties.JwtSecurityProperties;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;

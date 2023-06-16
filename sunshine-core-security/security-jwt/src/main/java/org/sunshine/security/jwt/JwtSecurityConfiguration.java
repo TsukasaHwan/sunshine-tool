@@ -7,10 +7,11 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -43,7 +44,7 @@ import java.util.Set;
 @EnableWebSecurity
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(JwtSecurityProperties.class)
-@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
+@EnableMethodSecurity(securedEnabled = true, prePostEnabled = true)
 @Import(DefaultSecurityConfiguration.class)
 public class JwtSecurityConfiguration {
 
@@ -59,27 +60,26 @@ public class JwtSecurityConfiguration {
                                                    CorsConfigurationSource corsConfigurationSource,
                                                    PermitAllAnnotationSupport permitAllAnnotationSupport,
                                                    @Autowired(required = false) LogoutSuccessHandler logoutSuccessHandler) throws Exception {
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         Set<String> permitAllAntPatterns = new LinkedHashSet<>();
 
         List<String> permitAllPaths = jwtSecurityProperties.getPermitAllPaths();
-        if (!permitAllPaths.isEmpty()) {
-            http.authorizeHttpRequests().antMatchers(permitAllPaths.toArray(new String[0])).permitAll();
-            permitAllAntPatterns.addAll(permitAllPaths);
-        }
-
-        AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry = http.authorizeHttpRequests();
-        permitAllAnnotationSupport.getAntPatterns().forEach((httpMethod, antPatterns) -> {
-            Set<String> antPatternsSet = new LinkedHashSet<>(antPatterns);
-            antPatternsSet.removeIf(permitAllPaths::contains);
-            if (!antPatternsSet.isEmpty()) {
-                registry.antMatchers(httpMethod, antPatternsSet.toArray(new String[0])).permitAll();
-                permitAllAntPatterns.addAll(antPatternsSet);
+        http.authorizeHttpRequests(authorize -> {
+            if (!permitAllPaths.isEmpty()) {
+                authorize.requestMatchers(permitAllPaths.toArray(new String[0])).permitAll();
+                permitAllAntPatterns.addAll(permitAllPaths);
             }
+            permitAllAnnotationSupport.getAntPatterns().forEach((httpMethod, antPatterns) -> {
+                Set<String> antPatternsSet = new LinkedHashSet<>(antPatterns);
+                antPatternsSet.removeIf(permitAllPaths::contains);
+                if (!antPatternsSet.isEmpty()) {
+                    authorize.requestMatchers(httpMethod, antPatternsSet.toArray(new String[0])).permitAll();
+                    permitAllAntPatterns.addAll(antPatternsSet);
+                }
+            });
+            authorize.anyRequest().authenticated();
         });
-
-        http.authorizeHttpRequests().anyRequest().authenticated();
 
         AuthenticationEntryPoint authenticationEntryPoint = new JwtTokenAuthenticationEntryPoint();
         AuthenticationFailureHandler authenticationFailureHandler = new AuthenticationEntryPointFailureHandler(authenticationEntryPoint);
@@ -92,7 +92,9 @@ public class JwtSecurityConfiguration {
         http.userDetailsService(userDetailsService);
 
         if (logoutSuccessHandler != null) {
-            http.logout().logoutUrl(jwtSecurityProperties.getLogoutPath()).logoutSuccessHandler(logoutSuccessHandler);
+            http.logout(logoutConfigurer -> logoutConfigurer
+                    .logoutUrl(jwtSecurityProperties.getLogoutPath())
+                    .logoutSuccessHandler(logoutSuccessHandler));
         }
 
         http.exceptionHandling((exceptions) -> exceptions
@@ -100,9 +102,9 @@ public class JwtSecurityConfiguration {
                 .accessDeniedHandler(new CommonAccessDeniedHandler())
         );
 
-        http.csrf().disable();
+        http.csrf(AbstractHttpConfigurer::disable);
 
-        http.headers().frameOptions().disable();
+        http.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
 
         UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = (UrlBasedCorsConfigurationSource) corsConfigurationSource;
         urlBasedCorsConfigurationSource.getCorsConfigurations().forEach((s, configuration) -> {
@@ -112,7 +114,7 @@ public class JwtSecurityConfiguration {
             }
         });
 
-        http.cors().configurationSource(urlBasedCorsConfigurationSource);
+        http.cors(cors -> cors.configurationSource(urlBasedCorsConfigurationSource));
 
         return http.build();
     }

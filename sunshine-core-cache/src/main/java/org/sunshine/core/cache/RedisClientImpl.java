@@ -3,6 +3,7 @@ package org.sunshine.core.cache;
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.connection.RedisStreamCommands;
 import org.springframework.data.redis.connection.stream.*;
+import org.springframework.data.redis.connection.stream.Record;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 

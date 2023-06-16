@@ -1,12 +1,12 @@
 package org.sunshine.core.tool.support;
 
+import co.elastic.clients.elasticsearch._types.FieldSort;
+import co.elastic.clients.elasticsearch._types.SortOptions;
+import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.sort.SortBuilder;
-import org.elasticsearch.search.sort.SortBuilders;
-import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.sunshine.core.tool.api.request.Query;
@@ -68,29 +68,40 @@ public class Condition {
     }
 
     /**
-     * 转化成elasticsearch中的分页SearchSourceBuilder
+     * 转化成elasticsearch中的分页SearchRequest
      *
      * @param query 查询条件
-     * @return SearchSourceBuilder
+     * @return SearchRequest
      */
-    public static SearchSourceBuilder getPageSearchSourceBuilder(Query query) {
+    public static SearchRequest getPageSearchRequest(Query query) {
         checkQuery(query);
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        searchSourceBuilder.from((query.getCurrent() - 1) * query.getSize());
-        searchSourceBuilder.size(query.getSize());
-        String ascs = query.getAscs();
-        String descs = query.getDescs();
-        if (StringUtils.isNotBlank(ascs)) {
-            String[] columns = StringUtils.delimitedListToStringArray(ascs, StringPool.COMMA);
-            List<SortBuilder<?>> sorts = Arrays.stream(columns).map(column -> SortBuilders.fieldSort(StringUtils.cleanIdentifier(column)).order(SortOrder.ASC)).collect(Collectors.toList());
-            searchSourceBuilder.sort(sorts);
-        }
-        if (StringUtils.isNotBlank(descs)) {
-            String[] columns = StringUtils.delimitedListToStringArray(descs, StringPool.COMMA);
-            List<SortBuilder<?>> sorts = Arrays.stream(columns).map(column -> SortBuilders.fieldSort(StringUtils.cleanIdentifier(column)).order(SortOrder.DESC)).collect(Collectors.toList());
-            searchSourceBuilder.sort(sorts);
-        }
-        return searchSourceBuilder;
+        return SearchRequest.of(builder -> {
+            builder.from((query.getCurrent() - 1) * query.getSize());
+            builder.size(query.getSize());
+            String ascs = query.getAscs();
+            String descs = query.getDescs();
+            if (StringUtils.isNotBlank(ascs)) {
+                String[] columns = StringUtils.delimitedListToStringArray(ascs, StringPool.COMMA);
+                List<SortOptions> sorts = Arrays.stream(columns).map(column -> SortOptions.of(sortBuilder -> {
+                    String field = StringUtils.cleanIdentifier(column);
+                    FieldSort fieldSort = FieldSort.of(fieldSortBuilder -> fieldSortBuilder.field(field).order(SortOrder.Asc));
+                    sortBuilder.field(fieldSort);
+                    return sortBuilder;
+                })).collect(Collectors.toList());
+                builder.sort(sorts);
+            }
+            if (StringUtils.isNotBlank(descs)) {
+                String[] columns = StringUtils.delimitedListToStringArray(descs, StringPool.COMMA);
+                List<SortOptions> sorts = Arrays.stream(columns).map(column -> SortOptions.of(sortBuilder -> {
+                    String field = StringUtils.cleanIdentifier(column);
+                    FieldSort fieldSort = FieldSort.of(fieldSortBuilder -> fieldSortBuilder.field(field).order(SortOrder.Desc));
+                    sortBuilder.field(fieldSort);
+                    return sortBuilder;
+                })).collect(Collectors.toList());
+                builder.sort(sorts);
+            }
+            return builder;
+        });
     }
 
     /**

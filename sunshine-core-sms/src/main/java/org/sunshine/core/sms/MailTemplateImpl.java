@@ -1,5 +1,7 @@
 package org.sunshine.core.sms;
 
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeUtility;
 import org.springframework.boot.context.properties.PropertyMapper;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -7,8 +9,6 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.sunshine.core.sms.model.FileMailMessage;
 import org.sunshine.core.tool.support.Try;
 
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeUtility;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 

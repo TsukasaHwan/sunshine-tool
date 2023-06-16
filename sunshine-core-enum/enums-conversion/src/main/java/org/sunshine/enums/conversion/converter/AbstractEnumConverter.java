@@ -1,9 +1,9 @@
 package org.sunshine.enums.conversion.converter;
 
 
+import jakarta.persistence.AttributeConverter;
 import org.sunshine.enums.core.enums.CodeEnum;
 
-import javax.persistence.AttributeConverter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 

@@ -1,5 +1,6 @@
 package org.sunshine.core.tool.config;
 
+import jakarta.servlet.DispatcherType;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -9,8 +10,6 @@ import org.sunshine.core.tool.enums.WebFilterOrderEnum;
 import org.sunshine.core.tool.request.RequestFilter;
 import org.sunshine.core.tool.request.RequestProperties;
 import org.sunshine.core.tool.request.XssProperties;
-
-import javax.servlet.DispatcherType;
 
 /**
  * Xss配置类

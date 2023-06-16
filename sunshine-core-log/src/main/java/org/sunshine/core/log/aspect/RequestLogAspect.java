@@ -1,6 +1,8 @@
 package org.sunshine.core.log.aspect;
 
 import com.alibaba.fastjson2.JSON;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -26,8 +28,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.sunshine.core.tool.util.ReflectionUtils;
 import org.sunshine.core.tool.util.StringUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

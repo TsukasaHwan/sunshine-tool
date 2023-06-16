@@ -6,6 +6,8 @@ import com.alibaba.csp.sentinel.adapter.spring.webmvc.callback.BlockExceptionHan
 import com.alibaba.fastjson2.JSON;
 import feign.Feign;
 import feign.RequestInterceptor;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -18,9 +20,6 @@ import org.springframework.http.MediaType;
 import org.sunshine.core.cloud.header.FeignRequestInterceptor;
 import org.sunshine.core.cloud.properties.FeignHeadersProperties;
 import org.sunshine.core.tool.api.response.Result;
-
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 
 /**
  * @author Teamo

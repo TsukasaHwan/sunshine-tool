@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.sunshine</groupId>
         <artifactId>sunshine-core-enum</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>2.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>enums-conversion</artifactId>
@@ -45,7 +45,7 @@
         <dependency>
             <groupId>org.sunshine</groupId>
             <artifactId>enums-core</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>2.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

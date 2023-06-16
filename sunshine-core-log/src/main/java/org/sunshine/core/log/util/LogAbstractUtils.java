@@ -1,12 +1,12 @@
 package org.sunshine.core.log.util;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.sunshine.core.log.model.LogAbstract;
 import org.sunshine.core.tool.config.ServerInfo;
 import org.sunshine.core.tool.util.StringPool;
 import org.sunshine.core.tool.util.UrlUtils;
 import org.sunshine.core.tool.util.WebUtils;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
