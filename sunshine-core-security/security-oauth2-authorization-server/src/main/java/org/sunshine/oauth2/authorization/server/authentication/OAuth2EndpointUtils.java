@@ -1,16 +1,11 @@
 package org.sunshine.oauth2.authorization.server.authentication;
 
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
-import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
-import org.springframework.security.oauth2.core.endpoint.PkceParameterNames;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -37,28 +32,6 @@ public class OAuth2EndpointUtils {
             }
         });
         return parameters;
-    }
-
-    static Map<String, Object> getParametersIfMatchesAuthorizationCodeGrantRequest(HttpServletRequest request, String... exclusions) {
-        if (!matchesAuthorizationCodeGrantRequest(request)) {
-            return Collections.emptyMap();
-        }
-        Map<String, Object> parameters = new HashMap<>(getParameters(request).toSingleValueMap());
-        for (String exclusion : exclusions) {
-            parameters.remove(exclusion);
-        }
-        return parameters;
-    }
-
-    static boolean matchesAuthorizationCodeGrantRequest(HttpServletRequest request) {
-        return AuthorizationGrantType.AUTHORIZATION_CODE.getValue().equals(
-                request.getParameter(OAuth2ParameterNames.GRANT_TYPE)) &&
-               request.getParameter(OAuth2ParameterNames.CODE) != null;
-    }
-
-    static boolean matchesPkceTokenRequest(HttpServletRequest request) {
-        return matchesAuthorizationCodeGrantRequest(request) &&
-               request.getParameter(PkceParameterNames.CODE_VERIFIER) != null;
     }
 
     static void throwError(String errorCode, String parameterName, String errorUri) {
