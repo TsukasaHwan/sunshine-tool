@@ -1270,7 +1270,7 @@ public class ImgUtils {
      * @return Base64的字符串表现形式
      */
     public static String toBase64(Image image, String imageType) {
-        return Base64Utils.encodeToString(toBytes(image, imageType));
+        return Base64.getEncoder().encodeToString(toBytes(image, imageType));
     }
 
     /**

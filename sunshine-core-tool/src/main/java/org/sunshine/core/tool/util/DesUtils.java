@@ -6,6 +6,7 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Objects;
 
 /**
@@ -80,7 +81,7 @@ public class DesUtils {
      * @return des hex
      */
     public static String encryptToBase64(byte[] data, String password) {
-        return Base64Utils.encodeToString(encrypt(data, password));
+        return Base64.getEncoder().encodeToString(encrypt(data, password));
     }
 
     /**
@@ -107,7 +108,7 @@ public class DesUtils {
      * @return des context
      */
     public static byte[] decryptFormBase64(byte[] data, String password) {
-        byte[] dataBytes = Base64Utils.decode(data);
+        byte[] dataBytes = Base64.getDecoder().decode(data);
         return decrypt(dataBytes, password);
     }
 
@@ -123,7 +124,7 @@ public class DesUtils {
         if (StringUtils.isBlank(data)) {
             return null;
         }
-        byte[] dataBytes = Base64Utils.decodeFromString(data);
+        byte[] dataBytes = Base64.getDecoder().decode(data);
         return new String(decrypt(dataBytes, password), StandardCharsets.UTF_8);
     }
 
