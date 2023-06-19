@@ -1,5 +1,6 @@
 package org.sunshine.security.core.filter;
 
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -7,7 +8,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Set;
+import java.util.List;
 
 /**
  * 抽象认证
@@ -17,7 +18,7 @@ import java.util.Set;
  */
 public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter {
 
-    private Set<String> permitAllAntPatterns;
+    private List<AntPathRequestMatcher> antPathRequestMatchers;
 
     @Override
     @SuppressWarnings("NullableProblems")
@@ -49,19 +50,17 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
      */
     private boolean isPermitAll(HttpServletRequest request) {
         boolean isPermitAll = false;
-        if (permitAllAntPatterns != null && !permitAllAntPatterns.isEmpty()) {
-            if (permitAllAntPatterns.contains(request.getServletPath())) {
-                isPermitAll = true;
-            }
+        if (antPathRequestMatchers != null && !antPathRequestMatchers.isEmpty()) {
+            isPermitAll = antPathRequestMatchers.stream().anyMatch(antPathRequestMatcher -> antPathRequestMatcher.matches(request));
         }
         return isPermitAll;
     }
 
-    public Set<String> getPermitAllAntPatterns() {
-        return permitAllAntPatterns;
+    public List<AntPathRequestMatcher> getAntPathRequestMatchers() {
+        return antPathRequestMatchers;
     }
 
-    public void setPermitAllAntPatterns(Set<String> permitAllAntPatterns) {
-        this.permitAllAntPatterns = permitAllAntPatterns;
+    public void setAntPathRequestMatchers(List<AntPathRequestMatcher> antPathRequestMatchers) {
+        this.antPathRequestMatchers = antPathRequestMatchers;
     }
 }

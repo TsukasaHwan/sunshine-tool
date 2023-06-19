@@ -19,6 +19,7 @@ import org.springframework.security.web.authentication.AuthenticationEntryPointF
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.util.Assert;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -32,9 +33,11 @@ import org.sunshine.security.jwt.properties.JwtSecurityProperties;
 import org.sunshine.security.jwt.userdetails.JwtUserDetailsService;
 import org.sunshine.security.jwt.util.JwtClaimsUtils;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Teamo
@@ -61,12 +64,12 @@ public class JwtSecurityConfiguration {
                                                    @Autowired(required = false) LogoutSuccessHandler logoutSuccessHandler) throws Exception {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-        Set<String> permitAllAntPatterns = new LinkedHashSet<>();
+        List<AntPathRequestMatcher> antPathRequestMatchers = new ArrayList<>(16);
 
         List<String> permitAllPaths = jwtSecurityProperties.getPermitAllPaths();
         if (!permitAllPaths.isEmpty()) {
             http.authorizeHttpRequests().antMatchers(permitAllPaths.toArray(new String[0])).permitAll();
-            permitAllAntPatterns.addAll(permitAllPaths);
+            antPathRequestMatchers.addAll(permitAllPaths.stream().distinct().map(AntPathRequestMatcher::new).collect(Collectors.toList()));
         }
 
         AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry = http.authorizeHttpRequests();
@@ -75,7 +78,7 @@ public class JwtSecurityConfiguration {
             antPatternsSet.removeIf(permitAllPaths::contains);
             if (!antPatternsSet.isEmpty()) {
                 registry.antMatchers(httpMethod, antPatternsSet.toArray(new String[0])).permitAll();
-                permitAllAntPatterns.addAll(antPatternsSet);
+                antPathRequestMatchers.addAll(antPatternsSet.stream().map(path -> new AntPathRequestMatcher(path, httpMethod.toString())).collect(Collectors.toList()));
             }
         });
 
@@ -85,7 +88,7 @@ public class JwtSecurityConfiguration {
         AuthenticationFailureHandler authenticationFailureHandler = new AuthenticationEntryPointFailureHandler(authenticationEntryPoint);
 
         JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(userDetailsService, authenticationFailureHandler, jwtSecurityProperties);
-        jwtAuthenticationFilter.setPermitAllAntPatterns(permitAllAntPatterns);
+        jwtAuthenticationFilter.setAntPathRequestMatchers(antPathRequestMatchers);
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
