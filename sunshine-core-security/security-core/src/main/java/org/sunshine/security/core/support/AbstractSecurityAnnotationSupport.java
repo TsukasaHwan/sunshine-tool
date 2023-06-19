@@ -75,10 +75,7 @@ public abstract class AbstractSecurityAnnotationSupport implements InitializingB
         }
 
         requestMappingInfo.getMethodsCondition().getMethods().forEach(requestMethod -> {
-            HttpMethod httpMethod = HttpMethod.resolve(requestMethod.name());
-            if (httpMethod == null) {
-                return;
-            }
+            HttpMethod httpMethod = HttpMethod.valueOf(requestMethod.name());
 
             patterns.forEach(pattern -> antPatterns.add(httpMethod, RegexUtils.replaceAll(pattern, PATTERN, StringPool.ASTERISK)));
         });

@@ -20,10 +20,10 @@ public class Exceptions {
         if (e instanceof IllegalAccessException || e instanceof IllegalArgumentException
             || e instanceof NoSuchMethodException) {
             return new IllegalArgumentException(e);
-        } else if (e instanceof InvocationTargetException) {
-            return new RuntimeException(((InvocationTargetException) e).getTargetException());
-        } else if (e instanceof RuntimeException) {
-            return (RuntimeException) e;
+        } else if (e instanceof InvocationTargetException exception) {
+            return new RuntimeException(exception.getTargetException());
+        } else if (e instanceof RuntimeException exception) {
+            return exception;
         } else {
             return new RuntimeException(e);
         }
@@ -38,10 +38,10 @@ public class Exceptions {
     public static Throwable unwrap(Throwable wrapped) {
         Throwable unwrapped = wrapped;
         while (true) {
-            if (unwrapped instanceof InvocationTargetException) {
-                unwrapped = ((InvocationTargetException) unwrapped).getTargetException();
-            } else if (unwrapped instanceof UndeclaredThrowableException) {
-                unwrapped = ((UndeclaredThrowableException) unwrapped).getUndeclaredThrowable();
+            if (unwrapped instanceof InvocationTargetException ex) {
+                unwrapped = ex.getTargetException();
+            } else if (unwrapped instanceof UndeclaredThrowableException ex) {
+                unwrapped = ex.getUndeclaredThrowable();
             } else {
                 return unwrapped;
             }

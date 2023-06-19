@@ -55,12 +55,12 @@ public class ResponseExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public Result<?> handleException(Exception ex) {
-        if (ex instanceof CustomException) {
-            return handleCustomException((CustomException) ex);
-        } else if (ex instanceof BindException) {
-            return handleBindException((BindException) ex);
-        } else if (ex instanceof ConstraintViolationException) {
-            return handleConstraintViolationException((ConstraintViolationException) ex);
+        if (ex instanceof CustomException exception) {
+            return handleCustomException(exception);
+        } else if (ex instanceof BindException exception) {
+            return handleBindException(exception);
+        } else if (ex instanceof ConstraintViolationException exception) {
+            return handleConstraintViolationException(exception);
         } else {
             return handleUnknownException(ex);
         }

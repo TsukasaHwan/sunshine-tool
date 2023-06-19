@@ -149,8 +149,8 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
      * @return HttpServletRequest
      */
     public static HttpServletRequest getOrgRequest(HttpServletRequest request) {
-        if (request instanceof XssHttpServletRequestWrapper) {
-            return ((XssHttpServletRequestWrapper) request).getOrgRequest();
+        if (request instanceof XssHttpServletRequestWrapper requestWrapper) {
+            return requestWrapper.getOrgRequest();
         }
         return request;
     }

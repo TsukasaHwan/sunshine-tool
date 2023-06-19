@@ -253,7 +253,7 @@ public class BeanUtils extends org.springframework.beans.BeanUtils {
         generator.setSuperclass(superclass);
         generator.setUseCache(true);
         for (BeanProperty prop : props) {
-            generator.addProperty(prop.getName(), prop.getType());
+            generator.addProperty(prop.name(), prop.type());
         }
         return generator.create();
     }
