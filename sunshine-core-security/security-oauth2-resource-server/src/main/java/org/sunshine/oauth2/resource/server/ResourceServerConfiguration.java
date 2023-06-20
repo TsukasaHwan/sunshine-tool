@@ -7,10 +7,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
@@ -34,7 +34,7 @@ import java.util.Set;
  */
 @EnableWebSecurity
 @Configuration(proxyBeanMethods = false)
-@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
+@EnableMethodSecurity(securedEnabled = true, prePostEnabled = true)
 @EnableConfigurationProperties(OAuth2ResourceServerProperties.class)
 @Import(SecurityComponentConfiguration.class)
 public class ResourceServerConfiguration {
@@ -49,30 +49,28 @@ public class ResourceServerConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    PermitAllAnnotationSupport permitAllAnnotationSupport,
                                                    Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter) throws Exception {
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry = http.authorizeHttpRequests();
+        http.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         List<String> permitAllPaths = properties.getPermitAllPaths();
-        if (!permitAllPaths.isEmpty()) {
-            registry.antMatchers(permitAllPaths.toArray(new String[0])).permitAll();
-        }
-        permitAllAnnotationSupport.getAntPatterns().forEach((httpMethod, antPatterns) -> {
-            Set<String> antPatternsSet = new LinkedHashSet<>(antPatterns);
-            antPatternsSet.removeIf(permitAllPaths::contains);
-            if (!antPatternsSet.isEmpty()) {
-                registry.antMatchers(httpMethod, antPatternsSet.toArray(new String[0])).permitAll();
+        http.authorizeHttpRequests(authorize -> {
+            if (!permitAllPaths.isEmpty()) {
+                authorize.antMatchers(permitAllPaths.toArray(new String[0])).permitAll();
             }
+            permitAllAnnotationSupport.getAntPatterns().forEach((httpMethod, antPatterns) -> {
+                Set<String> antPatternsSet = new LinkedHashSet<>(antPatterns);
+                antPatternsSet.removeIf(permitAllPaths::contains);
+                if (!antPatternsSet.isEmpty()) {
+                    authorize.antMatchers(httpMethod, antPatternsSet.toArray(new String[0])).permitAll();
+                }
+            });
+            authorize.anyRequest().authenticated();
         });
 
-        registry.anyRequest().authenticated();
+        http.csrf(AbstractHttpConfigurer::disable);
 
-        http.csrf().disable();
-
-        http.oauth2ResourceServer()
-                .jwt()
-                .jwtAuthenticationConverter(jwtAuthenticationConverter)
-                .and()
-                .authenticationEntryPoint(new CommonAuthenticationEntryPoint())
-                .accessDeniedHandler(new CommonAccessDeniedHandler());
+        http.oauth2ResourceServer(oauth2ResourceServer -> {
+            oauth2ResourceServer.jwt(jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter));
+            oauth2ResourceServer.authenticationEntryPoint(new CommonAuthenticationEntryPoint()).accessDeniedHandler(new CommonAccessDeniedHandler());
+        });
 
         return http.build();
     }

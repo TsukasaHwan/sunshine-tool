@@ -6,10 +6,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,8 +32,8 @@ import java.util.Set;
 @EnableWebSecurity
 @Configuration(proxyBeanMethods = false)
 @Import(DefaultSecurityConfiguration.class)
+@EnableMethodSecurity(securedEnabled = true, prePostEnabled = true)
 @EnableConfigurationProperties(OAuth2AuthorizationServerProperties.class)
-@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 public class OAuth2WebSecurityConfiguration {
 
     private final OAuth2AuthorizationServerProperties properties;
@@ -44,31 +45,30 @@ public class OAuth2WebSecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    PermitAllAnnotationSupport permitAllAnnotationSupport) throws Exception {
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.sessionManagement(sessionManagementConfigurer -> sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         List<String> permitAllPaths = properties.getPermitAllPaths();
-        if (!permitAllPaths.isEmpty()) {
-            http.authorizeHttpRequests().antMatchers(permitAllPaths.toArray(new String[0])).permitAll();
-        }
-        AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry = http.authorizeHttpRequests();
-        permitAllAnnotationSupport.getAntPatterns().forEach((httpMethod, antPatterns) -> {
-            Set<String> antPatternsSet = new LinkedHashSet<>(antPatterns);
-            antPatternsSet.removeIf(permitAllPaths::contains);
-            if (!antPatternsSet.isEmpty()) {
-                registry.antMatchers(httpMethod, antPatternsSet.toArray(new String[0])).permitAll();
+        http.authorizeHttpRequests(registry -> {
+            if (!permitAllPaths.isEmpty()) {
+                registry.antMatchers(permitAllPaths.toArray(new String[0])).permitAll();
             }
+            permitAllAnnotationSupport.getAntPatterns().forEach((httpMethod, antPatterns) -> {
+                Set<String> antPatternsSet = new LinkedHashSet<>(antPatterns);
+                antPatternsSet.removeIf(permitAllPaths::contains);
+                if (!antPatternsSet.isEmpty()) {
+                    registry.antMatchers(httpMethod, antPatternsSet.toArray(new String[0])).permitAll();
+                }
+            });
+            registry.anyRequest().authenticated();
         });
 
         http
-                .authorizeHttpRequests()
-                .anyRequest().authenticated()
-                .and()
                 .exceptionHandling(exceptions -> {
                     exceptions.accessDeniedHandler(new CommonAccessDeniedHandler());
                     exceptions.authenticationEntryPoint(new CommonAuthenticationEntryPoint());
                 })
-                .csrf().disable()
-                .headers().frameOptions().disable();
+                .csrf(AbstractHttpConfigurer::disable)
+                .headers(httpSecurityHeadersConfigurer -> httpSecurityHeadersConfigurer.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
         return http.build();
     }
 
