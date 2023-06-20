@@ -105,7 +105,6 @@ public class CacheAutoConfiguration {
      */
     @Bean
     @Primary
-    @ConditionalOnMissingBean(CacheManager.class)
     public CacheManager cacheManager(CaffeineCacheManager caffeineCacheManager, RedisCacheManager redisCacheManager) {
         return new CustomCacheManager(caffeineCacheManager, redisCacheManager);
     }
