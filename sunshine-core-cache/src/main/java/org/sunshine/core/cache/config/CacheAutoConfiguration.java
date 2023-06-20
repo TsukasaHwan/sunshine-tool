@@ -73,6 +73,7 @@ public class CacheAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean(RedisCacheManager.class)
     public RedisCacheManager redisCacheManager(LettuceConnectionFactory factory) {
         RedisSerializer<?> redisSerializer = getRedisSerializer(new FastJsonRedisSerializer<>(Object.class));
         RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
@@ -83,6 +84,7 @@ public class CacheAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean(CaffeineCacheManager.class)
     public CaffeineCacheManager caffeineCacheManager() {
         CaffeineCacheManager caffeineCacheManager = new CaffeineCacheManager();
         Caffeine<Object, Object> caffeine = Caffeine.newBuilder()
@@ -103,6 +105,7 @@ public class CacheAutoConfiguration {
      */
     @Bean
     @Primary
+    @ConditionalOnMissingBean(CacheManager.class)
     public CacheManager cacheManager(CaffeineCacheManager caffeineCacheManager, RedisCacheManager redisCacheManager) {
         return new CustomCacheManager(caffeineCacheManager, redisCacheManager);
     }
@@ -141,7 +144,6 @@ public class CacheAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(RequestRateLimitAspect.class)
     public RequestRateLimitAspect rateLimitAspect(RedisTemplate<String, Object> redisTemplate) {
         return new RequestRateLimitAspect(redisTemplate);
     }
