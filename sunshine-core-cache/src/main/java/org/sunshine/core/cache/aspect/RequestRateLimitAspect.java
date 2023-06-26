@@ -73,15 +73,13 @@ public class RequestRateLimitAspect {
         if (limitType.equals(LimitType.FIXED_WINDOW)) {
             // 固定窗口
             redisScript.setScriptSource(FIX_RATE_LIMIT_SCRIPT);
-            // 强转int，由于FastJson序列化时会将long类型的字节数组带上L
-            result = redisTemplate.execute(redisScript, keys, requestRateLimit.limit(), (int) unit.toSeconds(requestRateLimit.expire()));
+            result = redisTemplate.execute(redisScript, keys, requestRateLimit.limit(), unit.toSeconds(requestRateLimit.expire()));
         } else if (limitType.equals(LimitType.SLIDE_WINDOW)) {
             // 滑动窗口
             long score = System.currentTimeMillis();
-            // 强转int，由于FastJson序列化时会将long类型的字节数组带上L
-            int windowTime = (int) (score - unit.toMillis(requestRateLimit.expire()));
+            long windowTime = score - unit.toMillis(requestRateLimit.expire());
             redisScript.setScriptSource(SLIDE_RATE_LIMIT_SCRIPT);
-            result = redisTemplate.execute(redisScript, keys, windowTime, (int) score, requestRateLimit.limit(), (int) score);
+            result = redisTemplate.execute(redisScript, keys, windowTime, score, requestRateLimit.limit(), score);
         }
         return result;
     }
