@@ -14,5 +14,5 @@ import java.lang.annotation.*;
 @Documented
 @Import(ResourceServerConfiguration.class)
 @Configuration
-public @interface EnableResourceServer {
+public @interface EnableOAuth2ResourceServer {
 }
