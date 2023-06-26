@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
  * @since 2020/6/9
  */
 @Documented
-@Target({ElementType.METHOD})
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DistributedLock {
 
