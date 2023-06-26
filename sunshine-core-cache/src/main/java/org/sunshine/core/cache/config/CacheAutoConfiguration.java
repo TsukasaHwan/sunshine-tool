@@ -132,7 +132,11 @@ public class CacheAutoConfiguration {
                     JSONReader.Feature.SupportArrayToBean,
                     JSONReader.Feature.SupportAutoType
             );
-            fastJsonConfig.setWriterFeatures(JSONWriter.Feature.WriteClassName, JSONWriter.Feature.WriteMapNullValue);
+            fastJsonConfig.setWriterFeatures(
+                    JSONWriter.Feature.WriteClassName,
+                    JSONWriter.Feature.WriteMapNullValue,
+                    JSONWriter.Feature.NotWriteNumberClassName
+            );
         } else {
             log.warn("Did not find what you need RedisSerializer, please confirm the correctness of the RedisSerializer!");
         }
