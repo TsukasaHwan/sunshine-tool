@@ -1,7 +1,7 @@
 
 ## sunshine-core-cache使用说明
 
-### 1 @[DistributedLock](sunshine-core-cache%2Fsrc%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Fcache%2Fannotation%2FDistributedLock.java)分布式锁注解，以及分布式锁[RedissionLockUtils](sunshine-core-cache%2Fsrc%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Fcache%2Fredission%2Futil%2FRedissionLockUtils.java)使用
+### 1 @[DistributedLock](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Fcache%2Fannotation%2FDistributedLock.java)分布式锁注解，以及分布式锁[RedissionLockUtils](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Fcache%2Fredission%2Futil%2FRedissionLockUtils.java)使用
 
 #### 1.1 先配置Redisson
 ```yaml
@@ -63,7 +63,7 @@ public class Test {
 }
 ```
 
-### 2 @[RequestRateLimit](sunshine-core-cache%2Fsrc%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Fcache%2Fannotation%2FRequestRateLimit.java)限流注解
+### 2 @[RequestRateLimit](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Fcache%2Fannotation%2FRequestRateLimit.java)限流注解
 
 ```java
 public class Test {
@@ -82,9 +82,9 @@ public class Test {
 }
 ```
 
-### 3 [RedisClient](sunshine-core-cache%2Fsrc%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Fcache%2FRedisClient.java)简化Spring Data Redis中的RedisTemplate操作只需注入即可使用
+### 3 [RedisClient](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Fcache%2FRedisClient.java)简化Spring Data Redis中的RedisTemplate操作只需注入即可使用
 
-### 4 [RedisKey](sunshine-core-cache%2Fsrc%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Fcache%2FRedisKey.java)接口，由于在高并发时使用字符串构建key值会出现线程安全问题，所以使用SpEL表达式+Guava ImmutableMap进行构建
+### 4 [RedisKey](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Fcache%2FRedisKey.java)接口，由于在高并发时使用字符串构建key值会出现线程安全问题，所以使用SpEL表达式+Guava ImmutableMap进行构建
 ```java
 @Getter
 public enum TestRedisKey implements RedisKey {
