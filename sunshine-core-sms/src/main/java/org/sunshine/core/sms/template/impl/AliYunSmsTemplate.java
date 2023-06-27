@@ -1,4 +1,4 @@
-package org.sunshine.core.sms;
+package org.sunshine.core.sms.template.impl;
 
 import com.alibaba.fastjson2.JSON;
 import com.aliyun.dysmsapi20170525.Client;
@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 import org.sunshine.core.sms.model.SmsSender;
+import org.sunshine.core.sms.template.SmsTemplate;
 import org.sunshine.core.tool.util.StringPool;
 
 import java.util.Objects;
@@ -17,9 +18,9 @@ import java.util.Objects;
  * @author Teamo
  * @since 2022/03/03
  */
-public class AliSmsTemplate implements SmsTemplate {
+public class AliYunSmsTemplate implements SmsTemplate {
 
-    private final static Logger log = LoggerFactory.getLogger(AliSmsTemplate.class);
+    private final static Logger log = LoggerFactory.getLogger(AliYunSmsTemplate.class);
 
     private static final String OK = "OK";
 
@@ -27,7 +28,7 @@ public class AliSmsTemplate implements SmsTemplate {
 
     private final Client client;
 
-    public AliSmsTemplate(Client client) {
+    public AliYunSmsTemplate(Client client) {
         this.client = client;
     }
 
@@ -40,12 +41,15 @@ public class AliSmsTemplate implements SmsTemplate {
             throw new IllegalArgumentException("The number of mobile phone numbers cannot be greater than 1000");
         }
 
+        SmsSender.AliYun aliYun = smsSender.getAliYun();
+        Assert.notNull(aliYun, "The AliYun SMS param must not be null!");
+
         SendSmsRequest sendSmsRequest = new SendSmsRequest()
                 .setPhoneNumbers(String.join(StringPool.COMMA, phoneNumbers))
                 .setSignName(smsSender.getSignName())
                 .setTemplateCode(smsSender.getTemplateCode())
-                .setTemplateParam(smsSender.getTemplateParam())
-                .setOutId(smsSender.getOutId());
+                .setTemplateParam(aliYun.getTemplateParam())
+                .setOutId(aliYun.getOutId());
         SendSmsResponse sendSmsResponse = null;
         try {
             sendSmsResponse = client.sendSms(sendSmsRequest);

@@ -1,4 +1,4 @@
-package org.sunshine.core.sms;
+package org.sunshine.core.sms.template;
 
 import org.springframework.mail.SimpleMailMessage;
 import org.sunshine.core.sms.model.FileMailMessage;
