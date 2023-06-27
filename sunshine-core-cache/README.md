@@ -186,7 +186,7 @@ public class Test1StreamListener extends AbstractStreamListener<Test1> {
 
     @Override
     protected RedisStreamKey redisStreamKey() {
-        return "test1";
+        return Stream.TEST1;
     }
 
     @Override
