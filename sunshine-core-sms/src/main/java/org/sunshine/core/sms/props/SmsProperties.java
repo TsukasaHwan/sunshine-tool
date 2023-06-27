@@ -6,13 +6,18 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author Teamo
  * @since 2022/03/03
  */
-@ConfigurationProperties("aliyun.sms")
-public class AliSmsProperties {
+@ConfigurationProperties("sms")
+public class SmsProperties {
 
     /**
      * 是否启用
      */
-    private Boolean enabled;
+    private boolean enabled;
+
+    /**
+     * 客户端类型
+     */
+    private ClientType clientType;
 
     /**
      * key id
@@ -29,12 +34,41 @@ public class AliSmsProperties {
      */
     private String endpoint;
 
-    public Boolean getEnabled() {
+    /**
+     * 地域参数
+     */
+    private String regionId;
+
+    /**
+     * 客户端类型
+     */
+    public enum ClientType {
+
+        /**
+         * 阿里云
+         */
+        ALIYUN,
+
+        /**
+         * 腾讯云
+         */
+        TENCENT
+    }
+
+    public boolean isEnabled() {
         return enabled;
     }
 
-    public void setEnabled(Boolean enabled) {
+    public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public ClientType getClientType() {
+        return clientType;
+    }
+
+    public void setClientType(ClientType clientType) {
+        this.clientType = clientType;
     }
 
     public String getKeyId() {
@@ -59,5 +93,13 @@ public class AliSmsProperties {
 
     public void setEndpoint(String endpoint) {
         this.endpoint = endpoint;
+    }
+
+    public String getRegionId() {
+        return regionId;
+    }
+
+    public void setRegionId(String regionId) {
+        this.regionId = regionId;
     }
 }
