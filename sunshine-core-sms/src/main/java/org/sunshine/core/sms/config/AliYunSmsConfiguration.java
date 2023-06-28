@@ -9,7 +9,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.Assert;
 import org.sunshine.core.sms.props.SmsProperties;
 import org.sunshine.core.sms.template.impl.AliYunSmsTemplate;
 import org.sunshine.core.tool.util.StringUtils;
@@ -24,28 +23,21 @@ import org.sunshine.core.tool.util.StringUtils;
 @ConditionalOnClass(Client.class)
 @EnableConfigurationProperties(SmsProperties.class)
 @ConditionalOnProperty(value = "sms.client-type", havingValue = "aliyun")
-public class AliYunSmsConfiguration {
+public class AliYunSmsConfiguration extends SmsConfiguration {
 
-    private final SmsProperties smsProperties;
-
-    public AliYunSmsConfiguration(SmsProperties smsProperties) {
-        this.smsProperties = smsProperties;
+    protected AliYunSmsConfiguration(SmsProperties smsProperties) {
+        super(smsProperties);
     }
 
     @Bean
     @ConditionalOnMissingBean(Client.class)
     public Client client() {
-        String keyId = smsProperties.getKeyId();
-        String keySecret = smsProperties.getKeySecret();
-        String endpoint = smsProperties.getEndpoint();
-        Assert.notNull(keyId, "The AliYun SMS keyId must not be null!");
-        Assert.notNull(keySecret, "The AliYun SMS keySecret must not be null!");
-        Assert.notNull(endpoint, "The AliYun SMS endpoint must not be null!");
+        SmsProperties smsProperties = getSmsProperties();
 
         Config config = new Config()
-                .setAccessKeyId(keyId)
-                .setAccessKeySecret(keySecret)
-                .setEndpoint(endpoint);
+                .setAccessKeyId(smsProperties.getKeyId())
+                .setAccessKeySecret(smsProperties.getKeySecret())
+                .setEndpoint(smsProperties.getEndpoint());
 
         String regionId = smsProperties.getRegionId();
         if (StringUtils.isNotBlank(regionId)) {

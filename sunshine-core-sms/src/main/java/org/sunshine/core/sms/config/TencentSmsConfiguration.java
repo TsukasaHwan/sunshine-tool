@@ -10,7 +10,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.Assert;
 import org.sunshine.core.sms.props.SmsProperties;
 import org.sunshine.core.sms.template.impl.TencentSmsTemplate;
 import org.sunshine.core.tool.util.StringUtils;
@@ -25,26 +24,20 @@ import org.sunshine.core.tool.util.StringUtils;
 @ConditionalOnClass(SmsClient.class)
 @EnableConfigurationProperties(SmsProperties.class)
 @ConditionalOnProperty(value = "sms.client-type", havingValue = "tencent")
-public class TencentSmsConfiguration {
+public class TencentSmsConfiguration extends SmsConfiguration {
 
-    private final SmsProperties smsProperties;
-
-    public TencentSmsConfiguration(SmsProperties smsProperties) {
-        this.smsProperties = smsProperties;
+    protected TencentSmsConfiguration(SmsProperties smsProperties) {
+        super(smsProperties);
     }
 
     @Bean
     @ConditionalOnMissingBean(SmsClient.class)
     public SmsClient smsClient() {
-        String keyId = smsProperties.getKeyId();
-        String keySecret = smsProperties.getKeySecret();
+        SmsProperties smsProperties = getSmsProperties();
+
+        Credential cred = new Credential(smsProperties.getKeyId(), smsProperties.getKeySecret());
+
         String regionId = smsProperties.getRegionId();
-        Assert.notNull(keyId, "The Tencent SMS keyId must not be null!");
-        Assert.notNull(keySecret, "The Tencent SMS keySecret must not be null!");
-        Assert.notNull(regionId, "The Tencent SMS regionId must not be null!");
-
-        Credential cred = new Credential(keyId, keySecret);
-
         String endpoint = smsProperties.getEndpoint();
         if (StringUtils.isNotBlank(endpoint)) {
             HttpProfile httpProfile = new HttpProfile();
