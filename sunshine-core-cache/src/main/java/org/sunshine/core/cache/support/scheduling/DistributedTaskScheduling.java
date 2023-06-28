@@ -17,21 +17,21 @@ public interface DistributedTaskScheduling {
     Logger log = LoggerFactory.getLogger(DistributedTaskScheduling.class);
 
     /**
-     * 运行业务逻辑
+     * 任务
      *
      * @throws Exception Exception
      */
-    void taskLogic() throws Exception;
+    void task() throws Exception;
 
     /**
-     * 执行分布式任务
+     * 执行
      *
      * @param lockKey 锁名称
      */
-    default void executeLogic(String lockKey) {
+    default void execute(String lockKey) {
         RedissionLockUtils.tryLock(lockKey, Try.accept(lock -> {
             if (lock) {
-                this.taskLogic();
+                this.task();
             }
         }), throwable -> log.error(throwable.getMessage(), throwable));
     }
