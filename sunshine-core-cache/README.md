@@ -1,5 +1,9 @@
 # ✨sunshine-core-cache
 
+## *💎*模块简介
+
+缓存相关功能模块，集成了SpringRedis，SpringCache，Redission
+
 ## *💫*使用说明
 
 1. **@[DistributedLock](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Fcache%2Fannotation%2FDistributedLock.java)

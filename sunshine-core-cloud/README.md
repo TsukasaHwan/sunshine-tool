@@ -1,8 +1,8 @@
 # ✨sunshine-core-cloud
 
-## *💎*项目简介
+## *💎*模块简介
 
-SpringCloud组件集成扩展模块
+SpringCloud组件扩展模块
 
 ## 💫使用说明
 

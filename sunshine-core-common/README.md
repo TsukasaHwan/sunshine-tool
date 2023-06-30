@@ -1,6 +1,6 @@
 # ✨sunshine-core-common
 
-## *💎*项目简介
+## *💎*模块简介
 
 sunshine-cache、sunshine-log、sunshine-tool以及集成了springdoc的公共模块
 
