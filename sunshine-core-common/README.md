@@ -39,4 +39,4 @@ sunshine-cache、sunshine-log、sunshine-tool以及集成了springdoc的公共�
 
 5. **默认集成了spring-boot-starter-validation，由于校验的时候无法保证顺序和无法判别是添加或更新，所以增加了自定义校验组 [ValidateGroup](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Fcommon%2Fgroup%2FValidateGroup.java)**
 
-***更多公共请看源码···***
+***更多功能请看源码···***
