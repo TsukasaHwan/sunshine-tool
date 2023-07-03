@@ -80,7 +80,7 @@ mybatis-plus扩展模块
 
 4. **支持SQL层面的批量新增。由于mybatis-plus的batchSave为代码层面的循环批量新增，存在性能问题所以提供sql层面的批量新增**
 
-   - Mapper接口继承 [BatchBaseMapper](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Fmp%2Fmapper%2FBatchBaseMapper.java)[BatchBaseMapper](src\main\java\org\sunshine\core\mp\mapper\BatchBaseMapper.java) 
+   - Mapper接口继承 [BatchBaseMapper](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Fmp%2Fmapper%2FBatchBaseMapper.java)
 
      ```java
      @Repository
