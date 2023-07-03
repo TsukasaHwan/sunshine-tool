@@ -118,7 +118,7 @@ mybatis-plus扩展模块
 
 5. **Ognl表达式工具**
 
-   -  [Ognl](src%2Fmain%2Fjava%2FOgnl.java) 工具类，主要是为了在ognl表达式访问静态方法时可以减少长长的类名称编写 Ognl访问静态方法的表达式： @class@method(args)
+   -  [Ognl](src%2Fmain%2Fjava%2FOgnl.java) 工具类，主要是为了在ognl表达式访问静态方法时可以减少长长的类名称编写 Ognl访问静态方法的表达式：@class@method(args)
 
      ```xml
      <if test="@Ognl@isNotEmpty(userId)">
