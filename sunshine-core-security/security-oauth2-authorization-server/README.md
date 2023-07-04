@@ -10,7 +10,7 @@ spring-security-oauth2认证服务默认使用JdbcTemplate，修改为mybatis-pl
 
 ## 💫使用说明
 
-1. **执行document/sql/oauth2下的[oauth2.sql](..\..\document\sql\oauth2\oauth2.sql)建表语句**
+1. **执行document/sql/oauth2下的[oauth2.sql](..%2F..%2Fdocument%2Fsql%2Foauth2%2Foauth2.sql)建表语句**
 
 2. **创建Mybatis-Plus数据库映射接口**
 
@@ -28,9 +28,9 @@ spring-security-oauth2认证服务默认使用JdbcTemplate，修改为mybatis-pl
      }
      ```
 
-     [OAuth2Auth](src\main\java\org\sunshine\oauth2\authorization\server\entity\OAuth2Auth.java)认证表，[OAuth2AuthConsent](src\main\java\org\sunshine\oauth2\authorization\server\entity\OAuth2AuthConsent.java)授权同意表， [OAuth2Client](src\main\java\org\sunshine\oauth2\authorization\server\entity\OAuth2Client.java)客户端表
+     [OAuth2Auth](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Foauth2%2Fauthorization%2Fserver%2Fentity%2FOAuth2Auth.java)认证表，[OAuth2AuthConsent](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Foauth2%2Fauthorization%2Fserver%2Fentity%2FOAuth2AuthConsent.java)授权同意表，[OAuth2Client](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Foauth2%2Fauthorization%2Fserver%2Fentity%2FOAuth2Client.java)客户端表
 
-3. **使用[RSAUtils](..\security-core\src\main\java\org\sunshine\security\core\util\RSAUtils.java)生成公钥私钥**
+3. **使用[RSAUtils](..%2Fsecurity-core%2Fsrc%2Fmain%2Fjava%2Forg%2Fsunshine%2Fsecurity%2Fcore%2Futil%2FRSAUtils.java)生成公钥私钥**
 
    - ```java
      public static void main(String[] args) throws NoSuchAlgorithmException {
@@ -74,4 +74,4 @@ spring-security-oauth2认证服务默认使用JdbcTemplate，修改为mybatis-pl
      ```
 
 5. **编写UserDetailsService实现类，注册到Spring容器**
-6. **启动类增加@[EnableOAuth2AuthorizationServer](src\main\java\org\sunshine\oauth2\authorization\server\EnableOAuth2AuthorizationServer.java)注解，即可开启OAUTH2认证服务**
+6. **启动类增加@[EnableOAuth2AuthorizationServer](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Foauth2%2Fauthorization%2Fserver%2FEnableOAuth2AuthorizationServer.java)注解，即可开启OAUTH2认证服务**
