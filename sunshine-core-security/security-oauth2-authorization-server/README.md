@@ -70,6 +70,7 @@ spring-security-oauth2认证服务默认使用JdbcTemplate，修改为mybatis-pl
          oauth2:
            resourceserver:
              jwt:
+               # 认证服务jwks路径
                jwk-set-uri: http://localhost:8081/oauth2/jwks
      ```
 
