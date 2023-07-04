@@ -20,7 +20,7 @@ Spring-Security集成JWT
      jwt:
        security:
          # token请求头
-       	header: Authorization
+       	 header: Authorization
          # token过期时间
          expires-in: 2H
          # 刷新token资源路径
