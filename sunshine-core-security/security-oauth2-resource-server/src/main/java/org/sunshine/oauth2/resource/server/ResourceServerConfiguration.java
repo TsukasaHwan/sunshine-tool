@@ -22,7 +22,7 @@ import org.sunshine.security.core.SecurityComponentConfiguration;
 import org.sunshine.security.core.handler.CommonAccessDeniedHandler;
 import org.sunshine.security.core.handler.CommonAuthenticationEntryPoint;
 import org.sunshine.security.core.oauth2.TokenConstant;
-import org.sunshine.security.core.support.PermitAllAnnotationSupport;
+import org.sunshine.security.core.support.AbstractSecurityAnnotationSupport;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -47,7 +47,7 @@ public class ResourceServerConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                   PermitAllAnnotationSupport permitAllAnnotationSupport,
+                                                   List<AbstractSecurityAnnotationSupport> securityAnnotationSupportList,
                                                    Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter) throws Exception {
         http.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         List<String> permitAllPaths = properties.getPermitAllPaths();
@@ -55,13 +55,13 @@ public class ResourceServerConfiguration {
             if (!permitAllPaths.isEmpty()) {
                 authorize.requestMatchers(permitAllPaths.toArray(new String[0])).permitAll();
             }
-            permitAllAnnotationSupport.getAntPatterns().forEach((httpMethod, antPatterns) -> {
+            securityAnnotationSupportList.forEach(annotationSupport -> annotationSupport.getAntPatterns().forEach((httpMethod, antPatterns) -> {
                 Set<String> antPatternsSet = new LinkedHashSet<>(antPatterns);
                 antPatternsSet.removeIf(permitAllPaths::contains);
                 if (!antPatternsSet.isEmpty()) {
                     authorize.requestMatchers(httpMethod, antPatternsSet.toArray(new String[0])).permitAll();
                 }
-            });
+            }));
             authorize.anyRequest().authenticated();
         });
 

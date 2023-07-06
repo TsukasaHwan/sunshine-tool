@@ -19,7 +19,7 @@ import org.sunshine.oauth2.authorization.server.properties.OAuth2AuthorizationSe
 import org.sunshine.security.core.DefaultSecurityConfiguration;
 import org.sunshine.security.core.handler.CommonAccessDeniedHandler;
 import org.sunshine.security.core.handler.CommonAuthenticationEntryPoint;
-import org.sunshine.security.core.support.PermitAllAnnotationSupport;
+import org.sunshine.security.core.support.AbstractSecurityAnnotationSupport;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -44,7 +44,7 @@ public class OAuth2WebSecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                   PermitAllAnnotationSupport permitAllAnnotationSupport) throws Exception {
+                                                   List<AbstractSecurityAnnotationSupport> securityAnnotationSupportList) throws Exception {
         http.sessionManagement(sessionManagementConfigurer -> sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         List<String> permitAllPaths = properties.getPermitAllPaths();
@@ -52,13 +52,13 @@ public class OAuth2WebSecurityConfiguration {
             if (!permitAllPaths.isEmpty()) {
                 registry.requestMatchers(permitAllPaths.toArray(new String[0])).permitAll();
             }
-            permitAllAnnotationSupport.getAntPatterns().forEach((httpMethod, antPatterns) -> {
+            securityAnnotationSupportList.forEach(annotationSupport -> annotationSupport.getAntPatterns().forEach((httpMethod, antPatterns) -> {
                 Set<String> antPatternsSet = new LinkedHashSet<>(antPatterns);
                 antPatternsSet.removeIf(permitAllPaths::contains);
                 if (!antPatternsSet.isEmpty()) {
                     registry.requestMatchers(httpMethod, antPatternsSet.toArray(new String[0])).permitAll();
                 }
-            });
+            }));
             registry.anyRequest().authenticated();
         });
 

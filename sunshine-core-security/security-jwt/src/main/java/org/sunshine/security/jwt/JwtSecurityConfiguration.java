@@ -26,7 +26,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.sunshine.security.core.DefaultSecurityConfiguration;
 import org.sunshine.security.core.handler.CommonAccessDeniedHandler;
-import org.sunshine.security.core.support.PermitAllAnnotationSupport;
+import org.sunshine.security.core.support.AbstractSecurityAnnotationSupport;
 import org.sunshine.security.jwt.filter.JwtAuthenticationFilter;
 import org.sunshine.security.jwt.handler.JwtLogoutSuccessHandler;
 import org.sunshine.security.jwt.handler.JwtTokenAuthenticationEntryPoint;
@@ -60,7 +60,7 @@ public class JwtSecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    UserDetailsService userDetailsService,
                                                    CorsConfigurationSource corsConfigurationSource,
-                                                   PermitAllAnnotationSupport permitAllAnnotationSupport,
+                                                   List<AbstractSecurityAnnotationSupport> securityAnnotationSupportList,
                                                    @Autowired(required = false) LogoutSuccessHandler logoutSuccessHandler) throws Exception {
         http.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
@@ -72,14 +72,14 @@ public class JwtSecurityConfiguration {
                 authorize.requestMatchers(permitAllPaths.toArray(new String[0])).permitAll();
                 antPathRequestMatchers.addAll(permitAllPaths.stream().distinct().map(AntPathRequestMatcher::new).toList());
             }
-            permitAllAnnotationSupport.getAntPatterns().forEach((httpMethod, antPatterns) -> {
+            securityAnnotationSupportList.forEach(annotationSupport -> annotationSupport.getAntPatterns().forEach((httpMethod, antPatterns) -> {
                 Set<String> antPatternsSet = new LinkedHashSet<>(antPatterns);
                 antPatternsSet.removeIf(permitAllPaths::contains);
                 if (!antPatternsSet.isEmpty()) {
                     authorize.requestMatchers(httpMethod, antPatternsSet.toArray(new String[0])).permitAll();
                     antPathRequestMatchers.addAll(antPatternsSet.stream().map(path -> new AntPathRequestMatcher(path, httpMethod.toString())).toList());
                 }
-            });
+            }));
             authorize.anyRequest().authenticated();
         });
 
