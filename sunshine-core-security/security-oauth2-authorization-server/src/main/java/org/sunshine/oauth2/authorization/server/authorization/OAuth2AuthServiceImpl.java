@@ -40,6 +40,7 @@ import java.util.Set;
  * @since 2023/4/26
  */
 public class OAuth2AuthServiceImpl implements OAuth2AuthorizationService {
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final BaseMapper<OAuth2Auth> oAuth2AuthMapper;

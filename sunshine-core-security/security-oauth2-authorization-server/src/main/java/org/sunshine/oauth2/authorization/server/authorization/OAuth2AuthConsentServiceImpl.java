@@ -29,7 +29,8 @@ public class OAuth2AuthConsentServiceImpl implements OAuth2AuthorizationConsentS
 
     private final RegisteredClientRepository registeredClientRepository;
 
-    public OAuth2AuthConsentServiceImpl(BaseMapper<OAuth2AuthConsent> oAuth2AuthConsentMapper, RegisteredClientRepository registeredClientRepository) {
+    public OAuth2AuthConsentServiceImpl(BaseMapper<OAuth2AuthConsent> oAuth2AuthConsentMapper,
+                                        RegisteredClientRepository registeredClientRepository) {
         Assert.notNull(oAuth2AuthConsentMapper, "oAuth2AuthConsentMapper cannot be null");
         Assert.notNull(registeredClientRepository, "registeredClientRepository cannot be null");
         this.oAuth2AuthConsentMapper = oAuth2AuthConsentMapper;
