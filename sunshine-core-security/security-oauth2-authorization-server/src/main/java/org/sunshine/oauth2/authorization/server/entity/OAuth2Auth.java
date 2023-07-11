@@ -3,8 +3,6 @@ package org.sunshine.oauth2.authorization.server.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -12,8 +10,6 @@ import java.time.LocalDateTime;
  * @author Teamo
  * @since 2023/4/26
  */
-@Getter
-@Setter
 @TableName(value = "oauth2_auth")
 public class OAuth2Auth {
 
@@ -146,4 +142,204 @@ public class OAuth2Auth {
      * 刷新令牌元数据（JSON）
      */
     private String refreshTokenMetadata;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getRegisteredClientId() {
+        return registeredClientId;
+    }
+
+    public void setRegisteredClientId(String registeredClientId) {
+        this.registeredClientId = registeredClientId;
+    }
+
+    public String getPrincipalName() {
+        return principalName;
+    }
+
+    public void setPrincipalName(String principalName) {
+        this.principalName = principalName;
+    }
+
+    public String getAuthorizationGrantType() {
+        return authorizationGrantType;
+    }
+
+    public void setAuthorizationGrantType(String authorizationGrantType) {
+        this.authorizationGrantType = authorizationGrantType;
+    }
+
+    public String getAuthorizedScopes() {
+        return authorizedScopes;
+    }
+
+    public void setAuthorizedScopes(String authorizedScopes) {
+        this.authorizedScopes = authorizedScopes;
+    }
+
+    public String getAttributes() {
+        return attributes;
+    }
+
+    public void setAttributes(String attributes) {
+        this.attributes = attributes;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public String getAuthorizationCodeValue() {
+        return authorizationCodeValue;
+    }
+
+    public void setAuthorizationCodeValue(String authorizationCodeValue) {
+        this.authorizationCodeValue = authorizationCodeValue;
+    }
+
+    public LocalDateTime getAuthorizationCodeIssuedAt() {
+        return authorizationCodeIssuedAt;
+    }
+
+    public void setAuthorizationCodeIssuedAt(LocalDateTime authorizationCodeIssuedAt) {
+        this.authorizationCodeIssuedAt = authorizationCodeIssuedAt;
+    }
+
+    public LocalDateTime getAuthorizationCodeExpiresAt() {
+        return authorizationCodeExpiresAt;
+    }
+
+    public void setAuthorizationCodeExpiresAt(LocalDateTime authorizationCodeExpiresAt) {
+        this.authorizationCodeExpiresAt = authorizationCodeExpiresAt;
+    }
+
+    public String getAuthorizationCodeMetadata() {
+        return authorizationCodeMetadata;
+    }
+
+    public void setAuthorizationCodeMetadata(String authorizationCodeMetadata) {
+        this.authorizationCodeMetadata = authorizationCodeMetadata;
+    }
+
+    public String getAccessTokenValue() {
+        return accessTokenValue;
+    }
+
+    public void setAccessTokenValue(String accessTokenValue) {
+        this.accessTokenValue = accessTokenValue;
+    }
+
+    public LocalDateTime getAccessTokenIssuedAt() {
+        return accessTokenIssuedAt;
+    }
+
+    public void setAccessTokenIssuedAt(LocalDateTime accessTokenIssuedAt) {
+        this.accessTokenIssuedAt = accessTokenIssuedAt;
+    }
+
+    public LocalDateTime getAccessTokenExpiresAt() {
+        return accessTokenExpiresAt;
+    }
+
+    public void setAccessTokenExpiresAt(LocalDateTime accessTokenExpiresAt) {
+        this.accessTokenExpiresAt = accessTokenExpiresAt;
+    }
+
+    public String getAccessTokenMetadata() {
+        return accessTokenMetadata;
+    }
+
+    public void setAccessTokenMetadata(String accessTokenMetadata) {
+        this.accessTokenMetadata = accessTokenMetadata;
+    }
+
+    public String getAccessTokenType() {
+        return accessTokenType;
+    }
+
+    public void setAccessTokenType(String accessTokenType) {
+        this.accessTokenType = accessTokenType;
+    }
+
+    public String getAccessTokenScopes() {
+        return accessTokenScopes;
+    }
+
+    public void setAccessTokenScopes(String accessTokenScopes) {
+        this.accessTokenScopes = accessTokenScopes;
+    }
+
+    public String getOidcIdTokenValue() {
+        return oidcIdTokenValue;
+    }
+
+    public void setOidcIdTokenValue(String oidcIdTokenValue) {
+        this.oidcIdTokenValue = oidcIdTokenValue;
+    }
+
+    public LocalDateTime getOidcIdTokenIssuedAt() {
+        return oidcIdTokenIssuedAt;
+    }
+
+    public void setOidcIdTokenIssuedAt(LocalDateTime oidcIdTokenIssuedAt) {
+        this.oidcIdTokenIssuedAt = oidcIdTokenIssuedAt;
+    }
+
+    public LocalDateTime getOidcIdTokenExpiresAt() {
+        return oidcIdTokenExpiresAt;
+    }
+
+    public void setOidcIdTokenExpiresAt(LocalDateTime oidcIdTokenExpiresAt) {
+        this.oidcIdTokenExpiresAt = oidcIdTokenExpiresAt;
+    }
+
+    public String getOidcIdTokenMetadata() {
+        return oidcIdTokenMetadata;
+    }
+
+    public void setOidcIdTokenMetadata(String oidcIdTokenMetadata) {
+        this.oidcIdTokenMetadata = oidcIdTokenMetadata;
+    }
+
+    public String getRefreshTokenValue() {
+        return refreshTokenValue;
+    }
+
+    public void setRefreshTokenValue(String refreshTokenValue) {
+        this.refreshTokenValue = refreshTokenValue;
+    }
+
+    public LocalDateTime getRefreshTokenIssuedAt() {
+        return refreshTokenIssuedAt;
+    }
+
+    public void setRefreshTokenIssuedAt(LocalDateTime refreshTokenIssuedAt) {
+        this.refreshTokenIssuedAt = refreshTokenIssuedAt;
+    }
+
+    public LocalDateTime getRefreshTokenExpiresAt() {
+        return refreshTokenExpiresAt;
+    }
+
+    public void setRefreshTokenExpiresAt(LocalDateTime refreshTokenExpiresAt) {
+        this.refreshTokenExpiresAt = refreshTokenExpiresAt;
+    }
+
+    public String getRefreshTokenMetadata() {
+        return refreshTokenMetadata;
+    }
+
+    public void setRefreshTokenMetadata(String refreshTokenMetadata) {
+        this.refreshTokenMetadata = refreshTokenMetadata;
+    }
 }
