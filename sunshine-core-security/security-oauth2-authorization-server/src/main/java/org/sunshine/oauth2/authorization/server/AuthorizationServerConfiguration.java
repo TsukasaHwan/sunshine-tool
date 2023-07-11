@@ -43,10 +43,10 @@ import org.sunshine.oauth2.authorization.server.authentication.OAuth2PasswordAut
 import org.sunshine.oauth2.authorization.server.authentication.OAuth2PasswordAuthenticationProvider;
 import org.sunshine.oauth2.authorization.server.authorization.OAuth2AuthConsentServiceImpl;
 import org.sunshine.oauth2.authorization.server.authorization.OAuth2AuthServiceImpl;
-import org.sunshine.oauth2.authorization.server.authorization.OAuth2ClientRepository;
+import org.sunshine.oauth2.authorization.server.authorization.OAuth2AuthedClientRepository;
 import org.sunshine.oauth2.authorization.server.entity.OAuth2Auth;
 import org.sunshine.oauth2.authorization.server.entity.OAuth2AuthConsent;
-import org.sunshine.oauth2.authorization.server.entity.OAuth2Client;
+import org.sunshine.oauth2.authorization.server.entity.OAuth2AuthedClient;
 import org.sunshine.oauth2.authorization.server.properties.OAuth2AuthorizationServerProperties;
 import org.sunshine.security.core.handler.CommonAuthenticationEntryPoint;
 import org.sunshine.security.core.oauth2.TokenConstant;
@@ -130,8 +130,8 @@ public class AuthorizationServerConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean(RegisteredClientRepository.class)
-    public RegisteredClientRepository registeredClientRepository(@Autowired(required = false) BaseMapper<OAuth2Client> oAuth2ClientMapper) {
-        return new OAuth2ClientRepository(oAuth2ClientMapper);
+    public RegisteredClientRepository registeredClientRepository(@Autowired(required = false) BaseMapper<OAuth2AuthedClient> oAuth2AuthedClientMapper) {
+        return new OAuth2AuthedClientRepository(oAuth2AuthedClientMapper);
     }
 
     /**

@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
-@TableName(value = "sys_oauth2_auth")
+@TableName(value = "oauth2_auth")
 public class OAuth2Auth {
 
     /**

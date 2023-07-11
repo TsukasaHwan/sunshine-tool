@@ -12,7 +12,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@TableName(value = "sys_oauth2_auth_consent")
+@TableName(value = "oauth2_auth_consent")
 public class OAuth2AuthConsent {
 
     /**

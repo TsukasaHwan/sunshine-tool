@@ -1,4 +1,7 @@
-CREATE TABLE `sys_oauth2_client`
+/*
+ OAuth2 Schema
+ */
+CREATE TABLE oauth2_authed_client
 (
     `id`                            varchar(100)  NOT NULL,
     `client_id`                     varchar(100)  NOT NULL,
@@ -15,7 +18,7 @@ CREATE TABLE `sys_oauth2_client`
     PRIMARY KEY (`id`)
 );
 
-CREATE TABLE `sys_oauth2_auth`
+CREATE TABLE oauth2_auth
 (
     `id`                            varchar(100) NOT NULL,
     `registered_client_id`          varchar(100) NOT NULL,
@@ -45,7 +48,7 @@ CREATE TABLE `sys_oauth2_auth`
     PRIMARY KEY (`id`)
 );
 
-CREATE TABLE `sys_oauth2_auth_consent`
+CREATE TABLE oauth2_auth_consent
 (
     `registered_client_id` varchar(100)  NOT NULL,
     `principal_name`       varchar(200)  NOT NULL,

@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
-@TableName(value = "sys_oauth2_client")
-public class OAuth2Client {
+@TableName(value = "oauth2_authed_client")
+public class OAuth2AuthedClient {
 
     /**
      * 客户端ID

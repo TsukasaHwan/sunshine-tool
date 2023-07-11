@@ -24,11 +24,11 @@ spring-security-oauth2认证服务默认使用JdbcTemplate，修改为mybatis-pl
      }
      
      @Repository
-     public interface OAuth2ClientMapper extends BaseMapper<OAuth2Client> {
+     public interface OAuth2AuthedClientMapper extends BaseMapper<OAuth2AuthedClient> {
      }
      ```
 
-     [OAuth2Auth](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Foauth2%2Fauthorization%2Fserver%2Fentity%2FOAuth2Auth.java)认证表，[OAuth2AuthConsent](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Foauth2%2Fauthorization%2Fserver%2Fentity%2FOAuth2AuthConsent.java)授权同意表，[OAuth2Client](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Foauth2%2Fauthorization%2Fserver%2Fentity%2FOAuth2Client.java)客户端表
+     [OAuth2Auth](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Foauth2%2Fauthorization%2Fserver%2Fentity%2FOAuth2Auth.java)认证表，[OAuth2AuthConsent](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Foauth2%2Fauthorization%2Fserver%2Fentity%2FOAuth2AuthConsent.java)授权同意表，[OAuth2AuthedClient](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Foauth2%2Fauthorization%2Fserver%2Fentity%2FOAuth2AuthedClient.java)客户端表
 
 3. **使用[RSAUtils](..%2Fsecurity-core%2Fsrc%2Fmain%2Fjava%2Forg%2Fsunshine%2Fsecurity%2Fcore%2Futil%2FRSAUtils.java)生成公钥私钥**
 
