@@ -12,7 +12,7 @@ public class PathUtils {
      * @param args 路径参数
      * @return 完整路径
      */
-    public static String builderPath(String... args) {
+    public static String buildPath(String... args) {
         StringBuilder sb = StringUtils.builder();
         for (int i = 0; i < args.length; i++) {
             String backPart = args[i];
@@ -44,8 +44,8 @@ public class PathUtils {
      * @param args 路径参数
      * @return 完整路径
      */
-    public static String builderPathEndSlash(String... args) {
-        StringBuilder sb = StringUtils.builder(builderPath(args));
+    public static String buildPathEndSlash(String... args) {
+        StringBuilder sb = StringUtils.builder(buildPath(args));
         if (!sb.toString().endsWith(StringPool.SLASH)) {
             sb.append(StringPool.SLASH);
         }
