@@ -60,6 +60,7 @@
         <dysmsapi20170525.version>2.0.23</dysmsapi20170525.version>
         <tencentcloud-sdk-java.version>3.1.786</tencentcloud-sdk-java.version>
         <aliyun.oss.version>3.16.0</aliyun.oss.version>
+        <minio.version>8.5.4</minio.version>
 
         <jjwt.version>0.11.5</jjwt.version>
         <easyexcel.version>3.3.0</easyexcel.version>

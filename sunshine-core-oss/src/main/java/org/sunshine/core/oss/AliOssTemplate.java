@@ -31,8 +31,11 @@ import java.util.Map;
  * @author Chill
  */
 public class AliOssTemplate implements OssTemplate {
+
     private final OSSClient ossClient;
+
     private final OssProperties ossProperties;
+
     private final OssRule ossRule;
 
     public AliOssTemplate(OSSClient ossClient, OssProperties ossProperties, OssRule ossRule) {
@@ -155,6 +158,7 @@ public class AliOssTemplate implements OssTemplate {
         PutOssFile file = new PutOssFile();
         file.setOriginalName(originalName);
         file.setName(key);
+        file.setDomain(getOssHost(bucketName));
         file.setLink(fileLink(bucketName, key));
         return file;
     }
