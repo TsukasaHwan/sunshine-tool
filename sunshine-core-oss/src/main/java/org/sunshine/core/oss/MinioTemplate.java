@@ -239,18 +239,16 @@ public class MinioTemplate implements OssTemplate {
         builder.append("            \"Action\": [\n");
 
         switch (policyType) {
-            case WRITE:
+            case WRITE -> {
                 builder.append("                \"s3:GetBucketLocation\",\n");
                 builder.append("                \"s3:ListBucketMultipartUploads\"\n");
-                break;
-            case READ_WRITE:
+            }
+            case READ_WRITE -> {
                 builder.append("                \"s3:GetBucketLocation\",\n");
                 builder.append("                \"s3:ListBucket\",\n");
                 builder.append("                \"s3:ListBucketMultipartUploads\"\n");
-                break;
-            default:
-                builder.append("                \"s3:GetBucketLocation\"\n");
-                break;
+            }
+            default -> builder.append("                \"s3:GetBucketLocation\"\n");
         }
 
         builder.append("            ],\n");
@@ -277,15 +275,15 @@ public class MinioTemplate implements OssTemplate {
         builder.append("            \"Action\": ");
 
         switch (policyType) {
-            case WRITE:
+            case WRITE -> {
                 builder.append("[\n");
                 builder.append("                \"s3:AbortMultipartUpload\",\n");
                 builder.append("                \"s3:DeleteObject\",\n");
                 builder.append("                \"s3:ListMultipartUploadParts\",\n");
                 builder.append("                \"s3:PutObject\"\n");
                 builder.append("            ],\n");
-                break;
-            case READ_WRITE:
+            }
+            case READ_WRITE -> {
                 builder.append("[\n");
                 builder.append("                \"s3:AbortMultipartUpload\",\n");
                 builder.append("                \"s3:DeleteObject\",\n");
@@ -293,10 +291,8 @@ public class MinioTemplate implements OssTemplate {
                 builder.append("                \"s3:ListMultipartUploadParts\",\n");
                 builder.append("                \"s3:PutObject\"\n");
                 builder.append("            ],\n");
-                break;
-            default:
-                builder.append("\"s3:GetObject\",\n");
-                break;
+            }
+            default -> builder.append("\"s3:GetObject\",\n");
         }
 
         builder.append("            \"Effect\": \"Allow\",\n");
