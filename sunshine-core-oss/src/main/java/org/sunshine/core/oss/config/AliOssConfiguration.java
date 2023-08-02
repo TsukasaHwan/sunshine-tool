@@ -1,16 +1,16 @@
-package org.sunshine.core.oss;
+package org.sunshine.core.oss.config;
 
 import com.aliyun.oss.ClientConfiguration;
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.common.auth.CredentialsProvider;
 import com.aliyun.oss.common.auth.DefaultCredentialProvider;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
-import org.sunshine.core.oss.config.OssConfiguration;
+import org.springframework.context.annotation.Configuration;
+import org.sunshine.core.oss.AliOssTemplate;
 import org.sunshine.core.oss.props.OssProperties;
 import org.sunshine.core.oss.rule.OssRule;
 
@@ -18,15 +18,15 @@ import org.sunshine.core.oss.rule.OssRule;
  * @author Teamo
  * @since 2023/5/5
  */
-@Import(OssConfiguration.class)
-@AutoConfiguration(after = OssConfiguration.class)
+@Configuration(proxyBeanMethods = false)
+@ConditionalOnClass(OSSClient.class)
 @EnableConfigurationProperties(OssProperties.class)
-@ConditionalOnProperty(value = "aliyun.oss.enabled", havingValue = "true")
-public class AliOssAutoConfiguration {
+@ConditionalOnProperty(value = "oss.client-type", havingValue = "aliyun")
+public class AliOssConfiguration {
 
     private final OssProperties ossProperties;
 
-    public AliOssAutoConfiguration(OssProperties ossProperties) {
+    public AliOssConfiguration(OssProperties ossProperties) {
         this.ossProperties = ossProperties;
     }
 

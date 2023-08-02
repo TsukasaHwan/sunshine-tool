@@ -11,6 +11,11 @@ public class PutOssFile {
     private String link;
 
     /**
+     * 域名地址
+     */
+    private String domain;
+
+    /**
      * 文件名
      */
     private String name;
@@ -26,6 +31,14 @@ public class PutOssFile {
 
     public void setLink(String link) {
         this.link = link;
+    }
+
+    public String getDomain() {
+        return domain;
+    }
+
+    public void setDomain(String domain) {
+        this.domain = domain;
     }
 
     public String getName() {

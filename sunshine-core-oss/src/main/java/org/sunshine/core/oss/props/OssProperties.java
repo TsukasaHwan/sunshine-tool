@@ -9,13 +9,18 @@ import java.util.Map;
  *
  * @author Chill
  */
-@ConfigurationProperties(prefix = "aliyun.oss")
+@ConfigurationProperties(prefix = "oss")
 public class OssProperties {
 
     /**
      * 是否启用
      */
-    private Boolean enabled;
+    private boolean enabled;
+
+    /**
+     * 客户端类型
+     */
+    private ClientType clientType;
 
     /**
      * 对象存储服务的URL
@@ -42,12 +47,33 @@ public class OssProperties {
      */
     private Map<String, Object> args;
 
-    public Boolean getEnabled() {
+    public enum ClientType {
+
+        /**
+         * 阿里云
+         */
+        ALIYUN,
+
+        /**
+         * Minio
+         */
+        MINIO
+    }
+
+    public boolean isEnabled() {
         return enabled;
     }
 
-    public void setEnabled(Boolean enabled) {
+    public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public ClientType getClientType() {
+        return clientType;
+    }
+
+    public void setClientType(ClientType clientType) {
+        this.clientType = clientType;
     }
 
     public String getEndpoint() {
