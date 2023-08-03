@@ -29,15 +29,16 @@ public class CustomCacheManager implements CacheManager {
     @SuppressWarnings("NullableProblems")
     public Cache getCache(String name) {
         Cache cache = cacheConcurrentMap.get(name);
-        if (cache == null) {
-            cache = cacheConcurrentMap.put(name, new CustomCache(name, localCacheManager.getCache(name), remoteCacheManager.getCache(name)));
-        }
-        return cache;
+        return cache == null ? cacheConcurrentMap.computeIfAbsent(name, this::createCustomCache) : cache;
     }
 
     @Override
     @SuppressWarnings("NullableProblems")
     public Collection<String> getCacheNames() {
         return Collections.unmodifiableSet(cacheConcurrentMap.keySet());
+    }
+
+    private CustomCache createCustomCache(String name) {
+        return new CustomCache(name, localCacheManager.getCache(name), remoteCacheManager.getCache(name));
     }
 }
