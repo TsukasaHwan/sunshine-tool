@@ -9,7 +9,7 @@ import java.util.function.Consumer;
  * @author Teamo
  * @since 2019/9/29
  */
-public class RedissionLockUtils {
+public class RedissonLockUtils {
 
     private static Locker locker;
 
@@ -19,7 +19,7 @@ public class RedissionLockUtils {
      * @param locker locker
      */
     public static void setLocker(Locker locker) {
-        RedissionLockUtils.locker = locker;
+        RedissonLockUtils.locker = locker;
     }
 
     /**

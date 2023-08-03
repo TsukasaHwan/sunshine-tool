@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.sunshine.core.cache.properties.RedissonProperties;
 import org.sunshine.core.cache.redission.RedissonLocker;
 import org.sunshine.core.cache.redission.codec.FastJsonCodec;
-import org.sunshine.core.cache.redission.util.RedissionLockUtils;
+import org.sunshine.core.cache.redission.util.RedissonLockUtils;
 import org.sunshine.core.tool.util.StringUtils;
 
 /**
@@ -56,7 +56,7 @@ public class RedissonAutoConfiguration {
     @Bean
     public RedissonLocker redissonLocker(RedissonClient redissonClient) {
         RedissonLocker locker = new RedissonLocker(redissonClient);
-        RedissionLockUtils.setLocker(locker);
+        RedissonLockUtils.setLocker(locker);
         return locker;
     }
 }

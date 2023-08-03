@@ -2,7 +2,7 @@ package org.sunshine.core.cache.support.scheduling;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sunshine.core.cache.redission.util.RedissionLockUtils;
+import org.sunshine.core.cache.redission.util.RedissonLockUtils;
 import org.sunshine.core.tool.support.Try;
 
 /**
@@ -29,7 +29,7 @@ public interface DistributedTaskScheduling {
      * @param lockKey 锁名称
      */
     default void execute(String lockKey) {
-        RedissionLockUtils.tryLock(lockKey, Try.accept(lock -> {
+        RedissonLockUtils.tryLock(lockKey, Try.accept(lock -> {
             if (lock) {
                 this.task();
             }
