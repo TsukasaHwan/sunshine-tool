@@ -7,7 +7,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.util.Assert;
 import org.sunshine.core.cache.annotation.DistributedLock;
-import org.sunshine.core.cache.redission.util.RedissonLockUtils;
+import org.sunshine.core.cache.redisson.util.RedissonLockUtils;
 import org.sunshine.core.tool.util.ReflectionUtils;
 import org.sunshine.core.tool.util.StringUtils;
 
