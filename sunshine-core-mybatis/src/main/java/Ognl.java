@@ -101,8 +101,7 @@ public class Ognl {
         if (o instanceof Number) {
             return true;
         }
-        if (o instanceof String) {
-            String str = (String) o;
+        if (o instanceof String str) {
             if (str.length() == 0) {
                 return false;
             }
@@ -129,8 +128,7 @@ public class Ognl {
         if (o == null) {
             return true;
         }
-        if (o instanceof String) {
-            String str = (String) o;
+        if (o instanceof String str) {
             return isBlank(str);
         }
         return false;
