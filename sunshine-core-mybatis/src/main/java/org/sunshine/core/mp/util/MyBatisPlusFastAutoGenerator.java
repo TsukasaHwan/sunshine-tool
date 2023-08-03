@@ -21,7 +21,7 @@ import java.util.Scanner;
 public class MyBatisPlusFastAutoGenerator {
 
     public static void generate(String url, String username, String password) {
-        String module = scanner("模块名称");
+        String module = scanner("模块名称：");
         String projectDir = System.getProperty("user.dir");
         FastAutoGenerator.create(url, username, password)
                 // 全局配置
@@ -70,7 +70,7 @@ public class MyBatisPlusFastAutoGenerator {
 
     private static String scanner(String tip) {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("请输入" + tip + "：");
+        System.out.println(tip);
         if (scanner.hasNext()) {
             String ipt = scanner.next();
             if (StringUtils.isNotBlank(ipt)) {
