@@ -38,7 +38,7 @@ public class MyBatisPlusFastAutoGenerator {
                 .strategyConfig((scanner, builder) -> {
                     Entity.Builder entityBuilder = builder
                             .addTablePrefix(scanner.apply("表前缀："))
-                            .addInclude(getTables(scanner.apply("请输入表名，多个英文逗号分隔？所有输入 all：")))
+                            .addInclude(getTables(scanner.apply("请输入表名，多个以英文逗号分隔，所有输入 all：")))
                             .entityBuilder()
                             .enableLombok()
                             .disableSerialVersionUID()
