@@ -7,7 +7,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.util.Assert;
 import org.sunshine.core.cache.annotation.DistributedLock;
-import org.sunshine.core.cache.redission.util.RedissionLockUtils;
+import org.sunshine.core.cache.redission.util.RedissonLockUtils;
 import org.sunshine.core.tool.util.ReflectionUtils;
 import org.sunshine.core.tool.util.StringUtils;
 
@@ -104,11 +104,11 @@ public class DistributedLockAspect {
      */
     private Object lock(ProceedingJoinPoint pjp, final String lockName) throws Throwable {
         try {
-            RedissionLockUtils.lock(lockName);
+            RedissonLockUtils.lock(lockName);
             return proceed(pjp);
         } finally {
-            if (RedissionLockUtils.isHeldByCurrentThread(lockName)) {
-                RedissionLockUtils.unlock(lockName);
+            if (RedissonLockUtils.isHeldByCurrentThread(lockName)) {
+                RedissonLockUtils.unlock(lockName);
             }
         }
     }
@@ -127,12 +127,12 @@ public class DistributedLockAspect {
         TimeUnit timeUnit = distributedLock.timeUnit();
         boolean lock = false;
         try {
-            lock = RedissionLockUtils.tryLock(lockName, waitTime, leaseTime, timeUnit);
+            lock = RedissonLockUtils.tryLock(lockName, waitTime, leaseTime, timeUnit);
             if (lock) {
                 return proceed(pjp);
             }
         } finally {
-            RedissionLockUtils.unlock(lock, lockName);
+            RedissonLockUtils.unlock(lock, lockName);
         }
         return null;
     }
