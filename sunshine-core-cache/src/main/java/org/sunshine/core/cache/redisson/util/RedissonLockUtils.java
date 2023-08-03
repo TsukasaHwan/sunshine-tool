@@ -1,6 +1,6 @@
-package org.sunshine.core.cache.redission.util;
+package org.sunshine.core.cache.redisson.util;
 
-import org.sunshine.core.cache.redission.Locker;
+import org.sunshine.core.cache.redisson.Locker;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;

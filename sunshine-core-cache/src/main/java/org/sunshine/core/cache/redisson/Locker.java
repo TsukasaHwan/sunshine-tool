@@ -1,4 +1,4 @@
-package org.sunshine.core.cache.redission;
+package org.sunshine.core.cache.redisson;
 
 import java.util.concurrent.TimeUnit;
 

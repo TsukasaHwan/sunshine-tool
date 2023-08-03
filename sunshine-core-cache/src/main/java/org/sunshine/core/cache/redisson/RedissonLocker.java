@@ -1,4 +1,4 @@
-package org.sunshine.core.cache.redission;
+package org.sunshine.core.cache.redisson;
 
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;

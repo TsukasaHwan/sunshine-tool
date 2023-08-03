@@ -1,4 +1,4 @@
-package org.sunshine.core.cache.redission.codec;
+package org.sunshine.core.cache.redisson.codec;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONReader;

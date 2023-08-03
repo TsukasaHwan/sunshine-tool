@@ -12,9 +12,9 @@ import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.sunshine.core.cache.properties.RedissonProperties;
-import org.sunshine.core.cache.redission.RedissonLocker;
-import org.sunshine.core.cache.redission.codec.FastJsonCodec;
-import org.sunshine.core.cache.redission.util.RedissonLockUtils;
+import org.sunshine.core.cache.redisson.RedissonLocker;
+import org.sunshine.core.cache.redisson.codec.FastJsonCodec;
+import org.sunshine.core.cache.redisson.util.RedissonLockUtils;
 import org.sunshine.core.tool.util.StringUtils;
 
 /**
