@@ -18,21 +18,10 @@ public class OperateLogUtils extends LogAbstractUtils {
     /**
      * 添加系统日志
      *
-     * @param className  类名称
-     * @param methodName 方法名称
-     * @param title      日志标题
-     * @param time       操作时长
-     * @param params     参数
+     * @param log {@link OperateLog}
      */
-    public static void addLog(String username, String className, String methodName, String title, long time, String params) {
-        OperateLog log = new OperateLog();
-        log.setMethodClass(className);
-        log.setMethodName(methodName);
-        log.setTime(String.valueOf(time));
-        log.setTitle(title);
-        log.setCreateBy(username);
+    public static void addOperateLog(OperateLog log) {
         addRequestInfoToLog(WebUtils.getRequest(), log);
-        log.setParams(params);
         Map<String, Object> event = Collections.singletonMap(LogExecutor.EVENT_LOG, log);
         SpringUtils.publishEvent(new OperateLogEvent(event));
     }
