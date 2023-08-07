@@ -1,9 +1,8 @@
 package org.sunshine.core.captcha.service;
 
 import com.xingyuv.captcha.service.CaptchaCacheService;
+import jakarta.annotation.Resource;
 import org.sunshine.core.cache.RedisClient;
-
-import javax.annotation.Resource;
 
 /**
  * @author Teamo
