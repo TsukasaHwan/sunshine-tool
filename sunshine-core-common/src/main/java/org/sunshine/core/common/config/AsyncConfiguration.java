@@ -1,5 +1,6 @@
 package org.sunshine.core.common.config;
 
+import com.alibaba.ttl.TtlRunnable;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.aop.interceptor.SimpleAsyncUncaughtExceptionHandler;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -40,6 +41,8 @@ public class AsyncConfiguration implements AsyncConfigurer {
         // setRejectedExecutionHandler：当pool已经达到max size的时候，如何处理新任务
         // CallerRunsPolicy：不在新线程中执行任务，而是由调用者所在的线程来执行
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
+        // 解决子线程无法获取父线程的上下文数据
+        executor.setTaskDecorator(TtlRunnable::get);
         executor.initialize();
         return executor;
     }
