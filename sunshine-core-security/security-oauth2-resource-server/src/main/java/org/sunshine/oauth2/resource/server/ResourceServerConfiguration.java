@@ -19,6 +19,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import org.springframework.security.web.SecurityFilterChain;
 import org.sunshine.oauth2.resource.server.properties.OAuth2ResourceServerProperties;
 import org.sunshine.security.core.SecurityComponentConfiguration;
+import org.sunshine.security.core.enums.RoleEnum;
 import org.sunshine.security.core.handler.CommonAccessDeniedHandler;
 import org.sunshine.security.core.handler.CommonAuthenticationEntryPoint;
 import org.sunshine.security.core.oauth2.TokenConstant;
@@ -85,7 +86,7 @@ public class ResourceServerConfiguration {
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
         jwtGrantedAuthoritiesConverter.setAuthoritiesClaimName(TokenConstant.AUTHORITIES);
-        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
+        jwtGrantedAuthoritiesConverter.setAuthorityPrefix(RoleEnum.RoleCode.ROLE_PREFIX);
 
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);

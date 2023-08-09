@@ -19,9 +19,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
@@ -48,6 +46,7 @@ import org.sunshine.oauth2.authorization.server.entity.OAuth2Auth;
 import org.sunshine.oauth2.authorization.server.entity.OAuth2AuthConsent;
 import org.sunshine.oauth2.authorization.server.entity.OAuth2AuthedClient;
 import org.sunshine.oauth2.authorization.server.properties.OAuth2AuthorizationServerProperties;
+import org.sunshine.security.core.enums.RoleEnum;
 import org.sunshine.security.core.handler.CommonAuthenticationEntryPoint;
 import org.sunshine.security.core.oauth2.TokenConstant;
 
@@ -232,12 +231,16 @@ public class AuthorizationServerConfiguration {
     @ConditionalOnMissingBean(OAuth2TokenCustomizer.class)
     public OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer() {
         return context -> {
-            if (context.getAuthorizationGrantType().getValue().equals(AuthorizationGrantType.PASSWORD.getValue())) {
-                Authentication authentication = context.getPrincipal();
-                if (authentication instanceof UsernamePasswordAuthenticationToken && authentication.getPrincipal() instanceof UserDetails userDetails) {
-                    Set<String> authorities = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
-                    context.getClaims().claim(TokenConstant.AUTHORITIES, authorities);
-                }
+            Authentication authentication = context.getPrincipal();
+            if (authentication instanceof UsernamePasswordAuthenticationToken && authentication.getPrincipal() instanceof UserDetails userDetails) {
+                Set<String> authorities = userDetails.getAuthorities().stream().map(grantedAuthority -> {
+                    String authority = grantedAuthority.getAuthority();
+                    if (authority.startsWith(RoleEnum.RoleCode.ROLE_PREFIX)) {
+                        return authority.replace(RoleEnum.RoleCode.ROLE_PREFIX, "");
+                    }
+                    return authority;
+                }).collect(Collectors.toSet());
+                context.getClaims().claim(TokenConstant.AUTHORITIES, authorities);
             }
         };
     }
