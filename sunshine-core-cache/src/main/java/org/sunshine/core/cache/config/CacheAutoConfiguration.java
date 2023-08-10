@@ -59,9 +59,9 @@ public class CacheAutoConfiguration {
         template.setKeySerializer(RedisSerializer.string());
         // hash的key也采用String的序列化方式
         template.setHashKeySerializer(RedisSerializer.string());
-        // value序列化方式采用jackson
+        // value序列化方式采用fastjson
         template.setValueSerializer(redisSerializer);
-        // hash的value序列化方式采用jackson
+        // hash的value序列化方式采用fastjson
         template.setHashValueSerializer(redisSerializer);
         template.afterPropertiesSet();
         return template;
