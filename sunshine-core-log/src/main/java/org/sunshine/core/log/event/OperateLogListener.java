@@ -1,6 +1,6 @@
 package org.sunshine.core.log.event;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.Async;
@@ -19,24 +19,18 @@ public class OperateLogListener {
 
     private final ServerInfo serverInfo;
 
-    private final BaseMapper<OperateLog> baseMapper;
-
-    public OperateLogListener(ServerInfo serverInfo, BaseMapper<OperateLog> baseMapper) {
+    public OperateLogListener(ServerInfo serverInfo) {
         this.serverInfo = serverInfo;
-        this.baseMapper = baseMapper;
     }
 
     @Async
     @Order
     @EventListener(OperateLogEvent.class)
     public void saveOperateLogLog(OperateLogEvent event) {
-        if (baseMapper == null) {
-            return;
-        }
         @SuppressWarnings("unchecked")
         Map<String, Object> source = (Map<String, Object>) event.getSource();
         OperateLog operateLog = (OperateLog) source.get(LogExecutor.EVENT_LOG);
         LogAbstractUtils.addOtherInfoToLog(operateLog, serverInfo);
-        baseMapper.insert(operateLog);
+        SqlHelper.execute(OperateLog.class, baseMapper -> baseMapper.insert(operateLog));
     }
 }
