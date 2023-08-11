@@ -258,6 +258,9 @@ public class IdCardUtils {
      * @return 是否有效的18位身份证
      */
     public static boolean isValidCard18(String idCard, boolean ignoreCase) {
+        if (idCard == null) {
+            return false;
+        }
         if (CHINA_ID_MAX_LENGTH != idCard.length()) {
             return false;
         }
@@ -294,6 +297,9 @@ public class IdCardUtils {
      * @return 是否合法
      */
     public static boolean isValidCard15(String idCard) {
+        if (idCard == null) {
+            return false;
+        }
         if (CHINA_ID_MIN_LENGTH != idCard.length()) {
             return false;
         }
