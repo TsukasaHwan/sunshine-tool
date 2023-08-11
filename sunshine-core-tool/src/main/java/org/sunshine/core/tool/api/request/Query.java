@@ -1,12 +1,14 @@
 package org.sunshine.core.tool.api.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springdoc.api.annotations.ParameterObject;
 
 /**
  * @author Teamo
  * @since 2020/10/27
  */
 @Schema
+@ParameterObject
 public class Query {
 
     public static final Integer DEFAULT_CURRENT = 1;
