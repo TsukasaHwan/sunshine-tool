@@ -162,11 +162,6 @@ public class INetUtils {
      * @param consumer 消费者
      */
     public static void tryPing(String host, int timeout, Consumer<Boolean> consumer) {
-        try {
-            InetAddress address = InetAddress.getByName(host);
-            consumer.accept(address.isReachable(timeout));
-        } catch (Exception e) {
-            consumer.accept(Boolean.FALSE);
-        }
+        consumer.accept(tryPing(host, timeout));
     }
 }
