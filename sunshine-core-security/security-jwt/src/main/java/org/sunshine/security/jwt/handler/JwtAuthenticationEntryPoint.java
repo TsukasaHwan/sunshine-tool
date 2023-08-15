@@ -14,7 +14,7 @@ import org.sunshine.security.jwt.exception.JwtExpiredException;
  * @author Teamo
  * @since 2023/3/13
  */
-public class JwtTokenAuthenticationEntryPoint extends CommonAuthenticationEntryPoint {
+public class JwtAuthenticationEntryPoint extends CommonAuthenticationEntryPoint {
 
     @Override
     protected void handleOtherException(HttpServletResponse response, AuthenticationException authException) {

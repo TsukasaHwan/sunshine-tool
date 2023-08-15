@@ -28,8 +28,8 @@ import org.sunshine.security.core.DefaultSecurityConfiguration;
 import org.sunshine.security.core.handler.CommonAccessDeniedHandler;
 import org.sunshine.security.core.support.AbstractSecurityAnnotationSupport;
 import org.sunshine.security.jwt.filter.JwtAuthenticationFilter;
+import org.sunshine.security.jwt.handler.JwtAuthenticationEntryPoint;
 import org.sunshine.security.jwt.handler.JwtLogoutSuccessHandler;
-import org.sunshine.security.jwt.handler.JwtTokenAuthenticationEntryPoint;
 import org.sunshine.security.jwt.properties.JwtSecurityProperties;
 import org.sunshine.security.jwt.userdetails.JwtUserDetailsService;
 import org.sunshine.security.jwt.util.JwtClaimsUtils;
@@ -83,7 +83,7 @@ public class JwtSecurityConfiguration {
             authorize.anyRequest().authenticated();
         });
 
-        AuthenticationEntryPoint authenticationEntryPoint = new JwtTokenAuthenticationEntryPoint();
+        AuthenticationEntryPoint authenticationEntryPoint = new JwtAuthenticationEntryPoint();
         AuthenticationFailureHandler authenticationFailureHandler = new AuthenticationEntryPointFailureHandler(authenticationEntryPoint);
 
         JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(userDetailsService, authenticationFailureHandler, jwtSecurityProperties);
