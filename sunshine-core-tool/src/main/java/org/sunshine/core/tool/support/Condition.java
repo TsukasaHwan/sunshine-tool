@@ -127,17 +127,17 @@ public class Condition {
     /**
      * 分页实体类集合包装
      *
-     * @param pages    源数据
+     * @param page     源数据
      * @param target   目标数据
      * @param callback 需要在拷贝中处理的逻辑函数
      * @param <E>      实体类
      * @param <V>      VO类
      * @return mybatis-plus分页
      */
-    public static <E, V> IPage<V> pageVo(IPage<E> pages, Supplier<V> target, BeanCallBack<E, V> callback) {
-        List<E> records = pages.getRecords();
+    public static <E, V> IPage<V> pageVo(IPage<E> page, Supplier<V> target, BeanCallBack<E, V> callback) {
+        List<E> records = page.getRecords();
         List<V> collect = BeanUtils.copyListProperties(records, target, callback);
-        IPage<V> pageVo = Page.of(pages.getCurrent(), pages.getSize(), pages.getTotal());
+        IPage<V> pageVo = Page.of(page.getCurrent(), page.getSize(), page.getTotal());
         pageVo.setRecords(collect);
         return pageVo;
     }
