@@ -109,8 +109,8 @@ public class Condition {
         }
     }
 
-    public static <E, V> IPage<V> pageVo(IPage<E> pages, Supplier<V> target) {
-        return pageVo(pages, target, null);
+    public static <E, V> IPage<V> pageVo(IPage<E> page, Supplier<V> target) {
+        return pageVo(page, target, null);
     }
 
     /**
