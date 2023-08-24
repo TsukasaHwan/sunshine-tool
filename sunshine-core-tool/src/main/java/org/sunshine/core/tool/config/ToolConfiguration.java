@@ -50,8 +50,11 @@ public class ToolConfiguration implements WebMvcConfigurer {
         OkHttp3ClientHttpRequestFactory factory = new OkHttp3ClientHttpRequestFactory(okHttpClient);
         restTemplate.setRequestFactory(factory);
 
-        StringHttpMessageConverter converter = (StringHttpMessageConverter) restTemplate.getMessageConverters().get(1);
-        converter.setDefaultCharset(StandardCharsets.UTF_8);
+        restTemplate.getMessageConverters().forEach(converter -> {
+            if (converter instanceof StringHttpMessageConverter) {
+                ((StringHttpMessageConverter) converter).setDefaultCharset(StandardCharsets.UTF_8);
+            }
+        });
 
         return restTemplate;
     }
