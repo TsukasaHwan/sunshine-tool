@@ -51,8 +51,8 @@ public class ToolConfiguration implements WebMvcConfigurer {
         restTemplate.setRequestFactory(factory);
 
         restTemplate.getMessageConverters().forEach(converter -> {
-            if (converter instanceof StringHttpMessageConverter) {
-                ((StringHttpMessageConverter) converter).setDefaultCharset(StandardCharsets.UTF_8);
+            if (converter instanceof StringHttpMessageConverter stringHttpMessageConverter) {
+                stringHttpMessageConverter.setDefaultCharset(StandardCharsets.UTF_8);
             }
         });
 
