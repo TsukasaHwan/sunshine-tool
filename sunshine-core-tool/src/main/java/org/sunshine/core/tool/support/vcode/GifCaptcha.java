@@ -86,7 +86,7 @@ public class GifCaptcha extends Captcha {
             g2d.setComposite(ac3);
             g2d.setColor(fontcolor[i]);
             g2d.drawOval(num(width), num(height), 5 + num(10), 5 + num(10));
-            g2d.drawString(chars[i] + "", (width - (len - i) * w) + (w - font.getSize()) + 1, h - 4);
+            g2d.drawString(String.valueOf(chars[i]), (width - (len - i) * w) + (w - font.getSize()) + 1, h - 4);
         }
         g2d.dispose();
         return image;
