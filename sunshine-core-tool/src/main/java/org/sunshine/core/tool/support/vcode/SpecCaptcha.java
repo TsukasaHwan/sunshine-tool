@@ -61,7 +61,7 @@ public class SpecCaptcha extends Captcha {
                 g.setComposite(ac3);
                 color = new Color(20 + num(110), 20 + num(110), 20 + num(110));
                 g.setColor(color);
-                g.drawString(chars[i] + "", (width - (len - i) * w) + size, h - 4);
+                g.drawString(String.valueOf(chars[i]), (width - (len - i) * w) + size, h - 4);
                 color = null;
                 ac3 = null;
             }
