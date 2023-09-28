@@ -682,12 +682,8 @@ public class DateUtils {
      * @return List<LocalDateTime>
      */
     public static List<Date> range(Date start, Date end, ChronoUnit unit) {
-        LocalDateTime startLocalDateTime = fromDate(start);
-        long between = unit.between(startLocalDateTime, fromDate(end));
-        return Stream.iterate(startLocalDateTime, date -> unit.addTo(date, 1))
-                .limit(between + 1)
-                .map(DateUtils::toDate)
-                .collect(Collectors.toList());
+        List<LocalDateTime> range = range(fromDate(start), fromDate(end), unit);
+        return range.stream().map(DateUtils::toDate).collect(Collectors.toList());
     }
 
     /**
