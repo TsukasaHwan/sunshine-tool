@@ -13,7 +13,19 @@ import java.util.Map;
  * @since 2019/10/17
  */
 public class RestTemplateUtils {
-    private static RestTemplate restTemplate;
+
+    private static class RestTemplateInstance {
+        private static final RestTemplate INSTANCE = SpringUtils.getBean(RestTemplate.class);
+    }
+
+    /**
+     * 获取RestTemplate实例对象，可自由调用其方法
+     *
+     * @return RestTemplate实例对象
+     */
+    public static RestTemplate getRestTemplate() {
+        return RestTemplateInstance.INSTANCE;
+    }
 
     // ----------------------------------GET-------------------------------------------------------
 
@@ -607,17 +619,5 @@ public class RestTemplateUtils {
      */
     public static <T> ResponseEntity<T> exchange(String url, HttpMethod method, HttpEntity<?> requestEntity, Class<T> responseType, Map<String, ?> uriVariables) {
         return getRestTemplate().exchange(url, method, requestEntity, responseType, uriVariables);
-    }
-
-    /**
-     * 获取RestTemplate实例对象，可自由调用其方法
-     *
-     * @return RestTemplate实例对象
-     */
-    public static RestTemplate getRestTemplate() {
-        if (restTemplate == null) {
-            restTemplate = SpringUtils.getBean(RestTemplate.class);
-        }
-        return restTemplate;
     }
 }
