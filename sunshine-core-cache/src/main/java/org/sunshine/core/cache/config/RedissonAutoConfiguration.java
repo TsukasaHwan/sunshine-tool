@@ -5,7 +5,9 @@ import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.Codec;
 import org.redisson.config.Config;
 import org.redisson.config.SingleServerConfig;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
@@ -14,8 +16,11 @@ import org.springframework.context.annotation.Bean;
 import org.sunshine.core.cache.properties.RedissonProperties;
 import org.sunshine.core.cache.redisson.RedissonLocker;
 import org.sunshine.core.cache.redisson.codec.FastJsonCodec;
+import org.sunshine.core.cache.redisson.queue.DelayedQueueJob;
 import org.sunshine.core.cache.redisson.util.RedissonLockUtils;
 import org.sunshine.core.tool.util.StringUtils;
+
+import java.util.List;
 
 /**
  * @author Teamo
@@ -58,5 +63,11 @@ public class RedissonAutoConfiguration {
         RedissonLocker locker = new RedissonLocker(redissonClient);
         RedissonLockUtils.setLocker(locker);
         return locker;
+    }
+
+    @Bean
+    @ConditionalOnBean(DelayedQueueJob.class)
+    public CommandLineRunner queueRunner(List<DelayedQueueJob<?>> delayedQueueJobList, RedissonClient redissonClient) {
+        return args -> delayedQueueJobList.forEach(delayedQueueJob -> delayedQueueJob.start(redissonClient));
     }
 }
