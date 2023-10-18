@@ -8,7 +8,7 @@ import java.util.List;
  *
  * @author Chill
  */
-public interface INode extends Serializable {
+public interface INode<T> extends Serializable {
 
     /**
      * 主键
@@ -29,7 +29,7 @@ public interface INode extends Serializable {
      *
      * @return List
      */
-    List<INode> getChildren();
+    List<T> getChildren();
 
     /**
      * 是否有子孙节点

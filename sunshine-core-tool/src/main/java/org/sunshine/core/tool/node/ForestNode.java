@@ -5,7 +5,7 @@ package org.sunshine.core.tool.node;
  *
  * @author Chill
  */
-public class ForestNode extends BaseNode {
+public class ForestNode extends BaseNode<ForestNode> {
 
     private static final long serialVersionUID = 1L;
 
