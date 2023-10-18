@@ -8,7 +8,7 @@ import java.util.List;
  *
  * @author Chill
  */
-public class BaseNode implements INode {
+public class BaseNode<T> implements INode<T> {
 
     private static final long serialVersionUID = 1L;
 
@@ -25,7 +25,7 @@ public class BaseNode implements INode {
     /**
      * 子孙节点
      */
-    protected List<INode> children = new ArrayList<>();
+    protected List<T> children = new ArrayList<>();
 
     /**
      * 是否有子孙节点
@@ -63,11 +63,11 @@ public class BaseNode implements INode {
     }
 
     @Override
-    public List<INode> getChildren() {
+    public List<T> getChildren() {
         return children;
     }
 
-    public void setChildren(List<INode> children) {
+    public void setChildren(List<T> children) {
         this.children = children;
     }
 

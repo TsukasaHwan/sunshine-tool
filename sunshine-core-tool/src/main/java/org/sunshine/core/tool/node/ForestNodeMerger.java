@@ -17,11 +17,11 @@ public class ForestNodeMerger {
      * @param <T>   T 泛型标记
      * @return 多棵树的根节点集合
      */
-    public static <T extends INode> List<T> merge(List<T> items) {
+    public static <T extends INode<T>> List<T> merge(List<T> items) {
         ForestNodeManager<T> forestNodeManager = new ForestNodeManager<>(items);
         items.forEach(forestNode -> {
             if (forestNode.getParentId() != 0) {
-                INode node = forestNodeManager.getTreeNodeAt(forestNode.getParentId());
+                INode<T> node = forestNodeManager.getTreeNodeAt(forestNode.getParentId());
                 if (node != null) {
                     node.getChildren().add(forestNode);
                 } else {

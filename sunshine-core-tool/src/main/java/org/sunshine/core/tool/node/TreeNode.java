@@ -5,7 +5,7 @@ package org.sunshine.core.tool.node;
  *
  * @author Chill
  */
-public class TreeNode extends BaseNode {
+public class TreeNode extends BaseNode<TreeNode> {
 
     private static final long serialVersionUID = 1L;
 
