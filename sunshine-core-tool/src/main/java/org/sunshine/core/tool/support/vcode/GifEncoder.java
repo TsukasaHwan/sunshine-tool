@@ -4,6 +4,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * Gif 编码器
@@ -175,7 +177,7 @@ public class GifEncoder {
     public boolean start(String file) {
         boolean ok = true;
         try {
-            out = new BufferedOutputStream(new FileOutputStream(file));
+            out = new BufferedOutputStream(Files.newOutputStream(Paths.get(file)));
             ok = start(out);
             closeStream = true;
         } catch (IOException e) {
