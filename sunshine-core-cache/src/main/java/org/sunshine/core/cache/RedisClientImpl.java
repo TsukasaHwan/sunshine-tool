@@ -2,10 +2,12 @@ package org.sunshine.core.cache;
 
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.connection.RedisStreamCommands;
-import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.connection.stream.Record;
+import org.springframework.data.redis.connection.stream.*;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.data.redis.serializer.RedisSerializer;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -354,7 +356,17 @@ public class RedisClientImpl implements RedisClient {
 
     @Override
     public List<MapRecord<String, Object, Object>> streamClaim(String stream, String consumerGroup, String newOwner, RedisStreamCommands.XClaimOptions xClaimOptions) {
-        return redisTemplate.opsForStream().claim(stream, consumerGroup, newOwner, xClaimOptions);
+        return redisTemplate.execute((RedisCallback<List<MapRecord<String, Object, Object>>>) connection -> {
+            List<ByteRecord> raw = connection.streamCommands().xClaim(RedisSerializer.string().serialize(stream), consumerGroup, newOwner, xClaimOptions);
+            if (raw == null) {
+                return Collections.emptyList();
+            }
+            List<MapRecord<String, Object, Object>> result = new ArrayList<>(raw.size());
+            for (ByteRecord record : raw) {
+                result.add(record.deserialize(RedisSerializer.string(), redisTemplate.getHashKeySerializer(), redisTemplate.getHashValueSerializer()));
+            }
+            return result;
+        });
     }
 
     @Override
