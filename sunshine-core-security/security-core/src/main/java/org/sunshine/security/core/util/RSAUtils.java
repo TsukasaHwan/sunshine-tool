@@ -18,7 +18,7 @@ import java.util.Base64;
  */
 public class RSAUtils {
 
-    public static final Logger log = LoggerFactory.getLogger(RSAUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(RSAUtils.class);
 
     /**
      * 密钥长度 于原文长度对应 以及越长速度越慢
