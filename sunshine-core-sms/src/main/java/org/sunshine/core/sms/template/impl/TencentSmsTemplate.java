@@ -8,7 +8,7 @@ import com.tencentcloudapi.sms.v20210111.models.SendStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
-import org.sunshine.core.sms.model.SmsSender;
+import org.sunshine.core.sms.model.SmsMessage;
 import org.sunshine.core.sms.template.SmsTemplate;
 
 import java.util.Arrays;
@@ -33,21 +33,21 @@ public class TencentSmsTemplate implements SmsTemplate {
     }
 
     @Override
-    public boolean sendSms(SmsSender smsSender) {
-        Assert.notNull(smsSender, "SmsSender must not be null!");
-        String[] phoneNumbers = smsSender.getPhoneNumbers();
+    public boolean sendSms(SmsMessage smsMessage) {
+        Assert.notNull(smsMessage, "SmsSender must not be null!");
+        String[] phoneNumbers = smsMessage.getPhoneNumbers();
         Assert.notEmpty(phoneNumbers, "Phone numbers must not be empty!");
         if (phoneNumbers.length > PHONE_NUMBERS_LIMIT) {
             throw new IllegalArgumentException("The number of mobile phone numbers cannot be greater than 200");
         }
 
-        SmsSender.Tencent tencent = smsSender.getTencent();
+        SmsMessage.Tencent tencent = smsMessage.getTencent();
         Assert.notNull(tencent, "The Tencent SMS param must not be null!");
 
         SendSmsRequest req = new SendSmsRequest();
         req.setSmsSdkAppId(tencent.getSdkAppId());
-        req.setSignName(smsSender.getSignName());
-        req.setTemplateId(smsSender.getTemplateCode());
+        req.setSignName(smsMessage.getSignName());
+        req.setTemplateId(smsMessage.getTemplateCode());
         req.setTemplateParamSet(tencent.getTemplateParam());
         req.setPhoneNumberSet(phoneNumbers);
         SendSmsResponse response = null;

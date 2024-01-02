@@ -8,7 +8,7 @@ import com.aliyun.dysmsapi20170525.models.SendSmsResponseBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
-import org.sunshine.core.sms.model.SmsSender;
+import org.sunshine.core.sms.model.SmsMessage;
 import org.sunshine.core.sms.template.SmsTemplate;
 import org.sunshine.core.tool.util.StringPool;
 
@@ -33,21 +33,21 @@ public class AliYunSmsTemplate implements SmsTemplate {
     }
 
     @Override
-    public boolean sendSms(SmsSender smsSender) {
-        Assert.notNull(smsSender, "SmsSender must not be null!");
-        String[] phoneNumbers = smsSender.getPhoneNumbers();
+    public boolean sendSms(SmsMessage smsMessage) {
+        Assert.notNull(smsMessage, "SmsSender must not be null!");
+        String[] phoneNumbers = smsMessage.getPhoneNumbers();
         Assert.notEmpty(phoneNumbers, "Phone numbers must not be empty!");
         if (phoneNumbers.length > PHONE_NUMBERS_LIMIT) {
             throw new IllegalArgumentException("The number of mobile phone numbers cannot be greater than 1000");
         }
 
-        SmsSender.AliYun aliYun = smsSender.getAliYun();
+        SmsMessage.AliYun aliYun = smsMessage.getAliYun();
         Assert.notNull(aliYun, "The AliYun SMS param must not be null!");
 
         SendSmsRequest sendSmsRequest = new SendSmsRequest()
                 .setPhoneNumbers(String.join(StringPool.COMMA, phoneNumbers))
-                .setSignName(smsSender.getSignName())
-                .setTemplateCode(smsSender.getTemplateCode())
+                .setSignName(smsMessage.getSignName())
+                .setTemplateCode(smsMessage.getTemplateCode())
                 .setTemplateParam(aliYun.getTemplateParam())
                 .setOutId(aliYun.getOutId());
         SendSmsResponse sendSmsResponse = null;
