@@ -1,6 +1,6 @@
 package org.sunshine.core.sms.template;
 
-import org.sunshine.core.sms.model.SmsSender;
+import org.sunshine.core.sms.model.SmsMessage;
 
 /**
  * @author Teamo
@@ -11,8 +11,8 @@ public interface SmsTemplate {
     /**
      * 发送短信
      *
-     * @param smsSender {@link SmsSender}
+     * @param smsMessage {@link SmsMessage}
      * @return 是否成功
      */
-    boolean sendSms(SmsSender smsSender);
+    boolean sendSms(SmsMessage smsMessage);
 }

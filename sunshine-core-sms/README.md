@@ -56,9 +56,9 @@
      
      public void testSms() {
          // 阿里云
-         SmsSender.AliYun aliYun = SmsSender.AliYun.builder().templateParam("").outId("").build();
-         SmsSender smsSender = SmsSender.builder().phoneNumbers("13888888888").signName("").templateCode("").build(aliYun);
-         boolean isSuccess = smsTemplate.sendSms(smsSender);
+         SmsMessage.AliYun aliYun = SmsMessage.AliYun.builder().templateParam("").outId("").build();
+         SmsMessage smsMessage = SmsMessage.builder().phoneNumbers("13888888888").signName("").templateCode("").build(aliYun);
+         boolean isSuccess = smsTemplate.sendSms(smsMessage);
      }
      ```
 

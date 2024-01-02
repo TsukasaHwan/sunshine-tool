@@ -4,7 +4,7 @@ package org.sunshine.core.sms.model;
  * @author Teamo
  * @since 2022/03/03
  */
-public class SmsSender {
+public class SmsMessage {
 
     /**
      * 电话号码，支持批量调用
@@ -33,14 +33,14 @@ public class SmsSender {
      */
     private Tencent tencent;
 
-    SmsSender(String[] phoneNumbers, String signName, String templateCode, AliYun aliYun) {
+    SmsMessage(String[] phoneNumbers, String signName, String templateCode, AliYun aliYun) {
         this.phoneNumbers = phoneNumbers;
         this.signName = signName;
         this.templateCode = templateCode;
         this.aliYun = aliYun;
     }
 
-    SmsSender(String[] phoneNumbers, String signName, String templateCode, Tencent tencent) {
+    SmsMessage(String[] phoneNumbers, String signName, String templateCode, Tencent tencent) {
         this.phoneNumbers = phoneNumbers;
         this.signName = signName;
         this.templateCode = templateCode;
@@ -97,12 +97,12 @@ public class SmsSender {
             return this;
         }
 
-        public SmsSender build(AliYun aliYun) {
-            return new SmsSender(this.phoneNumbers, this.signName, this.templateCode, aliYun);
+        public SmsMessage build(AliYun aliYun) {
+            return new SmsMessage(this.phoneNumbers, this.signName, this.templateCode, aliYun);
         }
 
-        public SmsSender build(Tencent tencent) {
-            return new SmsSender(this.phoneNumbers, this.signName, this.templateCode, tencent);
+        public SmsMessage build(Tencent tencent) {
+            return new SmsMessage(this.phoneNumbers, this.signName, this.templateCode, tencent);
         }
     }
 
