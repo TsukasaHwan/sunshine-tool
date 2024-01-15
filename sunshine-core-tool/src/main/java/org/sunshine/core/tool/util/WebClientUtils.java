@@ -1,6 +1,7 @@
 package org.sunshine.core.tool.util;
 
 import org.springframework.http.MediaType;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Map;
@@ -161,17 +162,17 @@ public class WebClientUtils {
      * 带请求头的POST请求调用方式
      *
      * @param url          请求URL
-     * @param bodyValue    请求参数体
      * @param headers      请求头参数
+     * @param bodyValue    请求参数体
      * @param uriVariables URI中的变量，按顺序依次对应
      * @return WebClient.ResponseSpec 响应对象类
      */
-    public static WebClient.ResponseSpec post(String url, Object bodyValue, Map<String, String> headers, Object... uriVariables) {
+    public static WebClient.ResponseSpec post(String url, Map<String, String> headers, Object bodyValue, Object... uriVariables) {
         return getWebClient()
                 .post()
                 .uri(url, uriVariables)
-                .bodyValue(bodyValue)
                 .headers(requestHeaders -> requestHeaders.setAll(headers))
+                .bodyValue(bodyValue)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve();
     }
@@ -180,17 +181,17 @@ public class WebClientUtils {
      * 带请求头的POST请求调用方式
      *
      * @param url          请求URL
-     * @param bodyValue    请求参数体
      * @param headers      请求头参数
+     * @param bodyValue    请求参数体
      * @param uriVariables URI中的变量，与Map中的key对应
      * @return WebClient.ResponseSpec 响应对象类
      */
-    public static WebClient.ResponseSpec post(String url, Object bodyValue, Map<String, String> headers, Map<String, ?> uriVariables) {
+    public static WebClient.ResponseSpec post(String url, Map<String, String> headers, Object bodyValue, Map<String, ?> uriVariables) {
         return getWebClient()
                 .post()
                 .uri(url, uriVariables)
-                .bodyValue(bodyValue)
                 .headers(requestHeaders -> requestHeaders.setAll(headers))
+                .bodyValue(bodyValue)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve();
     }
@@ -249,17 +250,17 @@ public class WebClientUtils {
      * 带请求头的PUT请求调用方式
      *
      * @param url          请求URL
-     * @param bodyValue    请求参数体
      * @param headers      请求头参数
+     * @param bodyValue    请求参数体
      * @param uriVariables URI中的变量，按顺序依次对应
      * @return WebClient.ResponseSpec 响应对象类
      */
-    public static WebClient.ResponseSpec put(String url, Object bodyValue, Map<String, String> headers, Object... uriVariables) {
+    public static WebClient.ResponseSpec put(String url, Map<String, String> headers, Object bodyValue, Object... uriVariables) {
         return getWebClient()
                 .put()
                 .uri(url, uriVariables)
-                .bodyValue(bodyValue)
                 .headers(requestHeaders -> requestHeaders.setAll(headers))
+                .bodyValue(bodyValue)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve();
     }
@@ -268,17 +269,17 @@ public class WebClientUtils {
      * 带请求头的PUT请求调用方式
      *
      * @param url          请求URL
-     * @param bodyValue    请求参数体
      * @param headers      请求头参数
+     * @param bodyValue    请求参数体
      * @param uriVariables URI中的变量，与Map中的key对应
      * @return WebClient.ResponseSpec 响应对象类
      */
-    public static WebClient.ResponseSpec put(String url, Object bodyValue, Map<String, String> headers, Map<String, ?> uriVariables) {
+    public static WebClient.ResponseSpec put(String url, Map<String, String> headers, Object bodyValue, Map<String, ?> uriVariables) {
         return getWebClient()
                 .put()
                 .uri(url, uriVariables)
-                .bodyValue(bodyValue)
                 .headers(requestHeaders -> requestHeaders.setAll(headers))
+                .bodyValue(bodyValue)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve();
     }
