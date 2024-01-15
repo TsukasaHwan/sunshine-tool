@@ -1,5 +1,8 @@
 package org.sunshine.core.tool.config;
 
+import io.netty.channel.ChannelOption;
+import io.netty.handler.timeout.ReadTimeoutHandler;
+import io.netty.handler.timeout.WriteTimeoutHandler;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -7,13 +10,20 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.OkHttp3ClientHttpRequestFactory;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.sunshine.core.tool.util.SpringUtils;
+import reactor.netty.http.client.HttpClient;
+import reactor.netty.resources.ConnectionProvider;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -57,5 +67,42 @@ public class ToolConfiguration implements WebMvcConfigurer {
         });
 
         return restTemplate;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(WebClient.class)
+    public WebClient webClient() {
+        // 连接池
+        ConnectionProvider provider = ConnectionProvider
+                .builder("custom")
+                // 最大连接数
+                .maxConnections(200)
+                // 最大空闲时间
+                .maxIdleTime(Duration.ofSeconds(5))
+                // 等待超时时间
+                .pendingAcquireTimeout(Duration.ofSeconds(10))
+                // 最大等待连接数量
+                .pendingAcquireMaxCount(-1)
+                .build();
+
+        HttpClient httpClient = HttpClient.create(provider)
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 2000)
+                .option(ChannelOption.SO_KEEPALIVE, true)
+                .responseTimeout(Duration.ofSeconds(6))
+                .keepAlive(true)
+                // 连接成功
+                .doOnConnected(connection -> connection.addHandlerLast(new ReadTimeoutHandler(30))
+                        .addHandlerLast(new WriteTimeoutHandler(30)))
+                // 每次请求后执行flush，防止服务器主动断开连接
+                .doAfterRequest((httpClientRequest, connection) -> {
+                    connection.channel().alloc().buffer().release();
+                    connection.channel().flush();
+                    connection.channel().pipeline().flush();
+                });
+
+        return WebClient.builder()
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .build();
     }
 }
