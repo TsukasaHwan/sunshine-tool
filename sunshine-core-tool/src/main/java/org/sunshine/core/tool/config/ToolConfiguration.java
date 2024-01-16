@@ -78,18 +78,19 @@ public class ToolConfiguration implements WebMvcConfigurer {
                 // 最大连接数
                 .maxConnections(200)
                 // 最大空闲时间
-                .maxIdleTime(Duration.ofSeconds(5))
-                // 等待超时时间
-                .pendingAcquireTimeout(Duration.ofSeconds(10))
-                // 最大等待连接数量
-                .pendingAcquireMaxCount(-1)
+                .maxIdleTime(Duration.ofSeconds(20))
+                // 连接的最大生命周期时间
+                .pendingAcquireTimeout(Duration.ofSeconds(60))
+                .pendingAcquireMaxCount(400)
+                .evictInBackground(Duration.ofSeconds(120))
                 .build();
 
         HttpClient httpClient = HttpClient.create(provider)
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 2000)
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .responseTimeout(Duration.ofSeconds(6))
                 .keepAlive(true)
+                .compress(true)
                 // 连接成功
                 .doOnConnected(connection -> connection.addHandlerLast(new ReadTimeoutHandler(30))
                         .addHandlerLast(new WriteTimeoutHandler(30)))
