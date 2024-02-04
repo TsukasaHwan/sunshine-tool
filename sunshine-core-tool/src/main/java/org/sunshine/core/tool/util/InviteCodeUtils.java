@@ -1,7 +1,5 @@
 package org.sunshine.core.tool.util;
 
-import org.springframework.util.Assert;
-
 import java.util.Arrays;
 
 /**
@@ -23,7 +21,7 @@ public class InviteCodeUtils {
     /**
      * 邀请码长度
      */
-    private final int codeLength;
+    private final int codeLength = 6;
 
     /**
      * PRIME1 与 CHARS 的长度 L互质，可保证 ( id * PRIME1) % L 在 [0,L)上均匀分布
@@ -35,21 +33,6 @@ public class InviteCodeUtils {
      * [0，codeLength）上均匀分布
      */
     private final static int PRIME2 = 11;
-
-    private InviteCodeUtils(int codeLength) {
-        this.codeLength = codeLength;
-    }
-
-    /**
-     * 邀请码指定长度
-     *
-     * @param codeLength 邀请码长度，必须大于或等于6
-     */
-    public static InviteCodeUtils of(Integer codeLength) {
-        Assert.notNull(codeLength, "The codeLength must not be null!");
-        Assert.isTrue(codeLength >= 6, "The codeLength must be greater than or equal 6!");
-        return new InviteCodeUtils(codeLength);
-    }
 
     /**
      * 生成邀请码
