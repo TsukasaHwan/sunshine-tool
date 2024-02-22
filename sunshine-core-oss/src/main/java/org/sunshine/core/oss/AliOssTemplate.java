@@ -270,25 +270,25 @@ public class AliOssTemplate implements OssTemplate {
     private ObjectMetadata getObjectMetadata(String extName) {
         ObjectMetadata objectMetadata;
         switch (extName.toLowerCase()) {
-            case "bmp":
+            case "bmp" -> {
                 objectMetadata = new ObjectMetadata();
                 objectMetadata.setContentType("image/bmp");
-                break;
-            case "jpeg":
-            case "jpg":
+            }
+            case "jpeg", "jpg" -> {
                 objectMetadata = new ObjectMetadata();
                 objectMetadata.setContentType("image/jpg");
-                break;
-            case "gif":
+            }
+            case "gif" -> {
                 objectMetadata = new ObjectMetadata();
                 objectMetadata.setContentType("image/gif");
-                break;
-            case "png":
+            }
+            case "png" -> {
                 objectMetadata = new ObjectMetadata();
                 objectMetadata.setContentType("image/png");
-                break;
-            default:
+            }
+            default -> {
                 return null;
+            }
         }
         return objectMetadata;
     }

@@ -59,7 +59,7 @@ public abstract class AbstractStreamListener<T> implements StreamListener<String
         String streamName = redisStreamKey().stream();
         String streamGroupName = redisStreamKey().group();
         Optional<PendingMessagesSummary> optionalPendingMessagesSummary = redisClient.streamPending(streamName, streamGroupName);
-        if (!optionalPendingMessagesSummary.isPresent()) {
+        if (optionalPendingMessagesSummary.isEmpty()) {
             return;
         }
         PendingMessagesSummary pendingMessagesSummary = optionalPendingMessagesSummary.get();
