@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
+import org.sunshine.security.jwt.Jwt;
 import org.sunshine.security.jwt.properties.JwtSecurityProperties;
 
 import java.time.Duration;
@@ -94,6 +95,23 @@ public class JwtClaimsUtils {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    /**
+     * 生成JWT对象
+     *
+     * @param subject subject
+     * @return {@link Jwt}
+     */
+    public static Jwt getJwt(String subject) {
+        String accessToken = JwtClaimsUtils.accessToken(subject);
+        String refreshToken = JwtClaimsUtils.refreshToken(subject);
+        long time = JwtClaimsUtils.parseToken(accessToken).getExpiration().getTime();
+        return Jwt.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .expiresIn(time)
+                .build();
     }
 
     /**
