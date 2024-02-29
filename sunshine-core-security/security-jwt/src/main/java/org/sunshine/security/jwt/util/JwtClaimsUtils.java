@@ -98,7 +98,7 @@ public class JwtClaimsUtils {
     }
 
     /**
-     * 生成JWT对象
+     * 获取JWT对象
      *
      * @param subject subject
      * @return {@link Jwt}
