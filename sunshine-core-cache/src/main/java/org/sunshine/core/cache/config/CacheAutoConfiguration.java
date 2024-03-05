@@ -32,7 +32,7 @@ import org.springframework.util.Assert;
 import org.sunshine.core.cache.RedisClient;
 import org.sunshine.core.cache.RedisClientImpl;
 import org.sunshine.core.cache.aspect.DistributedLockAspect;
-import org.sunshine.core.cache.aspect.RequestRateLimitAspect;
+import org.sunshine.core.cache.aspect.RateLimitAspect;
 import org.sunshine.core.cache.support.CustomCacheManager;
 
 import java.time.Duration;
@@ -147,7 +147,7 @@ public class CacheAutoConfiguration {
     }
 
     @Bean
-    public RequestRateLimitAspect rateLimitAspect(RedisTemplate<String, Object> redisTemplate) {
-        return new RequestRateLimitAspect(redisTemplate);
+    public RateLimitAspect rateLimitAspect(RedisTemplate<String, Object> redisTemplate) {
+        return new RateLimitAspect(redisTemplate);
     }
 }

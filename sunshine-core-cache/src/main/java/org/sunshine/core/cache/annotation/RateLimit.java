@@ -1,7 +1,5 @@
 package org.sunshine.core.cache.annotation;
 
-import org.sunshine.core.cache.enums.LimitKeyType;
-import org.sunshine.core.cache.enums.LimitType;
 import org.sunshine.core.tool.util.StringPool;
 
 import java.lang.annotation.*;
@@ -16,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RequestRateLimit {
+public @interface RateLimit {
 
     /**
      * key前缀
@@ -40,11 +38,11 @@ public @interface RequestRateLimit {
     int limit();
 
     /**
-     * 过期时间
+     * 时间窗口大小
      *
      * @return long
      */
-    long expire();
+    long windowSize();
 
     /**
      * 时间单位
@@ -61,16 +59,44 @@ public @interface RequestRateLimit {
     String msg() default "请勿频繁操作";
 
     /**
-     * 限制key类型
-     *
-     * @return {@link LimitKeyType}
-     */
-    LimitKeyType limitKeyType() default LimitKeyType.METHOD;
-
-    /**
      * 限流类型
      *
-     * @return {@link LimitType}
+     * @return {@link RateLimitType}
      */
-    LimitType limitType() default LimitType.FIXED_WINDOW;
+    RateLimitType type();
+
+    /**
+     * 限制key类型
+     *
+     * @return {@link RateLimitKeyType}
+     */
+    RateLimitKeyType keyType();
+
+    enum RateLimitType {
+
+        /**
+         * 固定窗口
+         * 在固定时间段内允许要求的请求数量访问，超过则拒绝
+         */
+        FIXED_WINDOW,
+
+        /**
+         * 滑动窗口
+         * 在一定的时间段内允许要求的请求数量访问，超过则拒绝
+         */
+        SLIDING_WINDOW
+    }
+
+    enum RateLimitKeyType {
+
+        /**
+         * 基于方法限流
+         */
+        METHOD,
+
+        /**
+         * 基于IP限流
+         */
+        IP
+    }
 }
