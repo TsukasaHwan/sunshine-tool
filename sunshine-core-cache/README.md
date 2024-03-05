@@ -69,7 +69,7 @@
        }
       ```
    
-2. **@[RequestRateLimit](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Fcache%2Fannotation%2FRequestRateLimit.java)限流注解**
+2. **@[RateLimit](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Fcache%2Fannotation%2FRateLimit.java)限流注解**
    - ```java
      public class Test {
      
@@ -80,7 +80,7 @@
           *
           * @return
           */
-         @RequestRateLimit(prefix = "limit:", limit = 1, expire = 10, limitKeyType = LimitKeyType.METHOD, limitType = LimitType.FIXED_WINDOW)
+         @RateLimit(prefix = "limit:", limit = 1, windowSize = 10, keyType = RateLimit.RateLimitKeyType.METHOD, type = RateLimit.RateLimitType.FIXED_WINDOW)
          public Result<Void> rateLimit() {
              return Result.ok();
          }
