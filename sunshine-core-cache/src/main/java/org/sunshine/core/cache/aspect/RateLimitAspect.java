@@ -77,7 +77,7 @@ public class RateLimitAspect {
             long currentTime = System.currentTimeMillis();
             long windowStart = currentTime - unit.toMillis(rateLimit.windowSize());
             redisScript.setScriptSource(SLIDING_WINDOW_LUA);
-            result = redisTemplate.execute(redisScript, keys, windowStart, currentTime, rateLimit.limit(), currentTime);
+            result = redisTemplate.execute(redisScript, keys, currentTime, windowStart, rateLimit.limit());
         } else {
             throw new IllegalArgumentException("Invalid rate limit type: " + type);
         }
