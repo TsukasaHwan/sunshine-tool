@@ -1,15 +1,9 @@
 package org.sunshine.core.cache.redisson.queue;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.redisson.api.RBlockingDeque;
 import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Teamo
@@ -18,24 +12,6 @@ import java.util.concurrent.TimeUnit;
 public interface DelayedQueueJob<T> {
 
     Logger log = LoggerFactory.getLogger(DelayedQueueJob.class);
-
-    /**
-     * 延迟线程池名称
-     */
-    ThreadFactory NAMED_THREAD_FACTORY = new ThreadFactoryBuilder().setNameFormat("delayed-queue-pool-%d").build();
-
-    /**
-     * 延迟队列线程池
-     */
-    ThreadPoolExecutor DELAYED_THREAD_POOL_EXECUTOR = new ThreadPoolExecutor(
-            Runtime.getRuntime().availableProcessors() * 2,
-            Math.max(Runtime.getRuntime().availableProcessors() * 2 * 4, 256),
-            10L,
-            TimeUnit.SECONDS,
-            new LinkedBlockingQueue<>(200),
-            NAMED_THREAD_FACTORY,
-            new ThreadPoolExecutor.AbortPolicy()
-    );
 
     /**
      * 是否启用
@@ -55,20 +31,21 @@ public interface DelayedQueueJob<T> {
         if (!isEnable()) {
             return;
         }
-        DELAYED_THREAD_POOL_EXECUTOR.execute(() -> {
-            RBlockingDeque<T> blockingDeque = redissonClient.getBlockingDeque(dequeKey());
-            //noinspection InfiniteLoopStatement
-            while (true) {
-                try {
-                    T take = blockingDeque.take();
-                    consume(take);
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                } finally {
-                    whenExceptionFinally();
-                }
+        String threadName = "DelayedQueueJob-" + this.getClass().getSimpleName();
+        Thread.currentThread().setName(threadName);
+        RBlockingDeque<T> blockingDeque = redissonClient.getBlockingDeque(dequeKey());
+        while (!Thread.currentThread().isInterrupted()) {
+            try {
+                T take = blockingDeque.take();
+                consume(take);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            } finally {
+                whenExceptionFinally();
             }
-        });
+        }
     }
 
     /**
