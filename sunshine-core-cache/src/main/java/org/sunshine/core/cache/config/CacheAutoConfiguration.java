@@ -142,11 +142,6 @@ public class CacheAutoConfiguration {
     }
 
     @Bean
-    public DistributedLockAspect distributedLockAspect() {
-        return new DistributedLockAspect();
-    }
-
-    @Bean
     public RateLimitAspect rateLimitAspect(RedisTemplate<String, Object> redisTemplate) {
         return new RateLimitAspect(redisTemplate);
     }

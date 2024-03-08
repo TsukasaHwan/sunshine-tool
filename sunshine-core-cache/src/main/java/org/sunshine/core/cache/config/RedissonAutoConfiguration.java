@@ -12,6 +12,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.sunshine.core.cache.aspect.DistributedLockAspect;
 import org.sunshine.core.cache.properties.RedissonProperties;
 import org.sunshine.core.cache.redisson.RedissonLocker;
 import org.sunshine.core.cache.redisson.codec.FastJsonCodec;
@@ -63,6 +64,11 @@ public class RedissonAutoConfiguration {
         RedissonLocker locker = new RedissonLocker(redissonClient);
         RedissonLockUtils.setLocker(locker);
         return locker;
+    }
+
+    @Bean
+    public DistributedLockAspect distributedLockAspect() {
+        return new DistributedLockAspect();
     }
 
     @Bean
