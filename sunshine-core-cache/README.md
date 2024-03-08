@@ -7,7 +7,7 @@
 ## *💫*使用说明
 
 1. **@[DistributedLock](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Fcache%2Fannotation%2FDistributedLock.java)
-   分布式锁注解，以及分布式锁[RedissonLockUtils.java](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Fcache%2Fredisson%2Futil%2FRedissonLockUtils.java)
+   分布式锁注解，以及分布式锁[RedissonLockUtils](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Fcache%2Fredisson%2Futil%2FRedissonLockUtils.java)
    使用**
    
     - SpringRedis开启Redisson(单机模式)
