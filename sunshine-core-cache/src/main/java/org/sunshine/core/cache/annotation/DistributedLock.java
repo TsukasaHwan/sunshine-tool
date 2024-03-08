@@ -4,7 +4,7 @@ import java.lang.annotation.*;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 分布式锁注解
+ * 分布式锁注解，依赖Redisson
  *
  * @author Teamo
  * @since 2020/6/9
