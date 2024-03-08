@@ -1,6 +1,7 @@
 package org.sunshine.core.cache.redisson.codec;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONReader;
 import com.alibaba.fastjson2.JSONWriter;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
@@ -37,7 +38,7 @@ public class FastJsonCodec extends BaseCodec {
      * 解码器
      */
     private final Decoder<Object> decoder = (buf, state) ->
-            JSON.parseObject(new ByteBufInputStream(buf), Object.class);
+            JSON.parseObject(new ByteBufInputStream(buf), Object.class, JSONReader.Feature.SupportAutoType);
 
     @Override
     public Decoder<Object> getValueDecoder() {
