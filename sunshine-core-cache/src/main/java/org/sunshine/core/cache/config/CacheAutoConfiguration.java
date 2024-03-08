@@ -2,6 +2,7 @@ package org.sunshine.core.cache.config;
 
 import com.alibaba.fastjson2.JSONReader;
 import com.alibaba.fastjson2.JSONWriter;
+import com.alibaba.fastjson2.filter.ContextAutoTypeBeforeHandler;
 import com.alibaba.fastjson2.support.config.FastJsonConfig;
 import com.alibaba.fastjson2.support.spring6.data.redis.FastJsonRedisSerializer;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -31,7 +32,6 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.util.Assert;
 import org.sunshine.core.cache.RedisClient;
 import org.sunshine.core.cache.RedisClientImpl;
-import org.sunshine.core.cache.aspect.DistributedLockAspect;
 import org.sunshine.core.cache.aspect.RateLimitAspect;
 import org.sunshine.core.cache.support.CustomCacheManager;
 
@@ -127,14 +127,14 @@ public class CacheAutoConfiguration {
             FastJsonConfig fastJsonConfig = fastJsonRedisSerializer.getFastJsonConfig();
             fastJsonConfig.setReaderFeatures(
                     JSONReader.Feature.FieldBased,
-                    JSONReader.Feature.SupportArrayToBean,
-                    JSONReader.Feature.SupportAutoType
+                    JSONReader.Feature.SupportArrayToBean
             );
             fastJsonConfig.setWriterFeatures(
                     JSONWriter.Feature.WriteClassName,
                     JSONWriter.Feature.WriteMapNullValue,
                     JSONWriter.Feature.NotWriteNumberClassName
             );
+            fastJsonConfig.setReaderFilters(new ContextAutoTypeBeforeHandler(true));
         } else {
             log.warn("Did not find what you need RedisSerializer, please confirm the correctness of the RedisSerializer!");
         }
