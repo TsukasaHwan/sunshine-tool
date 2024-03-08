@@ -28,11 +28,11 @@ public interface DelayedQueueJob<T> {
      * @param redissonClient RedissonClient
      */
     default void start(RedissonClient redissonClient) {
+        String threadName = "DelayedQueueJob-" + this.getClass().getSimpleName();
+        Thread.currentThread().setName(threadName);
         if (!isEnable()) {
             return;
         }
-        String threadName = "DelayedQueueJob-" + this.getClass().getSimpleName();
-        Thread.currentThread().setName(threadName);
         RBlockingDeque<T> blockingDeque = redissonClient.getBlockingDeque(dequeKey());
         while (!Thread.currentThread().isInterrupted()) {
             try {
