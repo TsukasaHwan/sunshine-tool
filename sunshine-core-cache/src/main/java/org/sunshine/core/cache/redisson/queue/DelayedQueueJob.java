@@ -36,8 +36,8 @@ public interface DelayedQueueJob<T> {
         RBlockingDeque<T> blockingDeque = redissonClient.getBlockingDeque(dequeKey());
         while (!Thread.currentThread().isInterrupted()) {
             try {
-                T take = blockingDeque.take();
-                consume(take);
+                T message = blockingDeque.take();
+                consume(message);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             } catch (Exception e) {
@@ -58,10 +58,10 @@ public interface DelayedQueueJob<T> {
     /**
      * 消费
      *
-     * @param take Object
+     * @param message Object
      * @throws Exception Exception
      */
-    void consume(T take) throws Exception;
+    void consume(T message) throws Exception;
 
     /**
      * 发生异常时最终处理
