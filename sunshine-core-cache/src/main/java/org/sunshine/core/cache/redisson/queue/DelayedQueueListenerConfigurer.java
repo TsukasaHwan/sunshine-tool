@@ -16,16 +16,16 @@ import java.util.concurrent.TimeUnit;
  * @author Teamo
  * @since 2024/3/7
  */
-public class DelayedQueueJobConfigurer implements InitializingBean, DisposableBean {
+public class DelayedQueueListenerConfigurer implements InitializingBean, DisposableBean {
 
     private ThreadPoolExecutor delayedThreadPoolExecutor;
 
-    private final List<DelayedQueueJob<?>> delayedQueueJobList;
+    private final List<DelayedQueueListener<?>> delayedQueueListenerList;
 
     private final RedissonClient redissonClient;
 
-    public DelayedQueueJobConfigurer(List<DelayedQueueJob<?>> delayedQueueJobList, RedissonClient redissonClient) {
-        this.delayedQueueJobList = delayedQueueJobList;
+    public DelayedQueueListenerConfigurer(List<DelayedQueueListener<?>> delayedQueueListenerList, RedissonClient redissonClient) {
+        this.delayedQueueListenerList = delayedQueueListenerList;
         this.redissonClient = redissonClient;
     }
 
@@ -38,10 +38,10 @@ public class DelayedQueueJobConfigurer implements InitializingBean, DisposableBe
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        Assert.notEmpty(delayedQueueJobList, "delayedQueueJobList must be not empty!");
+        Assert.notEmpty(delayedQueueListenerList, "delayedQueueListenerList must be not empty!");
 
         ThreadFactory namedThreadFactory = new ThreadFactoryBuilder().setNameFormat("delayed-queue-pool-%d").build();
-        int numberOfJob = delayedQueueJobList.size();
+        int numberOfJob = delayedQueueListenerList.size();
         delayedThreadPoolExecutor = new ThreadPoolExecutor(
                 numberOfJob,
                 numberOfJob,
@@ -50,6 +50,6 @@ public class DelayedQueueJobConfigurer implements InitializingBean, DisposableBe
                 new LinkedBlockingQueue<>(numberOfJob),
                 namedThreadFactory
         );
-        delayedQueueJobList.forEach(delayedQueueJob -> delayedThreadPoolExecutor.execute(() -> delayedQueueJob.start(redissonClient)));
+        delayedQueueListenerList.forEach(delayedQueueListener -> delayedThreadPoolExecutor.execute(new DelayedQueuePollTask<>(redissonClient, delayedQueueListener)));
     }
 }

@@ -16,8 +16,8 @@ import org.sunshine.core.cache.aspect.DistributedLockAspect;
 import org.sunshine.core.cache.properties.RedissonProperties;
 import org.sunshine.core.cache.redisson.RedissonLocker;
 import org.sunshine.core.cache.redisson.codec.FastJsonCodec;
-import org.sunshine.core.cache.redisson.queue.DelayedQueueJob;
-import org.sunshine.core.cache.redisson.queue.DelayedQueueJobConfigurer;
+import org.sunshine.core.cache.redisson.queue.DelayedQueueListener;
+import org.sunshine.core.cache.redisson.queue.DelayedQueueListenerConfigurer;
 import org.sunshine.core.cache.redisson.util.RedissonLockUtils;
 import org.sunshine.core.tool.util.StringUtils;
 
@@ -72,8 +72,8 @@ public class RedissonAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnBean(DelayedQueueJob.class)
-    public DelayedQueueJobConfigurer delayedQueueJobConfigurer(List<DelayedQueueJob<?>> delayedQueueJobList, RedissonClient redissonClient) {
-        return new DelayedQueueJobConfigurer(delayedQueueJobList, redissonClient);
+    @ConditionalOnBean(DelayedQueueListener.class)
+    public DelayedQueueListenerConfigurer delayedQueueListenerConfigurer(List<DelayedQueueListener<?>> delayedQueueListenerList, RedissonClient redissonClient) {
+        return new DelayedQueueListenerConfigurer(delayedQueueListenerList, redissonClient);
     }
 }
