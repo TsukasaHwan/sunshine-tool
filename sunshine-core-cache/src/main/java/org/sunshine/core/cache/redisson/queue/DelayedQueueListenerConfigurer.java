@@ -32,7 +32,7 @@ public class DelayedQueueListenerConfigurer implements InitializingBean, Disposa
     @Override
     public void destroy() throws Exception {
         if (delayedThreadPoolExecutor != null) {
-            delayedThreadPoolExecutor.shutdownNow();
+            delayedThreadPoolExecutor.shutdown();
         }
     }
 
