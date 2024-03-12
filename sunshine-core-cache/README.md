@@ -2,7 +2,7 @@
 
 ## *💎*模块简介
 
-缓存相关功能模块，集成了SpringRedis，SpringCache，Redission
+缓存相关功能模块，集成了SpringRedis，SpringCache，Redisson
 
 ## *💫*使用说明
 
@@ -37,7 +37,7 @@
         * 在指定时间内如果未获取倒锁则不执行方法，最长等待时间默认为5秒可以使用，锁释放时间默认为10秒
         */
        public class Test {
-      
+         
            /**
             * 如果testPojo的id为1，则锁的名称为'lock:1'
             *
@@ -48,7 +48,7 @@
            public Result<Void> lock(TestPojo testPojo) {
                return Result.ok();
            }
-      
+         
            public Result<Void> codeLock() {
                // 普通锁
                RedissionLockUtils.lock("");
@@ -61,7 +61,7 @@
                // ... 更多请看源码
                return Result.ok();
            }
-      
+         
            @Data
            public static class TestPojo {
                private Long id;
@@ -94,22 +94,22 @@
    - ```java
       @Getter
       public enum TestRedisKey implements RedisKey {
-     
+       
           /**
            * 测试
            */
           TEST("test:#{#id}", 3600L);
-     
+       
           private final String template;
-     
+       
           private final Long expire;
-     
+       
           TestRedisKey(String template, Long expire) {
               this.template = template;
               this.expire = expire;
           }
       }
-     
+       
       public class Test {
           public static void main(String[] args) {
               // test:1
@@ -224,3 +224,49 @@
    ```
 
 6. **默认开启SpringCache的二级缓存，使用caffeine作为本地缓存，Redis作为远程缓存。使用SpringCache注解即可。**
+
+7. **可扩展的Redisson延迟队列**
+   
+   - 定义消息类
+   ```java
+   public class UserMessage implements Serializable {
+        private String username;
+   
+        private String password;
+   
+        public String getUsername() {
+            return username;
+        }
+   
+        public void setUsername(String username) {
+            this.username = username;
+        }
+   
+        public String getPassword() {
+            return password;
+        }
+   
+        public void setPassword(String password) {
+            this.password = password;
+        }
+   }
+   ```
+   - 实现[DelayedQueueListener](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Fcache%2Fredisson%2Fqueue%2FDelayedQueueListener.java)接口
+   ```java
+   @Component
+   public class Test implements DelayedQueueListener<UserMessage> {
+   
+       @Override
+       public String delayedQueueKey() {
+           //队列key
+           return "test";
+       }
+   
+       @Override
+       public void consume(UserMessage message) throws Exception {
+           // 执行消费逻辑
+       }
+   }
+   ```
+
+​		可定义多个，更多使用方法请看源码
