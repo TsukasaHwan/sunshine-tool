@@ -38,7 +38,7 @@ public class DelayedQueueListenerConfigurer implements InitializingBean, Disposa
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        Assert.notEmpty(delayedQueueListenerList, "delayedQueueListenerList must be not empty!");
+        Assert.notEmpty(delayedQueueListenerList, "delayedQueueListenerList must not be empty!");
 
         ThreadFactory namedThreadFactory = new ThreadFactoryBuilder().setNameFormat("delayed-queue-pool-%d").build();
         int numberOfJob = delayedQueueListenerList.size();
