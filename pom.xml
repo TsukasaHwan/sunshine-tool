@@ -53,9 +53,9 @@
         <mybatis-plus.version>3.5.5</mybatis-plus.version>
         <mybatis-plus-generator.version>3.5.5</mybatis-plus-generator.version>
 
-        <fastjson.version>2.0.46</fastjson.version>
+        <fastjson.version>2.0.48</fastjson.version>
         <redisson.version>3.20.0</redisson.version>
-        <knife4j.version>4.3.0</knife4j.version>
+        <knife4j.version>4.4.0</knife4j.version>
 
         <tea-openapi.version>0.2.8</tea-openapi.version>
         <dysmsapi20170525.version>2.0.23</dysmsapi20170525.version>
@@ -63,8 +63,8 @@
         <aliyun.oss.version>3.16.0</aliyun.oss.version>
         <minio.version>8.5.4</minio.version>
 
-        <jjwt.version>0.11.5</jjwt.version>
-        <easyexcel.version>3.3.2</easyexcel.version>
+        <jjwt.version>0.12.5</jjwt.version>
+        <easyexcel.version>3.3.4</easyexcel.version>
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
         <google.autoservice.version>1.0.1</google.autoservice.version>
         <javapoet.version>1.12.1</javapoet.version>

@@ -1,7 +1,7 @@
 package org.sunshine.core.tool.api.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.springdoc.api.annotations.ParameterObject;
+import org.springdoc.core.annotations.ParameterObject;
 
 /**
  * @author Teamo

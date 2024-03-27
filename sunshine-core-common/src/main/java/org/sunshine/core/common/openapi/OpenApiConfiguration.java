@@ -8,9 +8,9 @@ import io.swagger.v3.oas.models.parameters.HeaderParameter;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
-import org.springdoc.core.GroupedOpenApi;
-import org.springdoc.core.customizers.OpenApiCustomiser;
+import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springdoc.core.customizers.OperationCustomizer;
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.util.Assert;
 import org.sunshine.core.tool.api.code.CommonCode;
@@ -35,12 +35,12 @@ public interface OpenApiConfiguration {
     /**
      * 默认实现
      *
-     * @param openApiCustomiser   OpenApiCustomiser
+     * @param openApiCustomizer   OpenApiCustomizer
      * @param operationCustomizer OperationCustomizer
      * @return GroupedOpenApi
      */
     @Bean
-    default GroupedOpenApi groupedOpenApi(OpenApiCustomiser openApiCustomiser, OperationCustomizer operationCustomizer) {
+    default GroupedOpenApi groupedOpenApi(OpenApiCustomizer openApiCustomizer, OperationCustomizer operationCustomizer) {
         GroupedOpenApiConfig groupedOpenApiConfig = groupedOpenApiConfig();
         Assert.notNull(groupedOpenApiConfig, "grouped OpenApi config must not be null!");
 
@@ -49,7 +49,7 @@ public interface OpenApiConfiguration {
                 .pathsToMatch(groupedOpenApiConfig.getPaths())
                 .addOperationCustomizer(operationCustomizer)
                 .packagesToScan(groupedOpenApiConfig.getBasePackage())
-                .addOpenApiCustomiser(openApiCustomiser)
+                .addOpenApiCustomizer(openApiCustomizer)
                 .build();
     }
 
@@ -70,10 +70,10 @@ public interface OpenApiConfiguration {
     /**
      * 默认响应消息
      *
-     * @return OpenApiCustomiser
+     * @return OpenApiCustomizer
      */
     @Bean
-    default OpenApiCustomiser openApiCustomiser() {
+    default OpenApiCustomizer openApiCustomizer() {
         return openApi -> openApi.getPaths().values().stream().flatMap(pathItem -> pathItem.readOperations().stream())
                 .forEach(operation -> {
                     ApiResponses responses = operation.getResponses();
@@ -91,6 +91,7 @@ public interface OpenApiConfiguration {
     default OperationCustomizer operationCustomizer() {
         return (operation, handlerMethod) -> {
             // TODO
+            @SuppressWarnings("rawtypes")
             Schema stringSchema = new StringSchema()._default("Bearer ").name("Authorization").description("请求接口Authorization");
             Parameter headerParameter = new HeaderParameter().name("Authorization").description("请求接口Authorization").schema(stringSchema);
             return operation.addParametersItem(headerParameter);
