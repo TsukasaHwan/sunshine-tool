@@ -23,7 +23,7 @@ import java.util.Set;
  * @description:
  */
 @AutoService(Processor.class)
-@SupportedSourceVersion(SourceVersion.RELEASE_8)
+@SupportedSourceVersion(SourceVersion.RELEASE_17)
 @SupportedAnnotationTypes("org.sunshine.enums.conversion.annotation.EnumAutoConverter")
 public class EnumConvertProcessor extends AbstractProcessor {
 

@@ -24,8 +24,8 @@ import java.util.Set;
  * @description:
  */
 @AutoService(Processor.class)
-@SupportedSourceVersion(SourceVersion.RELEASE_8)
-@SupportedAnnotationTypes("annotation.org.sunshine.enums.conversion.JsonAutoConverter")
+@SupportedSourceVersion(SourceVersion.RELEASE_17)
+@SupportedAnnotationTypes("org.sunshine.enums.conversion.JsonAutoConverter")
 public class JsonConvertProcessor extends AbstractProcessor {
 
     private Filer filer;
