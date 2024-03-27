@@ -35,12 +35,12 @@ public interface OpenApiConfiguration {
     /**
      * 默认实现
      *
-     * @param openApiCustomiser   OpenApiCustomiser
+     * @param openApiCustomizer   OpenApiCustomizer
      * @param operationCustomizer OperationCustomizer
      * @return GroupedOpenApi
      */
     @Bean
-    default GroupedOpenApi groupedOpenApi(OpenApiCustomiser openApiCustomiser, OperationCustomizer operationCustomizer) {
+    default GroupedOpenApi groupedOpenApi(OpenApiCustomiser openApiCustomizer, OperationCustomizer operationCustomizer) {
         GroupedOpenApiConfig groupedOpenApiConfig = groupedOpenApiConfig();
         Assert.notNull(groupedOpenApiConfig, "grouped OpenApi config must not be null!");
 
@@ -49,7 +49,7 @@ public interface OpenApiConfiguration {
                 .pathsToMatch(groupedOpenApiConfig.getPaths())
                 .addOperationCustomizer(operationCustomizer)
                 .packagesToScan(groupedOpenApiConfig.getBasePackage())
-                .addOpenApiCustomiser(openApiCustomiser)
+                .addOpenApiCustomiser(openApiCustomizer)
                 .build();
     }
 
@@ -70,10 +70,10 @@ public interface OpenApiConfiguration {
     /**
      * 默认响应消息
      *
-     * @return OpenApiCustomiser
+     * @return OpenApiCustomizer
      */
     @Bean
-    default OpenApiCustomiser openApiCustomiser() {
+    default OpenApiCustomiser openApiCustomizer() {
         return openApi -> openApi.getPaths().values().stream().flatMap(pathItem -> pathItem.readOperations().stream())
                 .forEach(operation -> {
                     ApiResponses responses = operation.getResponses();
@@ -91,6 +91,7 @@ public interface OpenApiConfiguration {
     default OperationCustomizer operationCustomizer() {
         return (operation, handlerMethod) -> {
             // TODO
+            @SuppressWarnings("rawtypes")
             Schema stringSchema = new StringSchema()._default("Bearer ").name("Authorization").description("请求接口Authorization");
             Parameter headerParameter = new HeaderParameter().name("Authorization").description("请求接口Authorization").schema(stringSchema);
             return operation.addParametersItem(headerParameter);

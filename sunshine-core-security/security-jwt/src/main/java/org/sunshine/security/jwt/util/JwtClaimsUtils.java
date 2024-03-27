@@ -64,17 +64,17 @@ public class JwtClaimsUtils {
     public static String sign(String subject, Duration expiresIn, Map<String, Object> claims) {
         Instant now = Instant.now();
         JwtBuilder jwtBuilder = Jwts.builder()
-                .setIssuedAt(Date.from(now))
+                .issuedAt(Date.from(now))
                 // 主题信息，可存储用户json
-                .setSubject(subject)
+                .subject(subject)
                 .signWith(properties.getSecret().getPrivateKey());
 
         if (expiresIn != null) {
-            jwtBuilder.setExpiration(Date.from(now.plus(expiresIn)));
+            jwtBuilder.expiration(Date.from(now.plus(expiresIn)));
         }
 
         if (claims != null) {
-            jwtBuilder.addClaims(claims);
+            jwtBuilder.claims(claims);
         }
 
         return jwtBuilder.compact();
@@ -89,12 +89,12 @@ public class JwtClaimsUtils {
     public static Claims parseToken(String token) {
         // 默认情况下 JJWT 只能解析 String, Date, Long, Integer, Short and Byte 类型，如果需要解析其他类型则需要配置 JacksonDeserializer
         // .deserializeJsonWith(new JacksonDeserializer(Maps.of(USER_INFO_KEY, UserInfo.class).build()))
-        return Jwts.parserBuilder()
-                .setSigningKey(properties.getSecret().getPublicKey())
-                .setAllowedClockSkewSeconds(properties.getAllowedClockSkew().getSeconds())
+        return Jwts.parser()
+                .verifyWith(properties.getSecret().getPublicKey())
+                .clockSkewSeconds(properties.getAllowedClockSkew().getSeconds())
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     /**
