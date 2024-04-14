@@ -96,10 +96,12 @@ public abstract class AbstractStreamListener<T> implements StreamListener<String
         long deliveryCount = pendingMessage.getTotalDeliveryCount();
         if (elapsedTimeSinceLastDelivery.getSeconds() > 20 && deliveryCount >= 1) {
             List<ObjectRecord<String, T>> result = redisClient.streamRange(clazz, redisStreamKey().stream(), Range.just(recordId.getValue()));
-            // 重试消息
-            ObjectRecord<String, T> objectRecord = result.get(0);
-            log.info("RedisStream消息重试:流:{},组:{},消费者:{},消息ID:{}", redisStreamKey().stream(), redisStreamKey().group(), redisStreamKey().consumer(), recordId);
-            onMessage(objectRecord);
+            if (result != null && result.size() > 0) {
+                // 重试消息
+                ObjectRecord<String, T> objectRecord = result.get(0);
+                log.info("RedisStream消息重试:流:{},组:{},消费者:{},消息ID:{}", redisStreamKey().stream(), redisStreamKey().group(), redisStreamKey().consumer(), recordId);
+                onMessage(objectRecord);
+            }
         }
     }
 }
