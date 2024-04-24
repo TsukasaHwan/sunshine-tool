@@ -155,6 +155,13 @@ public class Condition {
         return Arrays.stream(columns).map(column -> StringUtils.humpToUnderline(StringUtils.cleanIdentifier(column))).toArray(String[]::new);
     }
 
+    /**
+     * 构建排序条件的SortOptions列表
+     *
+     * @param fields 排序字段列表
+     * @param order  排序顺序
+     * @return SortOptions列表
+     */
     private static List<SortOptions> buildSortOptions(String fields, SortOrder order) {
         String[] columns = StringUtils.delimitedListToStringArray(fields, StringPool.COMMA);
         return Arrays.stream(columns)
