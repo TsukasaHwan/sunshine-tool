@@ -15,6 +15,7 @@ import org.sunshine.core.tool.util.BeanUtils;
 import org.sunshine.core.tool.util.StringPool;
 import org.sunshine.core.tool.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
@@ -78,37 +79,33 @@ public class Condition {
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         searchSourceBuilder.from((query.getCurrent() - 1) * query.getSize());
         searchSourceBuilder.size(query.getSize());
+
+        List<SortBuilder<?>> sorts = new ArrayList<>();
         String ascs = query.getAscs();
-        String descs = query.getDescs();
         if (StringUtils.isNotBlank(ascs)) {
-            String[] columns = StringUtils.delimitedListToStringArray(ascs, StringPool.COMMA);
-            List<SortBuilder<?>> sorts = Arrays.stream(columns).map(column -> SortBuilders.fieldSort(StringUtils.cleanIdentifier(column)).order(SortOrder.ASC)).collect(Collectors.toList());
-            searchSourceBuilder.sort(sorts);
+            sorts.addAll(buildSortBuilders(StringUtils.delimitedListToStringArray(ascs, StringPool.COMMA), SortOrder.ASC));
         }
+
+        String descs = query.getDescs();
         if (StringUtils.isNotBlank(descs)) {
-            String[] columns = StringUtils.delimitedListToStringArray(descs, StringPool.COMMA);
-            List<SortBuilder<?>> sorts = Arrays.stream(columns).map(column -> SortBuilders.fieldSort(StringUtils.cleanIdentifier(column)).order(SortOrder.DESC)).collect(Collectors.toList());
+            sorts.addAll(buildSortBuilders(StringUtils.delimitedListToStringArray(descs, StringPool.COMMA), SortOrder.DESC));
+        }
+
+        if (!sorts.isEmpty()) {
             searchSourceBuilder.sort(sorts);
         }
         return searchSourceBuilder;
     }
 
     /**
-     * 检查query
+     * 分页实体类集合包装
      *
-     * @param query Query
+     * @param page   源数据
+     * @param target 目标数据
+     * @param <E>    实体类
+     * @param <V>    VO类
+     * @return mybatis-plus分页
      */
-    private static void checkQuery(Query query) {
-        Integer current = query.getCurrent();
-        Integer size = query.getSize();
-        if (current == null || current <= 0) {
-            query.setCurrent(Query.DEFAULT_CURRENT);
-        }
-        if (size == null || size <= 0) {
-            query.setSize(Query.DEFAULT_SIZE);
-        }
-    }
-
     public static <E, V> IPage<V> pageVo(IPage<E> page, Supplier<V> target) {
         return pageVo(page, target, null);
     }
@@ -139,5 +136,34 @@ public class Condition {
      */
     private static String[] getUnderlineColumns(String[] columns) {
         return Arrays.stream(columns).map(column -> StringUtils.humpToUnderline(StringUtils.cleanIdentifier(column))).toArray(String[]::new);
+    }
+
+    /**
+     * 检查query
+     *
+     * @param query Query
+     */
+    private static void checkQuery(Query query) {
+        Integer current = query.getCurrent();
+        Integer size = query.getSize();
+        if (current == null || current <= 0) {
+            query.setCurrent(Query.DEFAULT_CURRENT);
+        }
+        if (size == null || size <= 0) {
+            query.setSize(Query.DEFAULT_SIZE);
+        }
+    }
+
+    /**
+     * 构建排序条件的SortBuilder列表
+     *
+     * @param columns 排序字段列表
+     * @param order   排序顺序
+     * @return SortBuilder列表
+     */
+    private static List<SortBuilder<?>> buildSortBuilders(String[] columns, SortOrder order) {
+        return Arrays.stream(columns)
+                .map(column -> SortBuilders.fieldSort(StringUtils.cleanIdentifier(column)).order(order))
+                .collect(Collectors.toList());
     }
 }
