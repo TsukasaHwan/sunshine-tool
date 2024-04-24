@@ -98,6 +98,15 @@ public class Condition {
         });
     }
 
+    /**
+     * 分页实体类集合包装
+     *
+     * @param page   源数据
+     * @param target 目标数据
+     * @param <E>    实体类
+     * @param <V>    VO类
+     * @return mybatis-plus分页
+     */
     public static <E, V> IPage<V> pageVo(IPage<E> page, Supplier<V> target) {
         return pageVo(page, target, null);
     }
