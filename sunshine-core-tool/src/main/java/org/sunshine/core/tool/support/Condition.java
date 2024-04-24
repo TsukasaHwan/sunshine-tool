@@ -15,6 +15,7 @@ import org.sunshine.core.tool.util.BeanUtils;
 import org.sunshine.core.tool.util.StringPool;
 import org.sunshine.core.tool.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
@@ -78,46 +79,23 @@ public class Condition {
         return SearchRequest.of(builder -> {
             builder.from((query.getCurrent() - 1) * query.getSize());
             builder.size(query.getSize());
+
+            List<SortOptions> sorts = new ArrayList<>();
             String ascs = query.getAscs();
-            String descs = query.getDescs();
             if (StringUtils.isNotBlank(ascs)) {
-                String[] columns = StringUtils.delimitedListToStringArray(ascs, StringPool.COMMA);
-                List<SortOptions> sorts = Arrays.stream(columns).map(column -> SortOptions.of(sortBuilder -> {
-                    String field = StringUtils.cleanIdentifier(column);
-                    FieldSort fieldSort = FieldSort.of(fieldSortBuilder -> fieldSortBuilder.field(field).order(SortOrder.Asc));
-                    sortBuilder.field(fieldSort);
-                    return sortBuilder;
-                })).collect(Collectors.toList());
-                builder.sort(sorts);
+                sorts.addAll(buildSortOptions(ascs, SortOrder.Asc));
             }
+
+            String descs = query.getDescs();
             if (StringUtils.isNotBlank(descs)) {
-                String[] columns = StringUtils.delimitedListToStringArray(descs, StringPool.COMMA);
-                List<SortOptions> sorts = Arrays.stream(columns).map(column -> SortOptions.of(sortBuilder -> {
-                    String field = StringUtils.cleanIdentifier(column);
-                    FieldSort fieldSort = FieldSort.of(fieldSortBuilder -> fieldSortBuilder.field(field).order(SortOrder.Desc));
-                    sortBuilder.field(fieldSort);
-                    return sortBuilder;
-                })).collect(Collectors.toList());
+                sorts.addAll(buildSortOptions(descs, SortOrder.Desc));
+            }
+
+            if (!sorts.isEmpty()) {
                 builder.sort(sorts);
             }
             return builder;
         });
-    }
-
-    /**
-     * 检查query
-     *
-     * @param query Query
-     */
-    private static void checkQuery(Query query) {
-        Integer current = query.getCurrent();
-        Integer size = query.getSize();
-        if (current == null || current <= 0) {
-            query.setCurrent(Query.DEFAULT_CURRENT);
-        }
-        if (size == null || size <= 0) {
-            query.setSize(Query.DEFAULT_SIZE);
-        }
     }
 
     public static <E, V> IPage<V> pageVo(IPage<E> page, Supplier<V> target) {
@@ -143,6 +121,22 @@ public class Condition {
     }
 
     /**
+     * 检查query
+     *
+     * @param query Query
+     */
+    private static void checkQuery(Query query) {
+        Integer current = query.getCurrent();
+        Integer size = query.getSize();
+        if (current == null || current <= 0) {
+            query.setCurrent(Query.DEFAULT_CURRENT);
+        }
+        if (size == null || size <= 0) {
+            query.setSize(Query.DEFAULT_SIZE);
+        }
+    }
+
+    /**
      * 将传入驼峰排序字段转换为下划线格式
      *
      * @param columns 字段数组
@@ -150,5 +144,17 @@ public class Condition {
      */
     private static String[] getUnderlineColumns(String[] columns) {
         return Arrays.stream(columns).map(column -> StringUtils.humpToUnderline(StringUtils.cleanIdentifier(column))).toArray(String[]::new);
+    }
+
+    private static List<SortOptions> buildSortOptions(String fields, SortOrder order) {
+        String[] columns = StringUtils.delimitedListToStringArray(fields, StringPool.COMMA);
+        return Arrays.stream(columns)
+                .map(column -> SortOptions.of(sortBuilder -> {
+                    String field = StringUtils.cleanIdentifier(column);
+                    FieldSort fieldSort = FieldSort.of(fieldSortBuilder -> fieldSortBuilder.field(field).order(order));
+                    sortBuilder.field(fieldSort);
+                    return sortBuilder;
+                }))
+                .collect(Collectors.toList());
     }
 }
