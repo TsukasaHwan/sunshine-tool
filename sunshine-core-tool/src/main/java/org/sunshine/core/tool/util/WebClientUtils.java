@@ -1,5 +1,6 @@
 package org.sunshine.core.tool.util;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -36,11 +37,7 @@ public class WebClientUtils {
      * @return WebClient.ResponseSpec 响应对象类
      */
     public static WebClient.ResponseSpec get(String url) {
-        return getWebClient()
-                .get()
-                .uri(url)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve();
+        return executeRequest(HttpMethod.GET, url);
     }
 
     /**
@@ -51,11 +48,7 @@ public class WebClientUtils {
      * @return WebClient.ResponseSpec 响应对象类
      */
     public static WebClient.ResponseSpec get(String url, Object... uriVariables) {
-        return getWebClient()
-                .get()
-                .uri(url, uriVariables)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve();
+        return executeRequest(HttpMethod.GET, url, uriVariables);
     }
 
     /**
@@ -66,11 +59,7 @@ public class WebClientUtils {
      * @return WebClient.ResponseSpec 响应对象类
      */
     public static WebClient.ResponseSpec get(String url, Map<String, ?> uriVariables) {
-        return getWebClient()
-                .get()
-                .uri(url, uriVariables)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve();
+        return executeRequest(HttpMethod.GET, url, uriVariables);
     }
 
     /**
@@ -82,12 +71,7 @@ public class WebClientUtils {
      * @return WebClient.ResponseSpec 响应对象类
      */
     public static WebClient.ResponseSpec get(String url, Map<String, String> headers, Object... uriVariables) {
-        return getWebClient()
-                .get()
-                .uri(url, uriVariables)
-                .headers(requestHeaders -> requestHeaders.setAll(headers))
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve();
+        return executeRequestWithHeaders(HttpMethod.GET, url, headers, uriVariables);
     }
 
     /**
@@ -99,12 +83,7 @@ public class WebClientUtils {
      * @return WebClient.ResponseSpec 响应对象类
      */
     public static WebClient.ResponseSpec get(String url, Map<String, String> headers, Map<String, ?> uriVariables) {
-        return getWebClient()
-                .get()
-                .uri(url, uriVariables)
-                .headers(requestHeaders -> requestHeaders.setAll(headers))
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve();
+        return executeRequestWithHeaders(HttpMethod.GET, url, headers, uriVariables);
     }
 
     // ----------------------------------POST-------------------------------------------------------
@@ -116,11 +95,7 @@ public class WebClientUtils {
      * @return WebClient.ResponseSpec 响应对象类
      */
     public static WebClient.ResponseSpec post(String url) {
-        return getWebClient()
-                .post()
-                .uri(url)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve();
+        return executeRequest(HttpMethod.POST, url);
     }
 
     /**
@@ -132,12 +107,7 @@ public class WebClientUtils {
      * @return WebClient.ResponseSpec 响应对象类
      */
     public static WebClient.ResponseSpec post(String url, Object bodyValue, Object... uriVariables) {
-        return getWebClient()
-                .post()
-                .uri(url, uriVariables)
-                .bodyValue(bodyValue)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve();
+        return executeRequestWithBody(HttpMethod.POST, url, bodyValue, uriVariables);
     }
 
     /**
@@ -149,12 +119,7 @@ public class WebClientUtils {
      * @return WebClient.ResponseSpec 响应对象类
      */
     public static WebClient.ResponseSpec post(String url, Object bodyValue, Map<String, ?> uriVariables) {
-        return getWebClient()
-                .post()
-                .uri(url, uriVariables)
-                .bodyValue(bodyValue)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve();
+        return executeRequestWithBody(HttpMethod.POST, url, bodyValue, uriVariables);
     }
 
     /**
@@ -167,13 +132,7 @@ public class WebClientUtils {
      * @return WebClient.ResponseSpec 响应对象类
      */
     public static WebClient.ResponseSpec post(String url, Map<String, String> headers, Object bodyValue, Object... uriVariables) {
-        return getWebClient()
-                .post()
-                .uri(url, uriVariables)
-                .headers(requestHeaders -> requestHeaders.setAll(headers))
-                .bodyValue(bodyValue)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve();
+        return executeRequestWithBodyAndHeaders(HttpMethod.POST, url, headers, bodyValue, uriVariables);
     }
 
     /**
@@ -186,13 +145,7 @@ public class WebClientUtils {
      * @return WebClient.ResponseSpec 响应对象类
      */
     public static WebClient.ResponseSpec post(String url, Map<String, String> headers, Object bodyValue, Map<String, ?> uriVariables) {
-        return getWebClient()
-                .post()
-                .uri(url, uriVariables)
-                .headers(requestHeaders -> requestHeaders.setAll(headers))
-                .bodyValue(bodyValue)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve();
+        return executeRequestWithBodyAndHeaders(HttpMethod.POST, url, headers, bodyValue, uriVariables);
     }
 
     // ----------------------------------PUT-------------------------------------------------------
@@ -204,11 +157,7 @@ public class WebClientUtils {
      * @return WebClient.ResponseSpec 响应对象类
      */
     public static WebClient.ResponseSpec put(String url) {
-        return getWebClient()
-                .put()
-                .uri(url)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve();
+        return executeRequest(HttpMethod.PUT, url);
     }
 
     /**
@@ -220,12 +169,7 @@ public class WebClientUtils {
      * @return WebClient.ResponseSpec 响应对象类
      */
     public static WebClient.ResponseSpec put(String url, Object bodyValue, Object... uriVariables) {
-        return getWebClient()
-                .put()
-                .uri(url, uriVariables)
-                .bodyValue(bodyValue)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve();
+        return executeRequestWithBody(HttpMethod.PUT, url, bodyValue, uriVariables);
     }
 
     /**
@@ -237,12 +181,7 @@ public class WebClientUtils {
      * @return WebClient.ResponseSpec 响应对象类
      */
     public static WebClient.ResponseSpec put(String url, Object bodyValue, Map<String, ?> uriVariables) {
-        return getWebClient()
-                .put()
-                .uri(url, uriVariables)
-                .bodyValue(bodyValue)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve();
+        return executeRequestWithBody(HttpMethod.PUT, url, bodyValue, uriVariables);
     }
 
     /**
@@ -255,13 +194,7 @@ public class WebClientUtils {
      * @return WebClient.ResponseSpec 响应对象类
      */
     public static WebClient.ResponseSpec put(String url, Map<String, String> headers, Object bodyValue, Object... uriVariables) {
-        return getWebClient()
-                .put()
-                .uri(url, uriVariables)
-                .headers(requestHeaders -> requestHeaders.setAll(headers))
-                .bodyValue(bodyValue)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve();
+        return executeRequestWithBodyAndHeaders(HttpMethod.PUT, url, headers, bodyValue, uriVariables);
     }
 
     /**
@@ -274,13 +207,7 @@ public class WebClientUtils {
      * @return WebClient.ResponseSpec 响应对象类
      */
     public static WebClient.ResponseSpec put(String url, Map<String, String> headers, Object bodyValue, Map<String, ?> uriVariables) {
-        return getWebClient()
-                .put()
-                .uri(url, uriVariables)
-                .headers(requestHeaders -> requestHeaders.setAll(headers))
-                .bodyValue(bodyValue)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve();
+        return executeRequestWithBodyAndHeaders(HttpMethod.PUT, url, headers, bodyValue, uriVariables);
     }
 
     // ----------------------------------DELETE-------------------------------------------------------
@@ -292,11 +219,7 @@ public class WebClientUtils {
      * @return WebClient.ResponseSpec 响应对象类
      */
     public static WebClient.ResponseSpec delete(String url) {
-        return getWebClient()
-                .delete()
-                .uri(url)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve();
+        return executeRequest(HttpMethod.DELETE, url);
     }
 
     /**
@@ -307,11 +230,7 @@ public class WebClientUtils {
      * @return WebClient.ResponseSpec 响应对象类
      */
     public static WebClient.ResponseSpec delete(String url, Object... uriVariables) {
-        return getWebClient()
-                .delete()
-                .uri(url, uriVariables)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve();
+        return executeRequest(HttpMethod.DELETE, url, uriVariables);
     }
 
     /**
@@ -322,11 +241,7 @@ public class WebClientUtils {
      * @return WebClient.ResponseSpec 响应对象类
      */
     public static WebClient.ResponseSpec delete(String url, Map<String, ?> uriVariables) {
-        return getWebClient()
-                .delete()
-                .uri(url, uriVariables)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve();
+        return executeRequest(HttpMethod.DELETE, url, uriVariables);
     }
 
     /**
@@ -338,12 +253,7 @@ public class WebClientUtils {
      * @return WebClient.ResponseSpec 响应对象类
      */
     public static WebClient.ResponseSpec delete(String url, Map<String, String> headers, Object... uriVariables) {
-        return getWebClient()
-                .delete()
-                .uri(url, uriVariables)
-                .headers(requestHeaders -> requestHeaders.setAll(headers))
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve();
+        return executeRequestWithHeaders(HttpMethod.DELETE, url, headers, uriVariables);
     }
 
     /**
@@ -355,10 +265,43 @@ public class WebClientUtils {
      * @return WebClient.ResponseSpec 响应对象类
      */
     public static WebClient.ResponseSpec delete(String url, Map<String, String> headers, Map<String, ?> uriVariables) {
+        return executeRequestWithHeaders(HttpMethod.DELETE, url, headers, uriVariables);
+    }
+
+    // ----------------------------------PRIVATE METHOD-------------------------------------------------------
+
+    private static WebClient.ResponseSpec executeRequest(HttpMethod method, String url, Object... uriVariables) {
         return getWebClient()
-                .delete()
+                .method(method)
+                .uri(url, uriVariables)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve();
+    }
+
+    private static WebClient.ResponseSpec executeRequestWithBody(HttpMethod method, String url, Object bodyValue, Object... uriVariables) {
+        return getWebClient()
+                .method(method)
+                .uri(url, uriVariables)
+                .bodyValue(bodyValue)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve();
+    }
+
+    private static WebClient.ResponseSpec executeRequestWithHeaders(HttpMethod method, String url, Map<String, String> headers, Object... uriVariables) {
+        return getWebClient()
+                .method(method)
                 .uri(url, uriVariables)
                 .headers(requestHeaders -> requestHeaders.setAll(headers))
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve();
+    }
+
+    private static WebClient.ResponseSpec executeRequestWithBodyAndHeaders(HttpMethod method, String url, Map<String, String> headers, Object bodyValue, Object... uriVariables) {
+        return getWebClient()
+                .method(method)
+                .uri(url, uriVariables)
+                .headers(requestHeaders -> requestHeaders.setAll(headers))
+                .bodyValue(bodyValue)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve();
     }
