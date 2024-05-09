@@ -79,7 +79,7 @@ public class OpenCodeUtils {
     public static String generateCode() {
         int length = 8;
         StringBuilder builder = new StringBuilder();
-        String uuid = IdUtils.fastUUID().toString().replace("-", "");
+        String uuid = IdUtils.simpleUUID();
         for (int i = 0; i < length; i++) {
             String s = uuid.substring(i * 4, i * 4 + 4);
             int x = Integer.parseInt(s, 16);
