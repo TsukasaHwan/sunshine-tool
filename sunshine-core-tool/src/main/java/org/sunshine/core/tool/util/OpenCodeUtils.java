@@ -5,7 +5,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.UUID;
 
 /**
  * @author Teamo
@@ -80,7 +79,7 @@ public class OpenCodeUtils {
     public static String generateCode() {
         int length = 8;
         StringBuilder builder = new StringBuilder();
-        String uuid = UUID.randomUUID().toString().replace("-", "");
+        String uuid = IdUtils.fastUUID().toString().replace("-", "");
         for (int i = 0; i < length; i++) {
             String s = uuid.substring(i * 4, i * 4 + 4);
             int x = Integer.parseInt(s, 16);
