@@ -1,8 +1,11 @@
 package org.sunshine.core.cache.config;
 
+import com.alibaba.fastjson2.JSONFactory;
+import com.alibaba.fastjson2.JSONReader;
+import com.alibaba.fastjson2.JSONWriter;
+import com.alibaba.fastjson2.support.redission.JSONCodec;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
-import org.redisson.client.codec.Codec;
 import org.redisson.config.Config;
 import org.redisson.config.SingleServerConfig;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -15,7 +18,6 @@ import org.springframework.context.annotation.Bean;
 import org.sunshine.core.cache.aspect.DistributedLockAspect;
 import org.sunshine.core.cache.properties.RedissonProperties;
 import org.sunshine.core.cache.redisson.RedissonLocker;
-import org.sunshine.core.cache.redisson.codec.FastJsonCodec;
 import org.sunshine.core.cache.redisson.queue.DelayedQueueListener;
 import org.sunshine.core.cache.redisson.queue.DelayedQueueListenerConfigurer;
 import org.sunshine.core.cache.redisson.util.RedissonLockUtils;
@@ -54,7 +56,12 @@ public class RedissonAutoConfiguration {
         if (StringUtils.isNotBlank(password)) {
             singleServerConfig.setPassword(password);
         }
-        Codec codec = new FastJsonCodec();
+        JSONWriter.Feature[] writerFeatures = {JSONWriter.Feature.WriteClassName};
+        JSONReader.Feature[] readerFeatures = {JSONReader.Feature.SupportAutoType};
+        JSONCodec codec = new JSONCodec(
+                JSONFactory.createWriteContext(writerFeatures),
+                JSONFactory.createReadContext(readerFeatures)
+        );
         config.setCodec(codec);
         return Redisson.create(config);
     }
