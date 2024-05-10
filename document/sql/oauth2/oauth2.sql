@@ -12,6 +12,7 @@ CREATE TABLE oauth2_authed_client
     `client_authentication_methods` varchar(1000) NOT NULL,
     `authorization_grant_types`     varchar(1000) NOT NULL,
     `redirect_uris`                 varchar(1000),
+    `post_logout_redirect_uris`     varchar(1000),
     `scopes`                        varchar(1000) NOT NULL,
     `client_settings`               varchar(2000) NOT NULL,
     `token_settings`                varchar(2000) NOT NULL,
@@ -28,7 +29,7 @@ CREATE TABLE oauth2_auth
     `attributes`                    text,
     `state`                         varchar(500),
     `authorization_code_value`      text,
-    `authorization_code_issued_at`  datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `authorization_code_issued_at`  datetime,
     `authorization_code_expires_at` datetime,
     `authorization_code_metadata`   text,
     `access_token_value`            text,
@@ -45,6 +46,14 @@ CREATE TABLE oauth2_auth
     `refresh_token_issued_at`       datetime,
     `refresh_token_expires_at`      datetime,
     `refresh_token_metadata`        text,
+    `user_code_value`               text,
+    `user_code_issued_at`           datetime,
+    `user_code_expires_at`          datetime,
+    `user_code_metadata`            text,
+    `device_code_value`             text,
+    `device_code_issued_at`         datetime,
+    `device_code_expires_at`        datetime,
+    `device_code_metadata`          text,
     PRIMARY KEY (`id`)
 );
 

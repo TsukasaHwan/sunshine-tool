@@ -64,6 +64,11 @@ public class OAuth2AuthedClient {
     private String redirectUris;
 
     /**
+     * 注销后重定向URI地址（以,分割）
+     */
+    private String postLogoutRedirectUris;
+
+    /**
      * 授权范围（以,分割）
      */
     private String scopes;
@@ -152,6 +157,14 @@ public class OAuth2AuthedClient {
 
     public void setRedirectUris(String redirectUris) {
         this.redirectUris = redirectUris;
+    }
+
+    public String getPostLogoutRedirectUris() {
+        return postLogoutRedirectUris;
+    }
+
+    public void setPostLogoutRedirectUris(String postLogoutRedirectUris) {
+        this.postLogoutRedirectUris = postLogoutRedirectUris;
     }
 
     public String getScopes() {

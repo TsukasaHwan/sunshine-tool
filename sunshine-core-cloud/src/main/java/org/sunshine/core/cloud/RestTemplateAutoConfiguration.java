@@ -17,13 +17,13 @@ import org.springframework.cloud.openfeign.FeignAutoConfiguration;
 import org.springframework.cloud.openfeign.support.FeignHttpClientProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
-import org.springframework.http.client.OkHttp3ClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 import org.sunshine.core.cloud.http.LbRestTemplate;
 import org.sunshine.core.cloud.http.RestTemplateHeaderInterceptor;
+import org.sunshine.core.cloud.http.client.OkHttp3ClientHttpRequestFactory;
 import org.sunshine.core.cloud.properties.FeignHeadersProperties;
 
 import javax.net.ssl.*;
@@ -139,8 +139,8 @@ public class RestTemplateAutoConfiguration {
             trustManagers[0] = disabledTrustManager;
             SSLContext sslContext = SSLContext.getInstance("SSL");
             sslContext.init(null, trustManagers, new java.security.SecureRandom());
-            SSLSocketFactory disabledSSLSocketFactory = sslContext.getSocketFactory();
-            builder.sslSocketFactory(disabledSSLSocketFactory, disabledTrustManager);
+            SSLSocketFactory disabledSslSocketFactory = sslContext.getSocketFactory();
+            builder.sslSocketFactory(disabledSslSocketFactory, disabledTrustManager);
             builder.hostnameVerifier(new TrustAllHostnames());
         } catch (NoSuchAlgorithmException | KeyManagementException e) {
             LOG.warn("Error setting SSLSocketFactory in OKHttpClient", e);

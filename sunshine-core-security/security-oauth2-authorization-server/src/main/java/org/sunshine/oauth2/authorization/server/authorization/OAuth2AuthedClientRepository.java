@@ -67,6 +67,7 @@ public class OAuth2AuthedClientRepository implements RegisteredClientRepository 
                 .set(OAuth2AuthedClient::getClientAuthenticationMethods, StringUtils.collectionToCommaDelimitedString(clientAuthenticationMethods))
                 .set(OAuth2AuthedClient::getAuthorizationGrantTypes, StringUtils.collectionToCommaDelimitedString(authorizationGrantTypes))
                 .set(OAuth2AuthedClient::getRedirectUris, StringUtils.collectionToCommaDelimitedString(registeredClient.getRedirectUris()))
+                .set(OAuth2AuthedClient::getPostLogoutRedirectUris, StringUtils.collectionToCommaDelimitedString(registeredClient.getPostLogoutRedirectUris()))
                 .set(OAuth2AuthedClient::getScopes, StringUtils.collectionToCommaDelimitedString(registeredClient.getScopes()))
                 .set(OAuth2AuthedClient::getClientSettings, writeMap(registeredClient.getClientSettings().getSettings()))
                 .set(OAuth2AuthedClient::getTokenSettings, writeMap(registeredClient.getTokenSettings().getSettings()));
@@ -89,6 +90,7 @@ public class OAuth2AuthedClientRepository implements RegisteredClientRepository 
         oAuth2AuthedClient.setClientAuthenticationMethods(StringUtils.collectionToCommaDelimitedString(clientAuthenticationMethods));
         oAuth2AuthedClient.setAuthorizationGrantTypes(StringUtils.collectionToCommaDelimitedString(authorizationGrantTypes));
         oAuth2AuthedClient.setRedirectUris(StringUtils.collectionToCommaDelimitedString(registeredClient.getRedirectUris()));
+        oAuth2AuthedClient.setPostLogoutRedirectUris(StringUtils.collectionToCommaDelimitedString(registeredClient.getPostLogoutRedirectUris()));
         oAuth2AuthedClient.setScopes(StringUtils.collectionToCommaDelimitedString(registeredClient.getScopes()));
         oAuth2AuthedClient.setClientSettings(writeMap(registeredClient.getClientSettings().getSettings()));
         oAuth2AuthedClient.setTokenSettings(writeMap(registeredClient.getTokenSettings().getSettings()));
@@ -155,6 +157,7 @@ public class OAuth2AuthedClientRepository implements RegisteredClientRepository 
                     authorizationGrantTypes.addAll(collect);
                 })
                 .redirectUris(redirectUris -> redirectUris.addAll(StringUtils.commaDelimitedListToSet(oAuth2AuthedClient.getRedirectUris())))
+                .postLogoutRedirectUris(postLogoutRedirectUris -> postLogoutRedirectUris.addAll(StringUtils.commaDelimitedListToSet(oAuth2AuthedClient.getPostLogoutRedirectUris())))
                 .scopes(scopes -> scopes.addAll(StringUtils.commaDelimitedListToSet(oAuth2AuthedClient.getScopes())))
                 .clientSettings(ClientSettings.withSettings(parseMap(oAuth2AuthedClient.getClientSettings())).build())
                 .tokenSettings(TokenSettings.withSettings(parseMap(oAuth2AuthedClient.getTokenSettings())).build());
@@ -178,7 +181,7 @@ public class OAuth2AuthedClientRepository implements RegisteredClientRepository 
 
     private Map<String, Object> parseMap(String data) {
         try {
-            return this.objectMapper.readValue(data, new TypeReference<Map<String, Object>>() {
+            return this.objectMapper.readValue(data, new TypeReference<>() {
             });
         } catch (Exception ex) {
             throw new IllegalArgumentException(ex.getMessage(), ex);

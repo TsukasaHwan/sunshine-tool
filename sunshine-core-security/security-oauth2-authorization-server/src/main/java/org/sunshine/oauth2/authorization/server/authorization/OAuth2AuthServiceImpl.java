@@ -8,12 +8,10 @@ import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.security.jackson2.SecurityJackson2Modules;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
-import org.springframework.security.oauth2.core.OAuth2RefreshToken;
-import org.springframework.security.oauth2.core.OAuth2Token;
+import org.springframework.security.oauth2.core.*;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
+import org.springframework.security.oauth2.core.oidc.endpoint.OidcParameterNames;
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationCode;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
@@ -104,7 +102,13 @@ public class OAuth2AuthServiceImpl implements OAuth2AuthorizationService {
                     .or()
                     .eq(OAuth2Auth::getAccessTokenValue, token)
                     .or()
-                    .eq(OAuth2Auth::getRefreshTokenValue, token);
+                    .eq(OAuth2Auth::getOidcIdTokenValue, token)
+                    .or()
+                    .eq(OAuth2Auth::getRefreshTokenValue, token)
+                    .or()
+                    .eq(OAuth2Auth::getUserCodeValue, token)
+                    .or()
+                    .eq(OAuth2Auth::getDeviceCodeValue, token);
             return findBy(wrapper);
         } else if (OAuth2ParameterNames.STATE.equals(tokenType.getValue())) {
             LambdaQueryWrapper<OAuth2Auth> wrapper = Wrappers.<OAuth2Auth>lambdaQuery()
@@ -121,6 +125,18 @@ public class OAuth2AuthServiceImpl implements OAuth2AuthorizationService {
         } else if (OAuth2TokenType.REFRESH_TOKEN.equals(tokenType)) {
             LambdaQueryWrapper<OAuth2Auth> wrapper = Wrappers.<OAuth2Auth>lambdaQuery()
                     .eq(OAuth2Auth::getRefreshTokenValue, token);
+            return findBy(wrapper);
+        } else if (OidcParameterNames.ID_TOKEN.equals(tokenType.getValue())) {
+            LambdaQueryWrapper<OAuth2Auth> wrapper = Wrappers.<OAuth2Auth>lambdaQuery()
+                    .eq(OAuth2Auth::getOidcIdTokenValue, token);
+            return findBy(wrapper);
+        } else if (OAuth2ParameterNames.USER_CODE.equals(tokenType.getValue())) {
+            LambdaQueryWrapper<OAuth2Auth> wrapper = Wrappers.<OAuth2Auth>lambdaQuery()
+                    .eq(OAuth2Auth::getUserCodeValue, token);
+            return findBy(wrapper);
+        } else if (OAuth2ParameterNames.DEVICE_CODE.equals(tokenType.getValue())) {
+            LambdaQueryWrapper<OAuth2Auth> wrapper = Wrappers.<OAuth2Auth>lambdaQuery()
+                    .eq(OAuth2Auth::getDeviceCodeValue, token);
             return findBy(wrapper);
         }
         return null;
@@ -169,6 +185,12 @@ public class OAuth2AuthServiceImpl implements OAuth2AuthorizationService {
 
         OAuth2Authorization.Token<OAuth2RefreshToken> refreshToken = authorization.getRefreshToken();
         applyTokenColum(oAuth2Auth, refreshToken);
+
+        OAuth2Authorization.Token<OAuth2UserCode> userCode = authorization.getToken(OAuth2UserCode.class);
+        applyTokenColum(oAuth2Auth, userCode);
+
+        OAuth2Authorization.Token<OAuth2DeviceCode> deviceCode = authorization.getToken(OAuth2DeviceCode.class);
+        applyTokenColum(oAuth2Auth, deviceCode);
 
         return oAuth2Auth;
     }
@@ -261,6 +283,26 @@ public class OAuth2AuthServiceImpl implements OAuth2AuthorizationService {
             builder.token(refreshToken, (metadata) -> metadata.putAll(refreshTokenMetadata));
         }
 
+        String userCodeValue = oAuth2Auth.getUserCodeValue();
+        if (StringUtils.isNotBlank(userCodeValue)) {
+            tokenIssuedAt = oAuth2Auth.getUserCodeIssuedAt().atZone(ZoneId.systemDefault()).toInstant();
+            tokenExpiresAt = oAuth2Auth.getUserCodeExpiresAt().atZone(ZoneId.systemDefault()).toInstant();
+            Map<String, Object> userCodeMetadata = parseMap(oAuth2Auth.getUserCodeMetadata());
+
+            OAuth2UserCode userCode = new OAuth2UserCode(userCodeValue, tokenIssuedAt, tokenExpiresAt);
+            builder.token(userCode, (metadata) -> metadata.putAll(userCodeMetadata));
+        }
+
+        String deviceCodeValue = oAuth2Auth.getDeviceCodeValue();
+        if (StringUtils.isNotBlank(deviceCodeValue)) {
+            tokenIssuedAt = oAuth2Auth.getDeviceCodeIssuedAt().atZone(ZoneId.systemDefault()).toInstant();
+            tokenExpiresAt = oAuth2Auth.getDeviceCodeExpiresAt().atZone(ZoneId.systemDefault()).toInstant();
+            Map<String, Object> deviceCodeMetadata = parseMap(oAuth2Auth.getDeviceCodeMetadata());
+
+            OAuth2DeviceCode deviceCode = new OAuth2DeviceCode(deviceCodeValue, tokenIssuedAt, tokenExpiresAt);
+            builder.token(deviceCode, (metadata) -> metadata.putAll(deviceCodeMetadata));
+        }
+
         return builder.build();
     }
 
@@ -303,6 +345,16 @@ public class OAuth2AuthServiceImpl implements OAuth2AuthorizationService {
             oAuth2Auth.setRefreshTokenIssuedAt(tokenIssuedAt);
             oAuth2Auth.setRefreshTokenExpiresAt(tokenExpiresAt);
             oAuth2Auth.setRefreshTokenMetadata(metadata);
+        } else if (t instanceof OAuth2UserCode) {
+            oAuth2Auth.setUserCodeValue(tokenValue);
+            oAuth2Auth.setUserCodeIssuedAt(tokenIssuedAt);
+            oAuth2Auth.setUserCodeExpiresAt(tokenExpiresAt);
+            oAuth2Auth.setUserCodeMetadata(metadata);
+        } else if (t instanceof OAuth2DeviceCode) {
+            oAuth2Auth.setDeviceCodeValue(tokenValue);
+            oAuth2Auth.setDeviceCodeIssuedAt(tokenIssuedAt);
+            oAuth2Auth.setDeviceCodeExpiresAt(tokenExpiresAt);
+            oAuth2Auth.setDeviceCodeMetadata(metadata);
         }
     }
 

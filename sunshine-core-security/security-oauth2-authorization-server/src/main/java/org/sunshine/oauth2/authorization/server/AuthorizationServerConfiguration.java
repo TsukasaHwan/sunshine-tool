@@ -109,7 +109,8 @@ public class AuthorizationServerConfiguration {
                 .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2ResourceServer -> oauth2ResourceServer.jwt(jwtConfigurer -> {
                 }))
-                .apply(authorizationServerConfigurer);
+                .with(authorizationServerConfigurer, oAuth2AuthorizationServerConfigurer -> {
+                });
 
         http.authenticationProvider(passwordAuthenticationProvider);
 

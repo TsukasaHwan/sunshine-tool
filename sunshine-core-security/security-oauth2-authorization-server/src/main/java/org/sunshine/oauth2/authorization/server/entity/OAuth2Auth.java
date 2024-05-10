@@ -143,6 +143,46 @@ public class OAuth2Auth {
      */
     private String refreshTokenMetadata;
 
+    /**
+     * 用户码值
+     */
+    private String userCodeValue;
+
+    /**
+     * 用户码发布时间
+     */
+    private LocalDateTime userCodeIssuedAt;
+
+    /**
+     * 用户码过期时间
+     */
+    private LocalDateTime userCodeExpiresAt;
+
+    /**
+     * 用户码元数据（JSON）
+     */
+    private String userCodeMetadata;
+
+    /**
+     * 设备码值
+     */
+    private String deviceCodeValue;
+
+    /**
+     * 设备码发布时间
+     */
+    private LocalDateTime deviceCodeIssuedAt;
+
+    /**
+     * 设备码过期时间
+     */
+    private LocalDateTime deviceCodeExpiresAt;
+
+    /**
+     * 设备码元数据（JSON）
+     */
+    private String deviceCodeMetadata;
+
     public String getId() {
         return id;
     }
@@ -341,5 +381,69 @@ public class OAuth2Auth {
 
     public void setRefreshTokenMetadata(String refreshTokenMetadata) {
         this.refreshTokenMetadata = refreshTokenMetadata;
+    }
+
+    public String getUserCodeValue() {
+        return userCodeValue;
+    }
+
+    public void setUserCodeValue(String userCodeValue) {
+        this.userCodeValue = userCodeValue;
+    }
+
+    public LocalDateTime getUserCodeIssuedAt() {
+        return userCodeIssuedAt;
+    }
+
+    public void setUserCodeIssuedAt(LocalDateTime userCodeIssuedAt) {
+        this.userCodeIssuedAt = userCodeIssuedAt;
+    }
+
+    public LocalDateTime getUserCodeExpiresAt() {
+        return userCodeExpiresAt;
+    }
+
+    public void setUserCodeExpiresAt(LocalDateTime userCodeExpiresAt) {
+        this.userCodeExpiresAt = userCodeExpiresAt;
+    }
+
+    public String getUserCodeMetadata() {
+        return userCodeMetadata;
+    }
+
+    public void setUserCodeMetadata(String userCodeMetadata) {
+        this.userCodeMetadata = userCodeMetadata;
+    }
+
+    public String getDeviceCodeValue() {
+        return deviceCodeValue;
+    }
+
+    public void setDeviceCodeValue(String deviceCodeValue) {
+        this.deviceCodeValue = deviceCodeValue;
+    }
+
+    public LocalDateTime getDeviceCodeIssuedAt() {
+        return deviceCodeIssuedAt;
+    }
+
+    public void setDeviceCodeIssuedAt(LocalDateTime deviceCodeIssuedAt) {
+        this.deviceCodeIssuedAt = deviceCodeIssuedAt;
+    }
+
+    public LocalDateTime getDeviceCodeExpiresAt() {
+        return deviceCodeExpiresAt;
+    }
+
+    public void setDeviceCodeExpiresAt(LocalDateTime deviceCodeExpiresAt) {
+        this.deviceCodeExpiresAt = deviceCodeExpiresAt;
+    }
+
+    public String getDeviceCodeMetadata() {
+        return deviceCodeMetadata;
+    }
+
+    public void setDeviceCodeMetadata(String deviceCodeMetadata) {
+        this.deviceCodeMetadata = deviceCodeMetadata;
     }
 }
