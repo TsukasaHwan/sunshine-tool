@@ -30,7 +30,7 @@ import java.util.List;
  * @since 2023/3/27
  */
 @AutoConfiguration
-@ConditionalOnProperty(prefix = "spring.redis", name = "redisson.enable", havingValue = "true")
+@ConditionalOnProperty(prefix = "spring.data.redis", name = "redisson.enable", havingValue = "true")
 @EnableConfigurationProperties({RedisProperties.class, RedissonProperties.class})
 public class RedissonAutoConfiguration {
     private final RedisProperties redisProperties;
