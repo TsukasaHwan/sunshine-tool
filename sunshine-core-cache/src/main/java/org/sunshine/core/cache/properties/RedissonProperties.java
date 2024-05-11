@@ -6,19 +6,19 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author Teamo
  * @since 2022/01/07
  */
-@ConfigurationProperties("spring.redis.redisson")
+@ConfigurationProperties("spring.data.redis.redisson")
 public class RedissonProperties {
 
     /**
      * Whether to enable
      */
-    private boolean enable;
+    private Boolean enable;
 
-    public boolean isEnable() {
+    public Boolean getEnable() {
         return enable;
     }
 
-    public void setEnable(boolean enable) {
+    public void setEnable(Boolean enable) {
         this.enable = enable;
     }
 }
