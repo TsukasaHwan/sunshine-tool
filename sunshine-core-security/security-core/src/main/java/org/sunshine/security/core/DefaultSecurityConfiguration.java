@@ -2,6 +2,7 @@ package org.sunshine.security.core;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,6 +27,7 @@ public class DefaultSecurityConfiguration {
     }
 
     @Bean
+    @Primary
     public CorsConfigurationSource corsConfigurationSource() {
         List<String> allowMethod = Arrays.asList(
                 HttpMethod.GET.name(),
