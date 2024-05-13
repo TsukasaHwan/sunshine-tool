@@ -12,6 +12,7 @@ import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springdoc.core.customizers.OperationCustomizer;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.util.Assert;
 import org.sunshine.core.tool.api.code.CommonCode;
 
@@ -73,6 +74,7 @@ public interface OpenApiConfiguration {
      * @return OpenApiCustomizer
      */
     @Bean
+    @Primary
     default OpenApiCustomizer openApiCustomizer() {
         return openApi -> openApi.getPaths().values().stream().flatMap(pathItem -> pathItem.readOperations().stream())
                 .forEach(operation -> {
@@ -88,6 +90,7 @@ public interface OpenApiConfiguration {
      * @return OperationCustomizer
      */
     @Bean
+    @Primary
     default OperationCustomizer operationCustomizer() {
         return (operation, handlerMethod) -> {
             // TODO
