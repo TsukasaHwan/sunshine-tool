@@ -1,9 +1,5 @@
 package org.sunshine.core.tool.support;
 
-import co.elastic.clients.elasticsearch._types.FieldSort;
-import co.elastic.clients.elasticsearch._types.SortOptions;
-import co.elastic.clients.elasticsearch._types.SortOrder;
-import co.elastic.clients.elasticsearch.core.SearchRequest;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -15,11 +11,9 @@ import org.sunshine.core.tool.util.BeanUtils;
 import org.sunshine.core.tool.util.StringPool;
 import org.sunshine.core.tool.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 /**
  * 分页工具
@@ -69,36 +63,6 @@ public class Condition {
     }
 
     /**
-     * 转化成elasticsearch中的分页SearchRequest
-     *
-     * @param query 查询条件
-     * @return SearchRequest
-     */
-    public static SearchRequest getPageSearchRequest(Query query) {
-        checkQuery(query);
-        return SearchRequest.of(builder -> {
-            builder.from((query.getCurrent() - 1) * query.getSize());
-            builder.size(query.getSize());
-
-            List<SortOptions> sorts = new ArrayList<>();
-            String ascs = query.getAscs();
-            if (StringUtils.isNotBlank(ascs)) {
-                sorts.addAll(buildSortOptions(ascs, SortOrder.Asc));
-            }
-
-            String descs = query.getDescs();
-            if (StringUtils.isNotBlank(descs)) {
-                sorts.addAll(buildSortOptions(descs, SortOrder.Desc));
-            }
-
-            if (!sorts.isEmpty()) {
-                builder.sort(sorts);
-            }
-            return builder;
-        });
-    }
-
-    /**
      * 分页实体类集合包装
      *
      * @param page   源数据
@@ -134,7 +98,7 @@ public class Condition {
      *
      * @param query Query
      */
-    private static void checkQuery(Query query) {
+    public static void checkQuery(Query query) {
         Integer current = query.getCurrent();
         Integer size = query.getSize();
         if (current == null || current <= 0) {
@@ -153,24 +117,5 @@ public class Condition {
      */
     private static String[] getUnderlineColumns(String[] columns) {
         return Arrays.stream(columns).map(column -> StringUtils.humpToUnderline(StringUtils.cleanIdentifier(column))).toArray(String[]::new);
-    }
-
-    /**
-     * 构建排序条件的SortOptions列表
-     *
-     * @param fields 排序字段列表
-     * @param order  排序顺序
-     * @return SortOptions列表
-     */
-    private static List<SortOptions> buildSortOptions(String fields, SortOrder order) {
-        String[] columns = StringUtils.delimitedListToStringArray(fields, StringPool.COMMA);
-        return Arrays.stream(columns)
-                .map(column -> SortOptions.of(sortBuilder -> {
-                    String field = StringUtils.cleanIdentifier(column);
-                    FieldSort fieldSort = FieldSort.of(fieldSortBuilder -> fieldSortBuilder.field(field).order(order));
-                    sortBuilder.field(fieldSort);
-                    return sortBuilder;
-                }))
-                .collect(Collectors.toList());
     }
 }
