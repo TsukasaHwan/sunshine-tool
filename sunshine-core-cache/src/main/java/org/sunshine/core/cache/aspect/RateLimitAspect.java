@@ -11,7 +11,7 @@ import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.scripting.support.ResourceScriptSource;
 import org.springframework.util.Assert;
 import org.sunshine.core.cache.annotation.RateLimit;
-import org.sunshine.core.tool.exception.CustomException;
+import org.sunshine.core.tool.exception.BusinessException;
 import org.sunshine.core.tool.util.StringPool;
 import org.sunshine.core.tool.util.StringUtils;
 import org.sunshine.core.tool.util.WebUtils;
@@ -57,7 +57,7 @@ public class RateLimitAspect {
         ImmutableList<String> keys = ImmutableList.of(rateLimit.prefix() + key + StringPool.COLON + request.getRequestURI());
         Long result = selectLimitType(keys, rateLimit);
         if (result == null || result.equals(0L)) {
-            throw new CustomException(rateLimit.msg());
+            throw new BusinessException(rateLimit.msg());
         }
         return joinPoint.proceed();
     }
