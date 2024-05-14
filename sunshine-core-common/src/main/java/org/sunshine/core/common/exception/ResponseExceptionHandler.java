@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.sunshine.core.tool.api.code.CommonCode;
 import org.sunshine.core.tool.api.code.ResultCode;
 import org.sunshine.core.tool.api.response.Result;
-import org.sunshine.core.tool.exception.CustomException;
+import org.sunshine.core.tool.exception.BusinessException;
 
 import java.util.Map;
 import java.util.Objects;
@@ -55,8 +55,8 @@ public class ResponseExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public Result<?> handleException(Exception ex) {
-        if (ex instanceof CustomException exception) {
-            return handleCustomException(exception);
+        if (ex instanceof BusinessException exception) {
+            return handleBusinessException(exception);
         } else if (ex instanceof BindException exception) {
             return handleBindException(exception);
         } else if (ex instanceof ConstraintViolationException exception) {
@@ -72,7 +72,7 @@ public class ResponseExceptionHandler {
      * @param ex 自定义异常
      * @return {Result}
      */
-    private Result<?> handleCustomException(CustomException ex) {
+    private Result<?> handleBusinessException(BusinessException ex) {
         return ex.getResult();
     }
 
