@@ -26,7 +26,7 @@ public class ElasticCondition extends Condition {
      * @return SearchRequest
      */
     public static SearchRequest getPageSearchRequest(Query query) {
-        Condition.checkQuery(query);
+        checkQuery(query);
         return SearchRequest.of(builder -> {
             builder.from((query.getCurrent() - 1) * query.getSize());
             builder.size(query.getSize());

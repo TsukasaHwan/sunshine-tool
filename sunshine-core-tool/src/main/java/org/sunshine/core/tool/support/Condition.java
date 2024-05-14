@@ -98,7 +98,7 @@ public class Condition {
      *
      * @param query Query
      */
-    public static void checkQuery(Query query) {
+    protected static void checkQuery(Query query) {
         Integer current = query.getCurrent();
         Integer size = query.getSize();
         if (current == null || current <= 0) {
