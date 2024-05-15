@@ -6,6 +6,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
+ * JDK17需在Linux上安装字体库
+ * <pre>
+ * yum install -y fontconfig
+ * fc-cache --force
  * gif验证码生成类
  *
  * @author anonymous
