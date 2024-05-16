@@ -5,6 +5,7 @@ import com.alibaba.fastjson2.JSONWriter;
 import com.alibaba.fastjson2.support.config.FastJsonConfig;
 import com.alibaba.fastjson2.support.spring.http.converter.FastJsonHttpMessageConverter;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.convert.converter.Converter;
@@ -33,7 +34,8 @@ import java.util.List;
  * @since 2019/7/10
  */
 @AutoConfiguration
-public class WebConfiguration implements WebMvcConfigurer {
+@ConditionalOnMissingBean(WebMvcConfigurer.class)
+public class DefaultWebConfiguration implements WebMvcConfigurer {
 
     private final Converter<String, LocalDateTime> localDateTimeConverter = (StringToLocalDateTimeConverter) source ->
             LocalDateTime.parse(source, DateUtils.DATETIME_FORMATTER);
