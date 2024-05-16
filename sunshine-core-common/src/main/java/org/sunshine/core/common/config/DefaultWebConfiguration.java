@@ -35,7 +35,7 @@ import java.util.List;
  */
 @AutoConfiguration
 @ConditionalOnMissingBean(WebMvcConfigurer.class)
-public class DefaultWebConfiguration implements WebMvcConfigurer {
+public abstract class DefaultWebConfiguration implements WebMvcConfigurer {
 
     private final Converter<String, LocalDateTime> localDateTimeConverter = (StringToLocalDateTimeConverter) source ->
             LocalDateTime.parse(source, DateUtils.DATETIME_FORMATTER);
