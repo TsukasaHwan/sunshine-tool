@@ -1,8 +1,12 @@
 package org.sunshine.core.tool.util;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -89,7 +93,7 @@ public class OpenCodeUtils {
     }
 
     /**
-     * 生成签名
+     * 使用HmacSHA256生成签名
      *
      * @param appSecret appSecret
      * @param params    按参数名ASCII码从小到大排序的参数
@@ -105,20 +109,16 @@ public class OpenCodeUtils {
 
         String queryString = queryStringBuilder.substring(0, queryStringBuilder.length() - 1);
 
-        String signatureBase = queryString + appSecret;
         byte[] signatureBytes = null;
         try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            signatureBytes = digest.digest(signatureBase.getBytes(StandardCharsets.UTF_8));
-        } catch (NoSuchAlgorithmException e) {
+            SecretKeySpec secretKeySpec = new SecretKeySpec(appSecret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+            Mac mac = Mac.getInstance("HmacSHA256");
+            mac.init(secretKeySpec);
+            signatureBytes = mac.doFinal(queryString.getBytes(StandardCharsets.UTF_8));
+        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             throw new RuntimeException("Failed to generate signature", e);
         }
 
-        StringBuilder hexString = new StringBuilder();
-        for (byte b : signatureBytes) {
-            hexString.append(String.format("%02x", b));
-        }
-
-        return hexString.toString();
+        return Base64.getEncoder().encodeToString(signatureBytes);
     }
 }
