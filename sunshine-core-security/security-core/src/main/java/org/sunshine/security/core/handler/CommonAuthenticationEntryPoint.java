@@ -36,6 +36,6 @@ public class CommonAuthenticationEntryPoint implements AuthenticationEntryPoint 
     }
 
     protected void handleOtherException(HttpServletResponse response, AuthenticationException authException) {
-        WebUtils.renderJson(response, Result.fail(CommonCode.AUTHENTICATION_FAILED));
+        WebUtils.renderJson(response, Result.fail(CommonCode.SERVER_ERROR));
     }
 }
