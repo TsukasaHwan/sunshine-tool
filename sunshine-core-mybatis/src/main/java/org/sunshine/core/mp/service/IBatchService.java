@@ -8,7 +8,7 @@ import java.util.Collection;
  * @author Teamo
  * @since 2023/5/6
  */
-public interface IBaseService<T> extends IService<T> {
+public interface IBatchService<T> extends IService<T> {
 
     /**
      * 插入（批量）仅适用于mysql
