@@ -1,5 +1,7 @@
 package org.sunshine.core.tool.node;
 
+import java.util.Objects;
+
 /**
  * 树型节点类
  *
@@ -37,5 +39,22 @@ public class TreeNode extends BaseNode<TreeNode> {
 
     public void setValue(Long value) {
         this.value = value;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        TreeNode other = (TreeNode) obj;
+        return Objects.equals(this.getId(), other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, parentId);
     }
 }
