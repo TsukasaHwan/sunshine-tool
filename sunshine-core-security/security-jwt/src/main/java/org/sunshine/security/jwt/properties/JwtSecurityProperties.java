@@ -47,6 +47,7 @@ public class JwtSecurityProperties {
      */
     private List<String> permitAllPaths = Arrays.asList(
             "/",
+            "/error",
             "/*.html",
             "/*/*.html",
             "/*/*.css",

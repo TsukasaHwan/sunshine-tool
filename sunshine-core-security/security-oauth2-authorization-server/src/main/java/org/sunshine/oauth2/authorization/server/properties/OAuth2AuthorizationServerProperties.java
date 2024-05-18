@@ -24,6 +24,7 @@ public class OAuth2AuthorizationServerProperties {
      */
     private List<String> permitAllPaths = Arrays.asList(
             "/",
+            "/error",
             "/*.html",
             "/*/*.html",
             "/*/*.css",
