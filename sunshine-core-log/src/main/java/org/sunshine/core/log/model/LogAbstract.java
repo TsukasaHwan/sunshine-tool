@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
  * @author Teamo
  */
 public class LogAbstract implements Serializable {
+
     protected static final long serialVersionUID = 1L;
 
     /**

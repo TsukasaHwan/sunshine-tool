@@ -2,6 +2,7 @@ package org.sunshine.core.tool.util;
 
 import org.springframework.util.Assert;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.Year;
@@ -758,6 +759,7 @@ public class IdCardUtils {
      * @author looly
      */
     public static class IdCard implements Serializable {
+        @Serial
         private static final long serialVersionUID = 1L;
 
         private final String provinceCode;

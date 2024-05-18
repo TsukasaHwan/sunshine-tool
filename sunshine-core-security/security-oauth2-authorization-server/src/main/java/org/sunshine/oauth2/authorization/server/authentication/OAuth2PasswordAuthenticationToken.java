@@ -7,6 +7,7 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.server.authorization.util.SpringAuthorizationServerVersion;
 import org.springframework.util.Assert;
 
+import java.io.Serial;
 import java.util.*;
 
 /**
@@ -15,6 +16,7 @@ import java.util.*;
  */
 public class OAuth2PasswordAuthenticationToken extends AbstractAuthenticationToken {
 
+    @Serial
     private static final long serialVersionUID = SpringAuthorizationServerVersion.SERIAL_VERSION_UID;
 
     private final AuthorizationGrantType authorizationGrantType;

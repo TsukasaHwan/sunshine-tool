@@ -28,6 +28,7 @@ public class FileUtils extends FileCopyUtils {
      * @author L.cm
      */
     public static class TrueFilter implements FileFilter, Serializable {
+        @Serial
         private static final long serialVersionUID = -6420452043795072619L;
 
         public final static TrueFilter TRUE = new TrueFilter();

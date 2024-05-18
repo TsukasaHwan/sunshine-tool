@@ -1,5 +1,7 @@
 package org.sunshine.core.tool.node;
 
+import java.io.Serial;
+
 /**
  * 森林节点类
  *
@@ -7,6 +9,7 @@ package org.sunshine.core.tool.node;
  */
 public class ForestNode extends BaseNode<ForestNode> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
