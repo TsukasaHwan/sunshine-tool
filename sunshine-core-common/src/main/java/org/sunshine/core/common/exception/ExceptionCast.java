@@ -32,11 +32,10 @@ public class ExceptionCast {
 
     /**
      * 将给定的结果信息封装成一个业务异常并抛出。
-     * 这个方法用于当异常信息主要由结果对象承载时，方便地将结果信息转换为异常。
      *
      * @param result 相关的结果信息。结果对象中可能包含了需要被抛出的异常的相关信息，例如错误代码或详细错误消息。
      */
     public static void cast(Result<?> result) {
-        cast(result.getMsg(), result);
+        throw new BusinessException(result);
     }
 }
