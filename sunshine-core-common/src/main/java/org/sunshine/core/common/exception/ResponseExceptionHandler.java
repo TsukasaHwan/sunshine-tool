@@ -124,8 +124,8 @@ public class ResponseExceptionHandler {
         // 从EXCEPTIONS中找异常类型所对应的错误代码，如果找到了将错误代码响应给用户，如果找不到给用户响应系统异常
         if (exceptions.get(ex.getClass()) == null) {
             log.error(ex.getMessage(), ex);
-            return Result.fail(CommonCode.SERVER_ERROR);
+            return Result.of(CommonCode.SERVER_ERROR);
         }
-        return Result.fail(exceptions.get(ex.getClass()));
+        return Result.of(exceptions.get(ex.getClass()));
     }
 }

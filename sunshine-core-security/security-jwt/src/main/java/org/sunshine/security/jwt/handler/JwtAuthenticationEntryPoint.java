@@ -19,7 +19,7 @@ public class JwtAuthenticationEntryPoint extends CommonAuthenticationEntryPoint 
     @Override
     protected void handleOtherException(HttpServletResponse response, AuthenticationException authException) {
         if (authException instanceof JwtExpiredException) {
-            WebUtils.renderJson(response, Result.fail(CommonCode.TOKEN_EXPIRED));
+            WebUtils.renderJson(response, Result.of(CommonCode.TOKEN_EXPIRED));
         } else {
             super.handleOtherException(response, authException);
         }

@@ -21,6 +21,6 @@ public class CommonAccessDeniedHandler implements AccessDeniedHandler {
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
-        WebUtils.renderJson(response, Result.fail(CommonCode.UNAUTHORIZED));
+        WebUtils.renderJson(response, Result.of(CommonCode.UNAUTHORIZED));
     }
 }

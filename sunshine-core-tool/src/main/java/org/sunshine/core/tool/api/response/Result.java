@@ -68,16 +68,16 @@ public class Result<T> implements Response {
         return new Result<>(CommonCode.FAIL, msg, data);
     }
 
-    public static <T> Result<T> fail(ResultCode resultCode) {
+    public static <T> Result<T> fail() {
+        return new Result<>(CommonCode.FAIL);
+    }
+
+    public static <T> Result<T> of(ResultCode resultCode) {
         return new Result<>(resultCode);
     }
 
-    public static <T> Result<T> fail(ResultCode resultCode, String msg) {
+    public static <T> Result<T> of(ResultCode resultCode, String msg) {
         return new Result<>(resultCode, msg);
-    }
-
-    public static <T> Result<T> fail() {
-        return new Result<>(CommonCode.FAIL);
     }
 
     public static boolean isSuccess(Result<?> result) {

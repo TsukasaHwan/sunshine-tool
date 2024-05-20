@@ -37,7 +37,7 @@ public class JwtSecurityProperties {
     private Duration refreshTokenExpiresIn = Duration.ofHours(1L);
 
     /**
-     * If the clock of the machine generating the token has a reasonable drift from the machine parsing it, the expiration check may fail.
+     * If the clock of the machine generating the token has a reasonable drift from the machine parsing it, the expiration check may of.
      * In this case you can use this field to allow some wiggle room on the difference between the clocks (1 to 2 minutes should be more than enough, Default is 0)
      */
     private Duration allowedClockSkew = Duration.ofSeconds(0L);
