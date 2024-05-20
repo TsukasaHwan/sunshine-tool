@@ -32,9 +32,17 @@ public class BusinessException extends RuntimeException {
      * @param message 错误信息，描述异常的详细信息。
      */
     public BusinessException(String message) {
-        super(message);
-        // 使用提供的错误信息创建一个失败的结果对象。
-        this.result = Result.fail(message);
+        this(message, Result.fail(message));
+    }
+
+    /**
+     * 构造函数，仅使用结果对象初始化业务异常。
+     * 适用于已存在结果对象的情况。
+     *
+     * @param result 业务操作的结果对象。
+     */
+    public BusinessException(Result<?> result) {
+        this(result.getMsg(), result);
     }
 
     /**
