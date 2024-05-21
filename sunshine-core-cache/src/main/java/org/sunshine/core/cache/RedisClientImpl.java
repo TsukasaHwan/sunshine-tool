@@ -373,4 +373,9 @@ public class RedisClientImpl implements RedisClient {
         }
         return redisTemplate.opsForStream().trim(stream, limit);
     }
+
+    @Override
+    public RedisTemplate<String, Object> redisTemplate() {
+        return this.redisTemplate;
+    }
 }
