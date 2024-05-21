@@ -14,13 +14,7 @@ import java.util.concurrent.TimeUnit;
  * @author Teamo
  * @since 2020/03/30
  */
-public class RedisClientImpl implements RedisClient {
-
-    private final RedisTemplate<String, Object> redisTemplate;
-
-    public RedisClientImpl(RedisTemplate<String, Object> redisTemplate) {
-        this.redisTemplate = redisTemplate;
-    }
+public record RedisClientImpl(RedisTemplate<String, Object> redisTemplate) implements RedisClient {
 
     @Override
     public Boolean expire(String key, long time) {

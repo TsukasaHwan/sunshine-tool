@@ -2,8 +2,9 @@ package org.sunshine.core.cache;
 
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.connection.RedisStreamCommands;
-import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.connection.stream.Record;
+import org.springframework.data.redis.connection.stream.*;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 
 import java.util.List;
@@ -561,4 +562,12 @@ public interface RedisClient {
      * @return Long
      */
     Long streamTrim(String stream, long limit);
+
+    /**
+     * 获取Redis模板对象。
+     * 这个方法用于返回一个配置好的Redis模板，可以在应用程序中直接使用它来操作Redis数据库。
+     *
+     * @return RedisTemplate<String, Object> 返回一个字符串键和对象值的Redis模板。这个模板可以用于执行各种Redis操作，如存取数据、执行命令等。
+     */
+    RedisTemplate<String, Object> redisTemplate();
 }
