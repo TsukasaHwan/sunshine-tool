@@ -8,11 +8,13 @@ import io.swagger.v3.oas.models.parameters.HeaderParameter;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
+import jakarta.annotation.security.PermitAll;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springdoc.core.customizers.OperationCustomizer;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.Assert;
 import org.sunshine.core.tool.api.code.CommonCode;
 
@@ -93,11 +95,18 @@ public interface OpenApiConfiguration {
     @Primary
     default OperationCustomizer operationCustomizer() {
         return (operation, handlerMethod) -> {
-            // TODO
-            @SuppressWarnings("rawtypes")
-            Schema stringSchema = new StringSchema()._default("Bearer ").name("Authorization").description("请求接口Authorization");
-            Parameter headerParameter = new HeaderParameter().name("Authorization").description("请求接口Authorization").schema(stringSchema);
-            return operation.addParametersItem(headerParameter);
+            PermitAll permitAll = handlerMethod.getMethodAnnotation(PermitAll.class);
+            if (permitAll == null) {
+                Class<?> beanType = handlerMethod.getBeanType();
+                permitAll = AnnotatedElementUtils.findMergedAnnotation(beanType, PermitAll.class);
+            }
+            if (permitAll != null) {
+                @SuppressWarnings("rawtypes")
+                Schema stringSchema = new StringSchema()._default("Bearer ").name("Authorization").description("请求接口Authorization");
+                Parameter headerParameter = new HeaderParameter().name("Authorization").description("请求接口Authorization").schema(stringSchema);
+                return operation.addParametersItem(headerParameter);
+            }
+            return operation;
         };
     }
 
