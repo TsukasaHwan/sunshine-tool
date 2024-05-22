@@ -90,11 +90,18 @@ public interface OpenApiConfiguration {
     @Bean
     default OperationCustomizer operationCustomizer() {
         return (operation, handlerMethod) -> {
-            // TODO
-            @SuppressWarnings("rawtypes")
-            Schema stringSchema = new StringSchema()._default("Bearer ").name("Authorization").description("请求接口Authorization");
-            Parameter headerParameter = new HeaderParameter().name("Authorization").description("请求接口Authorization").schema(stringSchema);
-            return operation.addParametersItem(headerParameter);
+            PermitAll permitAll = handlerMethod.getMethodAnnotation(PermitAll.class);
+            if (permitAll == null) {
+                Class<?> beanType = handlerMethod.getBeanType();
+                permitAll = AnnotatedElementUtils.findMergedAnnotation(beanType, PermitAll.class);
+            }
+            if (permitAll != null) {
+                @SuppressWarnings("rawtypes")
+                Schema stringSchema = new StringSchema()._default("Bearer ").name("Authorization").description("请求接口Authorization");
+                Parameter headerParameter = new HeaderParameter().name("Authorization").description("请求接口Authorization").schema(stringSchema);
+                return operation.addParametersItem(headerParameter);
+            }
+            return operation;
         };
     }
 
