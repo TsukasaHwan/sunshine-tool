@@ -104,7 +104,7 @@ public interface OpenApiConfiguration {
                 @SuppressWarnings("rawtypes")
                 Schema stringSchema = new StringSchema()._default("Bearer ").name("Authorization").description("请求接口Authorization");
                 Parameter headerParameter = new HeaderParameter().name("Authorization").description("请求接口Authorization").schema(stringSchema);
-                return operation.addParametersItem(headerParameter);
+                operation.addParametersItem(headerParameter);
             }
             return operation;
         };
