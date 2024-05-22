@@ -19,6 +19,7 @@ import org.springframework.util.Assert;
 import org.sunshine.core.tool.api.code.CommonCode;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * open api配置
@@ -95,12 +96,11 @@ public interface OpenApiConfiguration {
     @Primary
     default OperationCustomizer operationCustomizer() {
         return (operation, handlerMethod) -> {
-            PermitAll permitAll = handlerMethod.getMethodAnnotation(PermitAll.class);
-            if (permitAll == null) {
+            boolean empty = Optional.ofNullable(handlerMethod.getMethodAnnotation(PermitAll.class)).or(() -> {
                 Class<?> beanType = handlerMethod.getBeanType();
-                permitAll = AnnotatedElementUtils.findMergedAnnotation(beanType, PermitAll.class);
-            }
-            if (permitAll != null) {
+                return Optional.ofNullable(AnnotatedElementUtils.findMergedAnnotation(beanType, PermitAll.class));
+            }).isEmpty();
+            if (empty) {
                 @SuppressWarnings("rawtypes")
                 Schema stringSchema = new StringSchema()._default("Bearer ").name("Authorization").description("请求接口Authorization");
                 Parameter headerParameter = new HeaderParameter().name("Authorization").description("请求接口Authorization").schema(stringSchema);
