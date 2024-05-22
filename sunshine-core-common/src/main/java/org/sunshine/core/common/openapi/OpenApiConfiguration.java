@@ -12,9 +12,11 @@ import org.springdoc.core.GroupedOpenApi;
 import org.springdoc.core.customizers.OpenApiCustomiser;
 import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.Assert;
 import org.sunshine.core.tool.api.code.CommonCode;
 
+import javax.annotation.security.PermitAll;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -91,11 +93,11 @@ public interface OpenApiConfiguration {
     @Bean
     default OperationCustomizer operationCustomizer() {
         return (operation, handlerMethod) -> {
-            boolean empty = Optional.ofNullable(handlerMethod.getMethodAnnotation(PermitAll.class)).or(() -> {
+            PermitAll permitAll = Optional.ofNullable(handlerMethod.getMethodAnnotation(PermitAll.class)).orElseGet(() -> {
                 Class<?> beanType = handlerMethod.getBeanType();
-                return Optional.ofNullable(AnnotatedElementUtils.findMergedAnnotation(beanType, PermitAll.class));
-            }).isEmpty();
-            if (empty) {
+                return AnnotatedElementUtils.findMergedAnnotation(beanType, PermitAll.class);
+            });
+            if (permitAll == null) {
                 @SuppressWarnings("rawtypes")
                 Schema stringSchema = new StringSchema()._default("Bearer ").name("Authorization").description("请求接口Authorization");
                 Parameter headerParameter = new HeaderParameter().name("Authorization").description("请求接口Authorization").schema(stringSchema);
