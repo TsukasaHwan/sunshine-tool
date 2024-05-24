@@ -8,6 +8,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -49,7 +50,11 @@ public class RSAUtils {
         String publicKeyString = Base64.getEncoder().encodeToString(publicKey.getEncoded());
         String privateKeyString = Base64.getEncoder().encodeToString(privateKey.getEncoded());
 
-        return Map.of(PUBLIC_KEY, publicKeyString, PRIVATE_KEY, privateKeyString);
+        Map<String, String> keyMap = new HashMap<>(2);
+        keyMap.put(PUBLIC_KEY, publicKeyString);
+        keyMap.put(PRIVATE_KEY, privateKeyString);
+
+        return keyMap;
     }
 
     /**
