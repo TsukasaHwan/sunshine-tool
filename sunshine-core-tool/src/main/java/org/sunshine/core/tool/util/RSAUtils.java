@@ -1,4 +1,4 @@
-package org.sunshine.security.core.util;
+package org.sunshine.core.tool.util;
 
 import javax.crypto.Cipher;
 import java.nio.charset.StandardCharsets;
