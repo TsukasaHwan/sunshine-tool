@@ -11,6 +11,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
+import java.util.Map;
 
 /**
  * @author Teamo
@@ -26,9 +27,19 @@ public class RSAUtils {
     private final static int KEY_SIZE = 2048;
 
     /**
+     * 公钥
+     */
+    private static final String PUBLIC_KEY = "publicKey";
+
+    /**
+     * 私钥
+     */
+    private static final String PRIVATE_KEY = "privateKey";
+
+    /**
      * 随机生成密钥对
      */
-    public static void genKeyPair() throws NoSuchAlgorithmException {
+    public static Map<String, String> genKeyPair() throws NoSuchAlgorithmException {
         // KeyPairGenerator类用于生成公钥和私钥对，基于RSA算法生成对象
         KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance("RSA");
         // 初始化密钥对生成器
@@ -39,13 +50,11 @@ public class RSAUtils {
         RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
         // 得到公钥
         RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
-        String publicKeyString = Base64.getEncoder().encodeToString(publicKey.getEncoded());
 
-        // 得到私钥字符串
+        String publicKeyString = Base64.getEncoder().encodeToString(publicKey.getEncoded());
         String privateKeyString = Base64.getEncoder().encodeToString(privateKey.getEncoded());
 
-        log.info("公钥:{}", publicKeyString);
-        log.info("私钥:{}", privateKeyString);
+        return Map.of(PUBLIC_KEY, publicKeyString, PRIVATE_KEY, privateKeyString);
     }
 
     /**
