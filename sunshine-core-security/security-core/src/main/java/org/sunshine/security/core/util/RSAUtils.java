@@ -1,8 +1,5 @@
 package org.sunshine.security.core.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.crypto.Cipher;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
@@ -18,8 +15,6 @@ import java.util.Map;
  * @since 2023/01/09
  */
 public class RSAUtils {
-
-    private static final Logger log = LoggerFactory.getLogger(RSAUtils.class);
 
     /**
      * 密钥长度 于原文长度对应 以及越长速度越慢
