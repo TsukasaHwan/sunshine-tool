@@ -147,11 +147,11 @@ public class JwtClaimsUtils {
         if (authHeader == null) {
             return null;
         }
-        int indexOf = authHeader.indexOf(ACCESS_TOKEN_PREFIX);
-        if (indexOf == -1) {
+        boolean startsWith = authHeader.startsWith(ACCESS_TOKEN_PREFIX);
+        if (!startsWith) {
             return null;
         }
-        return authHeader.substring(indexOf + 7).trim();
+        return authHeader.substring(ACCESS_TOKEN_PREFIX.length()).trim();
     }
 
     /**
