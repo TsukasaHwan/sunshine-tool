@@ -24,12 +24,12 @@ public class RSAUtils {
     /**
      * 公钥
      */
-    private static final String PUBLIC_KEY = "publicKey";
+    public static final String PUBLIC_KEY = "publicKey";
 
     /**
      * 私钥
      */
-    private static final String PRIVATE_KEY = "privateKey";
+    public static final String PRIVATE_KEY = "privateKey";
 
     /**
      * 随机生成密钥对
