@@ -13,7 +13,8 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.sunshine.security.core.filter.AbstractAuthenticationFilter;
 import org.sunshine.security.core.util.SecurityUtils;
-import org.sunshine.security.jwt.exception.JwtExpiredException;
+import org.sunshine.security.jwt.exception.ExpiredJwtAuthenticationException;
+import org.sunshine.security.jwt.exception.JwtAuthenticationException;
 import org.sunshine.security.jwt.properties.JwtSecurityProperties;
 import org.sunshine.security.jwt.util.JwtClaimsUtils;
 
@@ -101,13 +102,14 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
 
     private void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, Exception e) throws ServletException, IOException {
         SecurityUtils.clearContext();
-        AuthenticationException exception = null;
+        AuthenticationException exception;
         if (e instanceof JwtException) {
             exception = handleJwtException((JwtException) e);
         } else if (e instanceof AuthenticationException) {
             exception = (AuthenticationException) e;
         } else {
             log.error(e.getMessage(), e);
+            exception = new JwtAuthenticationException(e.getMessage());
         }
         authenticationFailureHandler.onAuthenticationFailure(request, response, exception);
     }
@@ -120,10 +122,10 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
      */
     private AuthenticationException handleJwtException(JwtException e) {
         if (e instanceof ExpiredJwtException) {
-            return new JwtExpiredException(e.getMessage());
+            return new ExpiredJwtAuthenticationException(e.getMessage());
         } else {
             log.error(e.getMessage(), e);
+            return new JwtAuthenticationException(e.getMessage());
         }
-        return null;
     }
 }
