@@ -8,7 +8,6 @@ import jakarta.annotation.security.PermitAll;
 import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -147,7 +146,6 @@ public class JwtSecurityConfiguration {
 
     @Bean
     @Primary
-    @ConditionalOnClass(OperationCustomizer.class)
     public OperationCustomizer operationCustomizer() {
         return (operation, handlerMethod) -> {
             boolean empty = Optional.ofNullable(handlerMethod.getMethodAnnotation(PermitAll.class)).or(() -> {
