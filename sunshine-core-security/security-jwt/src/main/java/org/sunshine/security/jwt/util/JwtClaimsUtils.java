@@ -19,8 +19,6 @@ import java.util.Map;
  */
 public class JwtClaimsUtils {
 
-    public static final String ACCESS_TOKEN_PREFIX = "Bearer ";
-
     public static final String REFRESH_TOKEN_CLAIM_KEY = "refresh";
 
     private static JwtSecurityProperties properties;
@@ -143,15 +141,19 @@ public class JwtClaimsUtils {
      * @return JWT
      */
     public static String getToken(HttpServletRequest request) {
-        String authHeader = request.getHeader(properties.getHeader());
-        if (authHeader == null) {
+        String authToken = request.getHeader(getTokenRequestHeader());
+        if (authToken == null || authToken.isBlank()) {
             return null;
         }
-        boolean startsWith = authHeader.startsWith(ACCESS_TOKEN_PREFIX);
-        if (!startsWith) {
-            return null;
+        String tokenPrefix = getTokenPrefix();
+        if (tokenPrefix != null && !tokenPrefix.isBlank()) {
+            boolean startsWith = authToken.startsWith(tokenPrefix);
+            if (!startsWith) {
+                return null;
+            }
+            return authToken.substring(tokenPrefix.length()).trim();
         }
-        return authHeader.substring(ACCESS_TOKEN_PREFIX.length()).trim();
+        return authToken;
     }
 
     /**
@@ -161,5 +163,14 @@ public class JwtClaimsUtils {
      */
     public static String getTokenRequestHeader() {
         return properties.getHeader();
+    }
+
+    /**
+     * 获取token前缀
+     *
+     * @return token前缀
+     */
+    public static String getTokenPrefix() {
+        return properties.getTokenPrefix();
     }
 }

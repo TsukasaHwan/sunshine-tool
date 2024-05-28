@@ -22,6 +22,11 @@ public class JwtSecurityProperties {
     private String header = HttpHeaders.AUTHORIZATION;
 
     /**
+     * Token prefix.
+     */
+    private String tokenPrefix;
+
+    /**
      * Refresh token claim
      */
     private String refreshTokenClaim = "refresh_token";
@@ -108,6 +113,14 @@ public class JwtSecurityProperties {
 
     public void setHeader(String header) {
         this.header = header;
+    }
+
+    public String getTokenPrefix() {
+        return tokenPrefix;
+    }
+
+    public void setTokenPrefix(String tokenPrefix) {
+        this.tokenPrefix = tokenPrefix;
     }
 
     public String getRefreshTokenClaim() {
