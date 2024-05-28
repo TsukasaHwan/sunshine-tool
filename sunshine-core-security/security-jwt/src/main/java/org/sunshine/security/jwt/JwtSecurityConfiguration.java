@@ -1,12 +1,21 @@
 package org.sunshine.security.jwt;
 
+import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.media.StringSchema;
+import io.swagger.v3.oas.models.parameters.HeaderParameter;
+import io.swagger.v3.oas.models.parameters.Parameter;
+import jakarta.annotation.security.PermitAll;
+import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -34,10 +43,7 @@ import org.sunshine.security.jwt.properties.JwtSecurityProperties;
 import org.sunshine.security.jwt.userdetails.JwtUserDetailsService;
 import org.sunshine.security.jwt.util.JwtClaimsUtils;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Teamo
@@ -137,5 +143,26 @@ public class JwtSecurityConfiguration {
         Assert.notNull(secret.getPrivateKey(), "RSAPrivateKey must not be null!");
 
         return new JwtClaimsUtils(jwtSecurityProperties);
+    }
+
+    @Bean
+    @Primary
+    @ConditionalOnClass(OperationCustomizer.class)
+    public OperationCustomizer operationCustomizer() {
+        return (operation, handlerMethod) -> {
+            boolean empty = Optional.ofNullable(handlerMethod.getMethodAnnotation(PermitAll.class)).or(() -> {
+                Class<?> beanType = handlerMethod.getBeanType();
+                return Optional.ofNullable(AnnotatedElementUtils.findMergedAnnotation(beanType, PermitAll.class));
+            }).isEmpty();
+            if (empty) {
+                String header = JwtClaimsUtils.getTokenRequestHeader();
+                String tokenPrefix = JwtClaimsUtils.getTokenPrefix();
+                @SuppressWarnings("rawtypes")
+                Schema stringSchema = new StringSchema()._default(tokenPrefix).name(header).description("请求接口凭证");
+                Parameter headerParameter = new HeaderParameter().name(header).description("请求接口凭证").schema(stringSchema);
+                operation.addParametersItem(headerParameter);
+            }
+            return operation;
+        };
     }
 }

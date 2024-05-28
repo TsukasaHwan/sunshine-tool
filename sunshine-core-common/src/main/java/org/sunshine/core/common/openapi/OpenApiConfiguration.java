@@ -2,24 +2,18 @@ package org.sunshine.core.common.openapi;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.media.Schema;
-import io.swagger.v3.oas.models.media.StringSchema;
-import io.swagger.v3.oas.models.parameters.HeaderParameter;
-import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
-import jakarta.annotation.security.PermitAll;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springdoc.core.customizers.OperationCustomizer;
 import org.springdoc.core.models.GroupedOpenApi;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
-import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.Assert;
 import org.sunshine.core.tool.api.code.CommonCode;
 
 import java.util.Arrays;
-import java.util.Optional;
 
 /**
  * open api配置
@@ -44,17 +38,19 @@ public interface OpenApiConfiguration {
      * @return GroupedOpenApi
      */
     @Bean
-    default GroupedOpenApi groupedOpenApi(OpenApiCustomizer openApiCustomizer, OperationCustomizer operationCustomizer) {
+    default GroupedOpenApi groupedOpenApi(OpenApiCustomizer openApiCustomizer,
+                                          @Autowired(required = false) OperationCustomizer operationCustomizer) {
         GroupedOpenApiConfig groupedOpenApiConfig = groupedOpenApiConfig();
         Assert.notNull(groupedOpenApiConfig, "grouped OpenApi config must not be null!");
-
-        return GroupedOpenApi.builder()
+        GroupedOpenApi.Builder builder = GroupedOpenApi.builder()
                 .group(groupedOpenApiConfig.getGroupName())
                 .pathsToMatch(groupedOpenApiConfig.getPaths())
-                .addOperationCustomizer(operationCustomizer)
                 .packagesToScan(groupedOpenApiConfig.getBasePackage())
-                .addOpenApiCustomizer(openApiCustomizer)
-                .build();
+                .addOpenApiCustomizer(openApiCustomizer);
+        if (operationCustomizer != null) {
+            builder.addOperationCustomizer(operationCustomizer);
+        }
+        return builder.build();
     }
 
     /**
@@ -85,29 +81,6 @@ public interface OpenApiConfiguration {
                     Arrays.stream(CommonCode.values())
                             .forEach(commonCode -> responses.put(String.valueOf(commonCode.code()), new ApiResponse().description(commonCode.msg())));
                 });
-    }
-
-    /**
-     * 默认请求头
-     *
-     * @return OperationCustomizer
-     */
-    @Bean
-    @Primary
-    default OperationCustomizer operationCustomizer() {
-        return (operation, handlerMethod) -> {
-            boolean empty = Optional.ofNullable(handlerMethod.getMethodAnnotation(PermitAll.class)).or(() -> {
-                Class<?> beanType = handlerMethod.getBeanType();
-                return Optional.ofNullable(AnnotatedElementUtils.findMergedAnnotation(beanType, PermitAll.class));
-            }).isEmpty();
-            if (empty) {
-                @SuppressWarnings("rawtypes")
-                Schema stringSchema = new StringSchema()._default("Bearer ").name("Authorization").description("请求接口Authorization");
-                Parameter headerParameter = new HeaderParameter().name("Authorization").description("请求接口Authorization").schema(stringSchema);
-                operation.addParametersItem(headerParameter);
-            }
-            return operation;
-        };
     }
 
     class GroupedOpenApiConfig {
