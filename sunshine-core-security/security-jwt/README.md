@@ -19,6 +19,10 @@ Spring-Security集成JWT
    - ```yaml
      jwt:
        security:
+         # token前缀
+         token-header: Authorization
+         # token前缀
+         token-prefix: Bearer
          # token过期时间
          expires-in: 2H
          # 刷新token资源路径
@@ -44,8 +48,6 @@ Spring-Security集成JWT
            private-key: classpath:app.key
          # 登出路径
          logout-path: /logout
-         # token请求头
-         header: Authorization
      ```
      当然，默认开启了方法级别的注解权限控制，如需使用动态的接口放行可使用注解@PermitAll进行控制。也可自定义注解，只需继承[AbstractSecurityAnnotationSupport](..%2Fsecurity-core%2Fsrc%2Fmain%2Fjava%2Forg%2Fsunshine%2Fsecurity%2Fcore%2Fsupport%2FAbstractSecurityAnnotationSupport.java)类实现hasAnnotation方法并注册Bean到Spring容器即可。
 

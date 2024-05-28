@@ -144,7 +144,7 @@ public class JwtClaimsUtils {
      */
     public static String getToken(HttpServletRequest request) {
         String authToken = request.getHeader(getTokenRequestHeader());
-        if (authToken == null || authToken.isBlank()) {
+        if (authToken == null || "".equals(authToken.trim())) {
             return null;
         }
         String tokenPrefix = getTokenPrefix();
