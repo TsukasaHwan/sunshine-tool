@@ -21,6 +21,8 @@ public class JwtClaimsUtils {
 
     public static final String REFRESH_TOKEN_CLAIM_KEY = "refresh";
 
+    private static final char TOKEN_CONNECTOR_CHAT = ' ';
+
     private static JwtSecurityProperties properties;
 
     public JwtClaimsUtils(JwtSecurityProperties properties) {
@@ -146,14 +148,7 @@ public class JwtClaimsUtils {
             return null;
         }
         String tokenPrefix = getTokenPrefix();
-        if (tokenPrefix != null && !tokenPrefix.isBlank()) {
-            boolean startsWith = authToken.startsWith(tokenPrefix);
-            if (!startsWith) {
-                return null;
-            }
-            return authToken.substring(tokenPrefix.length()).trim();
-        }
-        return authToken;
+        return tokenPrefix == null ? authToken : authToken.startsWith(tokenPrefix) ? authToken.substring(tokenPrefix.length()).trim() : null;
     }
 
     /**
@@ -171,6 +166,6 @@ public class JwtClaimsUtils {
      * @return token前缀
      */
     public static String getTokenPrefix() {
-        return properties.getTokenPrefix();
+        return properties.getTokenPrefix() != null ? properties.getTokenPrefix() + TOKEN_CONNECTOR_CHAT : null;
     }
 }
