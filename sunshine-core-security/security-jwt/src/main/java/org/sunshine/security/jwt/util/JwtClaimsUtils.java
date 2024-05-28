@@ -104,9 +104,9 @@ public class JwtClaimsUtils {
      * @return {@link Jwt}
      */
     public static Jwt getJwt(String subject) {
-        String accessToken = JwtClaimsUtils.accessToken(subject);
-        String refreshToken = JwtClaimsUtils.refreshToken(subject);
-        long time = JwtClaimsUtils.parseToken(accessToken).getExpiration().getTime();
+        String accessToken = accessToken(subject);
+        String refreshToken = refreshToken(subject);
+        long time = parseToken(accessToken).getExpiration().getTime();
         return Jwt.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
