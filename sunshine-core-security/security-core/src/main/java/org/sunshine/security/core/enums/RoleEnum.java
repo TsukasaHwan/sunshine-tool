@@ -13,19 +13,19 @@ public enum RoleEnum {
 
     private final Long id;
 
-    private final String roleName;
+    private final String roleCode;
 
-    RoleEnum(long id, String roleName) {
+    RoleEnum(long id, String roleCode) {
         this.id = id;
-        this.roleName = roleName;
+        this.roleCode = roleCode;
     }
 
     public long getId() {
         return this.id;
     }
 
-    public String getRoleName() {
-        return this.roleName;
+    public String getRoleCode() {
+        return this.roleCode;
     }
 
     public static class RoleCode {
