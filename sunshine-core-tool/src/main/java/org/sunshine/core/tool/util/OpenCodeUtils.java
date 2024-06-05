@@ -18,7 +18,7 @@ public class OpenCodeUtils {
     /**
      * 生成appId
      *
-     * @return 16个字符
+     * @return 16位
      */
     public static String generateAppId() {
         return generateCode(16);
@@ -27,13 +27,13 @@ public class OpenCodeUtils {
     /**
      * 生成appSecret
      *
-     * @return 40个字符
+     * @return 32位
      */
     public static String generateAppSecret(String appId) {
         try {
             String salt = StringUtils.random(8);
             String str = appId + salt;
-            MessageDigest md = MessageDigest.getInstance("SHA-1");
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
             md.update(str.getBytes());
             byte[] digest = md.digest();
             StringBuilder builder = new StringBuilder();
@@ -45,7 +45,7 @@ public class OpenCodeUtils {
                 }
                 builder.append(shaHex);
             }
-            return builder.toString();
+            return builder.substring(0, 32);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException();
