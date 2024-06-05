@@ -27,7 +27,7 @@ public class OpenCodeUtils {
     /**
      * 生成appSecret
      *
-     * @return 32位
+     * @return 40位
      */
     public static String generateAppSecret(String appId) {
         try {
