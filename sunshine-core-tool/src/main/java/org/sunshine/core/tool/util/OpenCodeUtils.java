@@ -18,7 +18,7 @@ public class OpenCodeUtils {
     /**
      * 生成appId
      *
-     * @return 16位
+     * @return 16个字符
      */
     public static String generateAppId() {
         return generateCode(16);
@@ -27,7 +27,7 @@ public class OpenCodeUtils {
     /**
      * 生成appSecret
      *
-     * @return 40位
+     * @return 40个字符
      */
     public static String generateAppSecret(String appId) {
         try {
