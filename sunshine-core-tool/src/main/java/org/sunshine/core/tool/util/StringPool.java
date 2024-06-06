@@ -57,6 +57,7 @@ public interface StringPool {
     String RIGHT_SQ_BRACKET = "]";
     String TRUE = "true";
     String UNDERSCORE = "_";
+    char CHAR_UNDERSCORE = '_';
     String UTF_8 = "UTF-8";
     String GBK = "GBK";
     String ISO_8859_1 = "ISO-8859-1";
