@@ -806,7 +806,7 @@ public class FileUtils extends FileCopyUtils {
             && fileName.lastIndexOf(StringPool.SLASH, fileName.length() - 2) > 0) {
             // 在Linux下多层目录创建存在问题，/会被当成文件名的一部分，此处做处理
             // 使用/拆分路径（zip中无\），级联创建父目录
-            final List<String> pathParts = StringUtils.delimitedListToArrayList(fileName, "/");
+            final List<String> pathParts = List.of(StringUtils.delimitedListToStringArray(fileName, "/"));
             //目录个数
             final int lastPartIndex = pathParts.size() - 1;
             for (int i = 0; i < lastPartIndex; i++) {
