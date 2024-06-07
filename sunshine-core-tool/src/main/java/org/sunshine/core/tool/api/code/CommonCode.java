@@ -34,9 +34,9 @@ public enum CommonCode implements ResultCode {
     SERVER_ERROR(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "系统错误"),
 
     /**
-     * 账号或用户名错误
+     * 用户名或密码错误
      */
-    INCORRECT_CREDENTIALS(HttpServletResponse.SC_BAD_REQUEST, "账号或用户名错误"),
+    INCORRECT_CREDENTIALS(HttpServletResponse.SC_BAD_REQUEST, "用户名或密码错误"),
 
     /**
      * 权限不足，无权操作
