@@ -1,7 +1,6 @@
 package org.sunshine.core.tool.api.code;
 
 import jakarta.servlet.http.HttpServletResponse;
-import org.sunshine.core.tool.api.response.Response;
 
 /**
  * @author Teamo
@@ -9,29 +8,50 @@ import org.sunshine.core.tool.api.response.Response;
  */
 public enum CommonCode implements ResultCode {
 
-    //操作成功
-    SUCCESS(Response.SUCCESS_CODE, Response.SUCCESS),
+    /**
+     * 操作成功
+     */
+    SUCCESS(HttpServletResponse.SC_OK, "操作成功"),
 
-    //权限不足，无权操作
-    UNAUTHORIZED(HttpServletResponse.SC_UNAUTHORIZED, "权限不足，无权操作"),
-
-    //认证失败
-    AUTHENTICATION_FAILED(HttpServletResponse.SC_UNAUTHORIZED, "认证失败"),
-
-    //token过期
-    TOKEN_EXPIRED(HttpServletResponse.SC_FORBIDDEN, "token过期"),
-
-    //操作失败
+    /**
+     * 操作失败
+     */
     FAIL(HttpServletResponse.SC_BAD_REQUEST, "操作失败"),
 
-    //非法参数
+    /**
+     * 非法参数
+     */
     INVALID_PARAM(HttpServletResponse.SC_BAD_REQUEST, "非法参数"),
 
-    //请求方法不支持
-    REQUEST_NOT_SUPPORTED(HttpServletResponse.SC_BAD_REQUEST, "请求方法不支持"),
+    /**
+     * 请求方法不支持
+     */
+    REQUEST_METHOD_NOT_SUPPORTED(HttpServletResponse.SC_BAD_REQUEST, "请求方法不支持"),
 
-    //系统错误
-    SERVER_ERROR(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "系统错误");
+    /**
+     * 系统错误
+     */
+    SERVER_ERROR(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "系统错误"),
+
+    /**
+     * 账号或用户名错误
+     */
+    INCORRECT_CREDENTIALS(HttpServletResponse.SC_BAD_REQUEST, "账号或用户名错误"),
+
+    /**
+     * 权限不足，无权操作
+     */
+    UNAUTHORIZED(HttpServletResponse.SC_UNAUTHORIZED, "权限不足，无权操作"),
+
+    /**
+     * 认证失败
+     */
+    AUTHENTICATION_FAILED(HttpServletResponse.SC_UNAUTHORIZED, "认证失败"),
+
+    /**
+     * token过期
+     */
+    TOKEN_EXPIRED(HttpServletResponse.SC_FORBIDDEN, "token过期");
 
     private final int code;
     private final String msg;

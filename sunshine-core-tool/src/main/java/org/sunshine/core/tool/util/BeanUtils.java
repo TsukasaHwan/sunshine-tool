@@ -313,4 +313,16 @@ public class BeanUtils extends org.springframework.beans.BeanUtils {
             throw new CodeGenerationException(ex);
         }
     }
+
+    @FunctionalInterface
+    public interface BeanCallBack<S, T> {
+
+        /**
+         * Bean转换回调方法
+         *
+         * @param source 源数据
+         * @param target 目标数据
+         */
+        void callBack(S source, T target);
+    }
 }

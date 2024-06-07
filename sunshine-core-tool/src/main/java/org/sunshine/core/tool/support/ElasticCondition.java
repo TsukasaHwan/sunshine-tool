@@ -4,7 +4,7 @@ import co.elastic.clients.elasticsearch._types.FieldSort;
 import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
-import org.sunshine.core.tool.api.request.Query;
+import org.sunshine.core.tool.api.request.PageReqDto;
 import org.sunshine.core.tool.util.StringPool;
 import org.sunshine.core.tool.util.StringUtils;
 
@@ -15,29 +15,28 @@ import java.util.stream.Collectors;
 
 /**
  * @author Teamo
- * @since 2024/5/13
+ * @since 2024/5/14
  */
 public class ElasticCondition extends Condition {
 
     /**
      * 转化成elasticsearch中的分页SearchRequest
      *
-     * @param query 查询条件
-     * @return SearchRequest
+     * @param pageReqDto 查询条件
+     * @return SearchSourceBuilder
      */
-    public static SearchRequest getPageSearchRequest(Query query) {
-        checkQuery(query);
+    public static SearchRequest getPageSearchRequest(PageReqDto pageReqDto) {
         return SearchRequest.of(builder -> {
-            builder.from((query.getCurrent() - 1) * query.getSize());
-            builder.size(query.getSize());
+            builder.from((pageReqDto.getCurrent() - 1) * pageReqDto.getSize());
+            builder.size(pageReqDto.getSize());
 
             List<SortOptions> sorts = new ArrayList<>();
-            String ascs = query.getAscs();
+            String ascs = pageReqDto.getAscs();
             if (StringUtils.isNotBlank(ascs)) {
                 sorts.addAll(buildSortOptions(ascs, SortOrder.Asc));
             }
 
-            String descs = query.getDescs();
+            String descs = pageReqDto.getDescs();
             if (StringUtils.isNotBlank(descs)) {
                 sorts.addAll(buildSortOptions(descs, SortOrder.Desc));
             }

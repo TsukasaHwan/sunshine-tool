@@ -5,6 +5,7 @@ import org.sunshine.core.tool.api.code.CommonCode;
 import org.sunshine.core.tool.api.code.ResultCode;
 import org.sunshine.core.tool.util.ObjectUtils;
 
+import java.io.Serializable;
 import java.util.Optional;
 
 /**
@@ -12,7 +13,7 @@ import java.util.Optional;
  * @since 2020/10/23
  */
 @Schema
-public class Result<T> implements Response {
+public class Result<T> implements Serializable {
 
     @Schema(description = "状态码")
     private int code;
@@ -23,7 +24,7 @@ public class Result<T> implements Response {
     @Schema(description = "数据")
     private T data;
 
-    public Result() {
+    private Result() {
     }
 
     private Result(int code, String msg, T data) {
@@ -82,7 +83,7 @@ public class Result<T> implements Response {
 
     public static boolean isSuccess(Result<?> result) {
         return Optional.ofNullable(result)
-                .map(x -> ObjectUtils.nullSafeEquals(SUCCESS_CODE, x.code))
+                .map(x -> ObjectUtils.nullSafeEquals(CommonCode.SUCCESS.code(), x.code))
                 .orElse(Boolean.FALSE);
     }
 
