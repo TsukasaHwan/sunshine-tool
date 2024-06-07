@@ -1,8 +1,7 @@
-package org.sunshine.core.common.exception;
+package org.sunshine.core.tool.exception;
 
 import org.sunshine.core.tool.api.code.ResultCode;
 import org.sunshine.core.tool.api.response.Result;
-import org.sunshine.core.tool.exception.BusinessException;
 
 /**
  * 异常抛出工具类
@@ -10,7 +9,7 @@ import org.sunshine.core.tool.exception.BusinessException;
  * @author Teamo
  * @since 2019/7/10
  */
-public class ExceptionThrow {
+public class BusinessExceptionUtils {
 
     /**
      * 将给定的消息和结果封装成一个业务异常并抛出。
