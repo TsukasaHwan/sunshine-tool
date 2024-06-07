@@ -1,5 +1,6 @@
 package org.sunshine.core.common.exception;
 
+import org.sunshine.core.tool.api.code.ResultCode;
 import org.sunshine.core.tool.api.response.Result;
 import org.sunshine.core.tool.exception.BusinessException;
 
@@ -33,9 +34,9 @@ public class ExceptionCast {
     /**
      * 将给定的结果信息封装成一个业务异常并抛出。
      *
-     * @param result 相关的结果信息。结果对象中可能包含了需要被抛出的异常的相关信息，例如错误代码或详细错误消息。
+     * @param resultCode 相关的结果信息。结果对象中可能包含了需要被抛出的异常的相关信息，例如错误代码或详细错误消息。
      */
-    public static void cast(Result<?> result) {
-        throw new BusinessException(result);
+    public static void cast(ResultCode resultCode) {
+        throw new BusinessException(resultCode);
     }
 }
