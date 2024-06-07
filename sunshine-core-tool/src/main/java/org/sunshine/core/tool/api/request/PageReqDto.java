@@ -9,7 +9,7 @@ import org.springdoc.api.annotations.ParameterObject;
  */
 @Schema
 @ParameterObject
-public class Query {
+public class PageReqDto {
 
     public static final Integer DEFAULT_CURRENT = 1;
 
@@ -44,7 +44,7 @@ public class Query {
     }
 
     public void setCurrent(Integer current) {
-        this.current = current;
+        this.current = current == null || current <= 0 ? DEFAULT_CURRENT : current;
     }
 
     public Integer getSize() {
@@ -52,7 +52,7 @@ public class Query {
     }
 
     public void setSize(Integer size) {
-        this.size = size;
+        this.size = size == null || size <= 0 ? DEFAULT_SIZE : size;
     }
 
     public String getAscs() {

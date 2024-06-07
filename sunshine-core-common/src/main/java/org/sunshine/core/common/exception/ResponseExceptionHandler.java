@@ -43,7 +43,7 @@ public class ResponseExceptionHandler {
 
     static {
         BUILDER.put(HttpMessageNotReadableException.class, CommonCode.INVALID_PARAM);
-        BUILDER.put(HttpRequestMethodNotSupportedException.class, CommonCode.REQUEST_NOT_SUPPORTED);
+        BUILDER.put(HttpRequestMethodNotSupportedException.class, CommonCode.REQUEST_METHOD_NOT_SUPPORTED);
         BUILDER.put(AccessDeniedException.class, CommonCode.UNAUTHORIZED);
     }
 

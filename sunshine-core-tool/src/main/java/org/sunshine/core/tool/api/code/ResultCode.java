@@ -5,6 +5,7 @@ package org.sunshine.core.tool.api.code;
  * @since 2019/7/10
  */
 public interface ResultCode {
+
     /**
      * 操作码
      *

@@ -5,8 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.sunshine.core.tool.api.request.Query;
-import org.sunshine.core.tool.util.BeanCallBack;
+import org.sunshine.core.tool.api.request.PageReqDto;
 import org.sunshine.core.tool.util.BeanUtils;
 import org.sunshine.core.tool.util.StringPool;
 import org.sunshine.core.tool.util.StringUtils;
@@ -25,14 +24,13 @@ public class Condition {
     /**
      * 转化成mybatis-plus中的Page
      *
-     * @param query 查询条件
+     * @param pageReqDto 查询条件
      * @return IPage
      */
-    public static <T> IPage<T> getPage(Query query) {
-        checkQuery(query);
-        Page<T> page = Page.of(query.getCurrent(), query.getSize());
-        String ascs = query.getAscs();
-        String descs = query.getDescs();
+    public static <T> IPage<T> getPage(PageReqDto pageReqDto) {
+        Page<T> page = Page.of(pageReqDto.getCurrent(), pageReqDto.getSize());
+        String ascs = pageReqDto.getAscs();
+        String descs = pageReqDto.getDescs();
         if (StringUtils.isNotBlank(ascs)) {
             page.addOrder(OrderItem.ascs(getUnderlineColumns(StringUtils.delimitedListToStringArray(ascs, StringPool.COMMA))));
         }
@@ -45,14 +43,13 @@ public class Condition {
     /**
      * 转化成spring-data-jpa中的Page
      *
-     * @param query 查询条件
+     * @param pageReqDto 查询条件
      * @return PageRequest
      */
-    public static PageRequest getPageRequest(Query query) {
-        checkQuery(query);
-        PageRequest pageRequest = PageRequest.of(query.getCurrent(), query.getSize());
-        String ascs = query.getAscs();
-        String descs = query.getDescs();
+    public static PageRequest getPageRequest(PageReqDto pageReqDto) {
+        PageRequest pageRequest = PageRequest.of(pageReqDto.getCurrent(), pageReqDto.getSize());
+        String ascs = pageReqDto.getAscs();
+        String descs = pageReqDto.getDescs();
         if (StringUtils.isNotBlank(ascs)) {
             pageRequest = pageRequest.withSort(Sort.Direction.ASC, getUnderlineColumns(StringUtils.delimitedListToStringArray(ascs, StringPool.COMMA)));
         }
@@ -85,7 +82,7 @@ public class Condition {
      * @param <V>      VO类
      * @return mybatis-plus分页
      */
-    public static <E, V> IPage<V> pageVo(IPage<E> page, Supplier<V> target, BeanCallBack<E, V> callback) {
+    public static <E, V> IPage<V> pageVo(IPage<E> page, Supplier<V> target, BeanUtils.BeanCallBack<E, V> callback) {
         List<E> records = page.getRecords();
         List<V> collect = BeanUtils.copyListProperties(records, target, callback);
         IPage<V> pageVo = Page.of(page.getCurrent(), page.getSize(), page.getTotal());
@@ -101,21 +98,5 @@ public class Condition {
      */
     private static String[] getUnderlineColumns(String[] columns) {
         return Arrays.stream(columns).map(column -> StringUtils.humpToUnderline(StringUtils.cleanIdentifier(column))).toArray(String[]::new);
-    }
-
-    /**
-     * 检查query
-     *
-     * @param query Query
-     */
-    protected static void checkQuery(Query query) {
-        Integer current = query.getCurrent();
-        Integer size = query.getSize();
-        if (current == null || current <= 0) {
-            query.setCurrent(Query.DEFAULT_CURRENT);
-        }
-        if (size == null || size <= 0) {
-            query.setSize(Query.DEFAULT_SIZE);
-        }
     }
 }

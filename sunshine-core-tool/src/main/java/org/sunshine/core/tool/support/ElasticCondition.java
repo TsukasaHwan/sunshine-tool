@@ -4,7 +4,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
-import org.sunshine.core.tool.api.request.Query;
+import org.sunshine.core.tool.api.request.PageReqDto;
 import org.sunshine.core.tool.util.StringPool;
 import org.sunshine.core.tool.util.StringUtils;
 
@@ -22,22 +22,21 @@ public class ElasticCondition extends Condition {
     /**
      * 转化成elasticsearch中的分页SearchSourceBuilder
      *
-     * @param query 查询条件
+     * @param pageReqDto 查询条件
      * @return SearchSourceBuilder
      */
-    public static SearchSourceBuilder getPageSearchSourceBuilder(Query query) {
-        checkQuery(query);
+    public static SearchSourceBuilder getPageSearchSourceBuilder(PageReqDto pageReqDto) {
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        searchSourceBuilder.from((query.getCurrent() - 1) * query.getSize());
-        searchSourceBuilder.size(query.getSize());
+        searchSourceBuilder.from((pageReqDto.getCurrent() - 1) * pageReqDto.getSize());
+        searchSourceBuilder.size(pageReqDto.getSize());
 
         List<SortBuilder<?>> sorts = new ArrayList<>();
-        String ascs = query.getAscs();
+        String ascs = pageReqDto.getAscs();
         if (StringUtils.isNotBlank(ascs)) {
             sorts.addAll(buildSortBuilders(StringUtils.delimitedListToStringArray(ascs, StringPool.COMMA), SortOrder.ASC));
         }
 
-        String descs = query.getDescs();
+        String descs = pageReqDto.getDescs();
         if (StringUtils.isNotBlank(descs)) {
             sorts.addAll(buildSortBuilders(StringUtils.delimitedListToStringArray(descs, StringPool.COMMA), SortOrder.DESC));
         }

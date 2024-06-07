@@ -3,8 +3,9 @@ package org.sunshine.core.tool.api.response;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.data.domain.Page;
-import org.sunshine.core.tool.api.request.Query;
+import org.sunshine.core.tool.api.request.PageReqDto;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
@@ -15,12 +16,12 @@ import java.util.List;
  * @since 2019/7/10
  */
 @Schema
-public class QueryResult<T> implements Response {
+public class PageResult<T> implements Serializable {
 
     /**
-     * 返回数据
+     * 分页数据
      */
-    @Schema(description = "返回数据")
+    @Schema(description = "分页数据")
     private List<T> records;
 
     /**
@@ -47,15 +48,18 @@ public class QueryResult<T> implements Response {
     @Schema(description = "当前满足条件总行数")
     private long total;
 
-    private QueryResult(Query query) {
+    private PageResult() {
+    }
+
+    private PageResult(PageReqDto pageReqDto) {
         this.records = Collections.emptyList();
-        this.current = query.getCurrent();
-        this.size = query.getSize();
+        this.current = pageReqDto.getCurrent();
+        this.size = pageReqDto.getSize();
         this.pages = 0L;
         this.total = 0L;
     }
 
-    private QueryResult(IPage<T> page) {
+    private PageResult(IPage<T> page) {
         this.records = page.getRecords();
         this.current = page.getCurrent();
         this.pages = page.getPages();
@@ -63,7 +67,7 @@ public class QueryResult<T> implements Response {
         this.total = page.getTotal();
     }
 
-    private QueryResult(Page<T> page) {
+    private PageResult(Page<T> page) {
         this.records = page.getContent();
         this.current = page.getNumber();
         this.pages = page.getTotalPages();
@@ -72,36 +76,36 @@ public class QueryResult<T> implements Response {
     }
 
     /**
-     * 返回空的QueryResult
+     * 返回空的PageResult
      *
-     * @param query 分页条件
-     * @param <T>   泛型
-     * @return QueryResult
+     * @param pageReqDto 分页条件
+     * @param <T>        泛型
+     * @return PageResult
      */
-    public static <T> QueryResult<T> newEmptyQueryResult(Query query) {
-        return new QueryResult<>(query);
+    public static <T> PageResult<T> newEmptyPageResult(PageReqDto pageReqDto) {
+        return new PageResult<>(pageReqDto);
     }
 
     /**
-     * 返回QueryResult
+     * 返回PageResult
      *
      * @param page jpa分页接口
      * @param <T>  泛型
-     * @return QueryResult
+     * @return PageResult
      */
-    public static <T> QueryResult<T> newQueryResult(Page<T> page) {
-        return new QueryResult<>(page);
+    public static <T> PageResult<T> newPageResult(Page<T> page) {
+        return new PageResult<>(page);
     }
 
     /**
-     * 返回QueryResult
+     * 返回PageResult
      *
      * @param iPage mybatis-plus分页接口
      * @param <T>   泛型
-     * @return QueryResult
+     * @return PageResult
      */
-    public static <T> QueryResult<T> newQueryResult(IPage<T> iPage) {
-        return new QueryResult<>(iPage);
+    public static <T> PageResult<T> newPageResult(IPage<T> iPage) {
+        return new PageResult<>(iPage);
     }
 
     public List<T> getRecords() {

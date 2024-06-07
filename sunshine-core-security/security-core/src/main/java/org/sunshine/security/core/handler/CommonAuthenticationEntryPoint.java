@@ -4,7 +4,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.AuthenticationEntryPoint;
-import org.sunshine.core.tool.api.code.AdminCode;
 import org.sunshine.core.tool.api.code.CommonCode;
 import org.sunshine.core.tool.api.response.Result;
 import org.sunshine.core.tool.util.WebUtils;
@@ -27,9 +26,9 @@ public class CommonAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
     private void renderExceptionJson(HttpServletResponse response, AuthenticationException authException) {
         if (authException instanceof UsernameNotFoundException) {
-            WebUtils.renderJson(response, Result.of(AdminCode.UNKNOWN_ACCOUNT));
+            WebUtils.renderJson(response, Result.of(CommonCode.INCORRECT_CREDENTIALS));
         } else if (authException instanceof BadCredentialsException) {
-            WebUtils.renderJson(response, Result.of(AdminCode.INCORRECT_CREDENTIALS));
+            WebUtils.renderJson(response, Result.of(CommonCode.INCORRECT_CREDENTIALS));
         } else {
             handleOtherException(response, authException);
         }

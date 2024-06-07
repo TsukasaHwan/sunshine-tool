@@ -7,10 +7,9 @@
 ## 💫使用说明
 
 1. **api包定义接口返回规范**
-   - 统一返回码请实现接口[ResultCode](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Ftool%2Fapi%2Fcode%2FResultCode.java)，当然内部已经定义了一些返回码[AdminCode](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Ftool%2Fapi%2Fcode%2FAdminCode.java)，[CommonCode](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Ftool%2Fapi%2Fcode%2FCommonCode.java)。
-   - 统一分页查询请使用[Query](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Ftool%2Fapi%2Frequest%2FQuery.java)类入参。
-   - 统一接口结果返回请实现接口[Response](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Ftool%2Fapi%2Fresponse%2FResponse.java)，当然内部已经定义了默认的结果返回[Result](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Ftool%2Fapi%2Fresponse%2FResult.java)类。
-   - 统一分页查询结果返回请使用[QueryResult](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Ftool%2Fapi%2Fresponse%2FQueryResult.java)。
+   - 统一返回码请实现接口[ResultCode](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Ftool%2Fapi%2Fcode%2FResultCode.java)，当然内部已经定义了一些返回码[CommonCode](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Ftool%2Fapi%2Fcode%2FCommonCode.java)。
+   - 统一分页查询请使用[PageReqDto](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Ftool%2Fapi%2Frequest%2FPageReqDto.java)类入参。
+   - 统一分页查询结果返回请使用[PageResult](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Ftool%2Fapi%2Fresponse%2FPageResult.java)。
 
 2. **内置了[SpringUtils](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Ftool%2Futil%2FSpringUtils.java)可直接获取Spring容器中的Bean工具类。**
 
@@ -135,12 +134,12 @@
 
    - mybatis-plus
 
-     - 入参为[Query](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Ftool%2Fapi%2Frequest%2FQuery.java)时可使用getPage方法转化成mybatis-plus中的分页查询对象
+     - 入参为[PageReqDto](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Ftool%2Fapi%2Frequest%2FPageReqDto.java)时可使用getPage方法转化成mybatis-plus中的分页查询对象
 
      - pageVo方法可以将mybatis-plus分页查询结果对象转换为vo对象
 
        ```java
-       IPage<Test> page = this.page(Condition.getPage(query), wrapper);
+       IPage<Test> page = this.page(Condition.getPage(pageReqDto), wrapper);
        IPage<TestVo> pageVo = Condition.pageVo(page, TestVo::new);
        ```
 
@@ -148,11 +147,11 @@
 
    - jpa
 
-     - 入参为[Query](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Ftool%2Fapi%2Frequest%2FQuery.java)时可使用getPageRequest方法转化成jpa中的分页查询对象
+     - 入参为[PageReqDto](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Ftool%2Fapi%2Frequest%2FPageReqDto.java)时可使用getPageRequest方法转化成jpa中的分页查询对象
 
    - elasticsearch
 
-     - 入参为[Query](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Ftool%2Fapi%2Frequest%2FQuery.java)时可使用getPageSearchSourceBuilder方法转化成es中带分页参数的查询对象
+     - 入参为[PageReqDto](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Ftool%2Fapi%2Frequest%2FPageReqDto.java)时可使用getPageSearchSourceBuilder方法转化成es中带分页参数的查询对象
 
 10. **内置了一些实用工具，如需了解请查看源码**
 
