@@ -47,6 +47,34 @@ public class BusinessException extends RuntimeException {
     }
 
     /**
+     * 将给定的消息和结果封装成一个业务异常并抛出。
+     *
+     * @param message 业务异常的消息内容。
+     * @param result  相关的结果信息，可以为空。
+     */
+    public static void throwException(String message, Result<?> result) {
+        throw new BusinessException(message, result);
+    }
+
+    /**
+     * 将给定的消息封装成一个业务异常并抛出。
+     *
+     * @param message 业务异常的消息内容。
+     */
+    public static void throwException(String message) {
+        throw new BusinessException(message);
+    }
+
+    /**
+     * 将给定的结果信息封装成一个业务异常并抛出。
+     *
+     * @param resultCode 相关的结果信息。结果对象中可能包含了需要被抛出的异常的相关信息，例如错误代码或详细错误消息。
+     */
+    public static void throwException(ResultCode resultCode) {
+        throw new BusinessException(resultCode);
+    }
+
+    /**
      * 获取业务操作的结果信息。
      *
      * @return Result<?> 返回业务操作的结果，无论成功或失败都会包含相应的信息。
