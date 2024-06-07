@@ -36,7 +36,7 @@ public enum CommonCode implements ResultCode {
     /**
      * 用户名或密码错误
      */
-    INCORRECT_CREDENTIALS(HttpServletResponse.SC_BAD_REQUEST, "用户名或密码错误"),
+    USERNAME_OR_PASSWORD_ERROR(HttpServletResponse.SC_BAD_REQUEST, "用户名或密码错误"),
 
     /**
      * 权限不足，无权操作
