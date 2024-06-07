@@ -1,5 +1,6 @@
 package org.sunshine.core.tool.exception;
 
+import org.sunshine.core.tool.api.code.ResultCode;
 import org.sunshine.core.tool.api.response.Result;
 
 /**
@@ -36,13 +37,13 @@ public class BusinessException extends RuntimeException {
     }
 
     /**
-     * 构造函数，仅使用结果对象初始化业务异常。
-     * 适用于已存在结果对象的情况。
+     * 构造函数，使用结果码初始化业务异常。
+     * 适用于已知结果码的情况。
      *
-     * @param result 业务操作的结果对象。
+     * @param resultCode 业务操作的结果码。
      */
-    public BusinessException(Result<?> result) {
-        this(result.getMsg(), result);
+    public BusinessException(ResultCode resultCode) {
+        this(resultCode.msg(), Result.of(resultCode));
     }
 
     /**
