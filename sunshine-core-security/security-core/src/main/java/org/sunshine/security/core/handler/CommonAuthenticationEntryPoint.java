@@ -26,9 +26,9 @@ public class CommonAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
     private void renderExceptionJson(HttpServletResponse response, AuthenticationException authException) {
         if (authException instanceof UsernameNotFoundException) {
-            WebUtils.renderJson(response, Result.of(CommonCode.INCORRECT_CREDENTIALS));
+            WebUtils.renderJson(response, Result.of(CommonCode.USERNAME_OR_PASSWORD_ERROR));
         } else if (authException instanceof BadCredentialsException) {
-            WebUtils.renderJson(response, Result.of(CommonCode.INCORRECT_CREDENTIALS));
+            WebUtils.renderJson(response, Result.of(CommonCode.USERNAME_OR_PASSWORD_ERROR));
         } else {
             handleOtherException(response, authException);
         }
