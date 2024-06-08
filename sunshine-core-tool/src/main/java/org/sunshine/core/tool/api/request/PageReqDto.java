@@ -40,19 +40,19 @@ public class PageReqDto {
     private String descs;
 
     public Integer getCurrent() {
-        return current;
+        return current == null || current <= 0 ? DEFAULT_CURRENT : current;
     }
 
     public void setCurrent(Integer current) {
-        this.current = current == null || current <= 0 ? DEFAULT_CURRENT : current;
+        this.current = current;
     }
 
     public Integer getSize() {
-        return size;
+        return size == null || size <= 0 ? DEFAULT_SIZE : size;
     }
 
     public void setSize(Integer size) {
-        this.size = size == null || size <= 0 ? DEFAULT_SIZE : size;
+        this.size = size;
     }
 
     public String getAscs() {
