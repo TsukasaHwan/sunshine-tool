@@ -51,13 +51,11 @@ public class JwtSecurityProperties {
      * Accessible resource path.
      */
     private List<String> permitAllPaths = Arrays.asList(
-            "/",
             "/error",
             "/*.html",
             "/*/*.html",
             "/*/*.css",
             "/*/*.js",
-            "/profile/**",
             "/favicon.ico",
             "/swagger-resources/**",
             "/webjars/**",
