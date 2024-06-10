@@ -23,17 +23,12 @@ public class OAuth2AuthorizationServerProperties {
      * Accessible resource path.
      */
     private List<String> permitAllPaths = Arrays.asList(
-            "/",
             "/error",
-            "/*.html",
-            "/*/*.html",
-            "/*/*.css",
-            "/*/*.js",
-            "/profile/**",
-            "/favicon.ico",
-            "/swagger-resources/**",
+            "/doc.html",
+            "/swagger-ui/**",
             "/webjars/**",
-            "/*/api-docs/**"
+            "/*/api-docs/**",
+            "/favicon.ico"
     );
 
     /**
