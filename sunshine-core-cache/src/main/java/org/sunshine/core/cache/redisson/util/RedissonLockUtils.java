@@ -86,22 +86,6 @@ public class RedissonLockUtils {
     /**
      * 尝试获取锁
      *
-     * @param lockKey      锁名称
-     * @param lockConsumer 锁消费者
-     */
-    public static void tryLock(String lockKey, Consumer<Boolean> lockConsumer) {
-        boolean isLocked = false;
-        try {
-            isLocked = tryLock(lockKey);
-            lockConsumer.accept(isLocked);
-        } finally {
-            unlock(isLocked, lockKey);
-        }
-    }
-
-    /**
-     * 尝试获取锁
-     *
      * @param lockKey       锁名称
      * @param lockConsumer  锁消费者
      * @param errorConsumer 异常消费者
@@ -111,7 +95,7 @@ public class RedissonLockUtils {
         try {
             isLocked = tryLock(lockKey);
             lockConsumer.accept(isLocked);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             errorConsumer.accept(e);
         } finally {
             unlock(isLocked, lockKey);
@@ -147,7 +131,7 @@ public class RedissonLockUtils {
         try {
             isLocked = tryLock(lockKey, waitTime, leaseTime, unit);
             lockConsumer.accept(isLocked);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             errorConsumer.accept(e);
         } finally {
             unlock(isLocked, lockKey);
