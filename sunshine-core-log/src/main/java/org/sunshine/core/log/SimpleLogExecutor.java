@@ -32,9 +32,11 @@ public class SimpleLogExecutor implements LogExecutor {
         operateLog.setTime(String.valueOf(time));
         operateLog.setTitle(value);
 
-        if (principal instanceof UserDetails userDetails &&
-            StringUtils.isNotEmpty(userDetails.getUsername())) {
-            operateLog.setCreateBy(userDetails.getUsername());
+        if (principal instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) principal;
+            if (StringUtils.isNotEmpty(userDetails.getUsername())) {
+                operateLog.setCreateBy(userDetails.getUsername());
+            }
         }
 
         LogAbstractUtils.addRequestInfoToLog(WebUtils.getRequest(), operateLog);
