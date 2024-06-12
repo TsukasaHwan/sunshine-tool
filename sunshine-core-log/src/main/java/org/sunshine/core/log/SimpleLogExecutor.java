@@ -6,7 +6,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.sunshine.core.log.annotation.OperateLog;
 import org.sunshine.core.log.event.OperateLogEvent;
 import org.sunshine.core.log.util.LogAbstractUtils;
-import org.sunshine.core.tool.util.ObjectUtils;
 import org.sunshine.core.tool.util.SpringUtils;
 import org.sunshine.core.tool.util.StringUtils;
 import org.sunshine.core.tool.util.WebUtils;
@@ -22,7 +21,7 @@ public class SimpleLogExecutor implements LogExecutor {
 
     @Override
     public void execute(ProceedingJoinPoint point, OperateLog apiLog, long time) {
-        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String className = point.getTarget().getClass().getName();
         String methodName = point.getSignature().getName();
 
@@ -33,8 +32,9 @@ public class SimpleLogExecutor implements LogExecutor {
         operateLog.setTime(String.valueOf(time));
         operateLog.setTitle(value);
 
-        if (ObjectUtils.isNotEmpty(principal) && StringUtils.isNotEmpty(principal.getUsername())) {
-            operateLog.setCreateBy(principal.getUsername());
+        if (principal instanceof UserDetails userDetails &&
+            StringUtils.isNotEmpty(userDetails.getUsername())) {
+            operateLog.setCreateBy(userDetails.getUsername());
         }
 
         LogAbstractUtils.addRequestInfoToLog(WebUtils.getRequest(), operateLog);
