@@ -17,7 +17,7 @@ public abstract class SecurityUtils extends BaseSecurityUtils {
      * @return UserDetails
      */
     public static UserDetails getPrincipal() {
-        return (UserDetails) getAuthentication().getPrincipal();
+        return getAuthentication().getPrincipal() instanceof UserDetails userDetails ? userDetails : null;
     }
 
     /**
@@ -37,7 +37,7 @@ public abstract class SecurityUtils extends BaseSecurityUtils {
      * @return UserDetails
      */
     public static UserDetails getPrincipal(Authentication authentication) {
-        return (UserDetails) authentication.getPrincipal();
+        return authentication.getPrincipal() instanceof UserDetails userDetails ? userDetails : null;
     }
 
 }
