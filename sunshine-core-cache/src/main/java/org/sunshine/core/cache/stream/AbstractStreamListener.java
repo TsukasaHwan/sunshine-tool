@@ -34,22 +34,11 @@ public abstract class AbstractStreamListener<T> implements StreamListener<String
 
     /**
      * 清理消息队列
+     *
+     * @param count 保留数量
      */
     protected void trimStream(long count) {
-        // 定时的清理stream中的数据
         redisClient.streamTrim(redisStreamKey().stream(), count);
-    }
-
-    /**
-     * 清理所有消息队列
-     */
-    protected void trimAllStream() {
-        String stream = redisStreamKey().stream();
-        String group = redisStreamKey().group();
-        redisClient.streamPending(stream, group).ifPresent(pendingMessagesSummary -> {
-            long count = pendingMessagesSummary.getTotalPendingMessages();
-            trimStream(count);
-        });
     }
 
     /**
