@@ -307,6 +307,11 @@ public record RedisClientImpl(RedisTemplate<String, Object> redisTemplate) imple
     }
 
     @Override
+    public StreamInfo.XInfoConsumers streamConsumers(String stream, String group) {
+        return redisTemplate.opsForStream().consumers(stream, group);
+    }
+
+    @Override
     public RecordId streamAdd(StringRecord record) {
         return redisTemplate.opsForStream().add(record);
     }
@@ -358,6 +363,11 @@ public record RedisClientImpl(RedisTemplate<String, Object> redisTemplate) imple
 
     @Override
     public Long streamAck(String stream, String group, String... recordIds) {
+        return redisTemplate.opsForStream().acknowledge(stream, group, recordIds);
+    }
+
+    @Override
+    public Long streamAck(String stream, String group, RecordId... recordIds) {
         return redisTemplate.opsForStream().acknowledge(stream, group, recordIds);
     }
 

@@ -450,6 +450,15 @@ public interface RedisClient {
     boolean streamCreateGroup(String stream, String group);
 
     /**
+     * 获取有关存储在指定键处的流的特定使用者组中每个使用者的信息。
+     *
+     * @param stream Stream key
+     * @param group  组
+     * @return XInfoConsumer
+     */
+    StreamInfo.XInfoConsumers streamConsumers(String stream, String group);
+
+    /**
      * 添加Stream消息
      *
      * @param record StringRecord
@@ -553,6 +562,16 @@ public interface RedisClient {
      * @return Long
      */
     Long streamAck(String stream, String group, String... recordIds);
+
+    /**
+     * Stream确认消息
+     *
+     * @param stream    Stream key
+     * @param group     组
+     * @param recordIds 消息数组
+     * @return Long
+     */
+    Long streamAck(String stream, String group, RecordId... recordIds);
 
     /**
      * 清理指定Stream中的数据
