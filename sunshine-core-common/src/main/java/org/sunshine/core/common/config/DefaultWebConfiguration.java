@@ -20,6 +20,7 @@ import org.sunshine.core.common.exception.ResponseExceptionHandler;
 import org.sunshine.core.tool.datamask.DataMaskJsonFilter;
 import org.sunshine.core.tool.enums.WebFilterOrderEnum;
 import org.sunshine.core.tool.util.DateUtils;
+import org.sunshine.core.tool.util.StringUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -36,13 +37,13 @@ import java.util.List;
 public class DefaultWebConfiguration implements WebMvcConfigurer {
 
     private final Converter<String, LocalDateTime> localDateTimeConverter = (StringToLocalDateTimeConverter) source ->
-            source.isBlank() ? null : LocalDateTime.parse(source, DateUtils.DATETIME_FORMATTER);
+            StringUtils.isBlank(source) ? null : LocalDateTime.parse(source, DateUtils.DATETIME_FORMATTER);
 
     private final Converter<String, LocalDate> localDateConverter = (StringToLocalDateConverter) source ->
-            source.isBlank() ? null : LocalDate.parse(source, DateUtils.DATE_FORMATTER);
+            StringUtils.isBlank(source) ? null : LocalDate.parse(source, DateUtils.DATE_FORMATTER);
 
     private final Converter<String, LocalTime> localTimeConverter = (StringToLocalTimeConverter) source ->
-            source.isBlank() ? null : LocalTime.parse(source, DateUtils.TIME_FORMATTER);
+            StringUtils.isBlank(source) ? null : LocalTime.parse(source, DateUtils.TIME_FORMATTER);
 
     /**
      * 集成fastJson

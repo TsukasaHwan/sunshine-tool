@@ -10,6 +10,7 @@ import org.sunshine.core.cache.RedisClient;
 
 import java.time.Duration;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Teamo
@@ -109,7 +110,7 @@ public abstract class AbstractStreamListener<T> implements StreamListener<String
         oldConsumerTransferMessageMap.forEach((oldConsumer, recordIds) -> {
             // 根据当前consumer去获取另外一个consumer
             StreamInfo.XInfoConsumers consumers = redisClient.streamConsumers(redisStreamKey().stream(), redisStreamKey().group());
-            List<StreamInfo.XInfoConsumer> newConsumers = consumers.stream().filter(consumer -> !consumer.consumerName().equals(oldConsumer)).toList();
+            List<StreamInfo.XInfoConsumer> newConsumers = consumers.stream().filter(consumer -> !consumer.consumerName().equals(oldConsumer)).collect(Collectors.toList());
             newConsumers.forEach(consumer -> {
                 List<MapRecord<String, Object, Object>> mapRecords = redisClient.streamClaim(redisStreamKey().stream(), redisStreamKey().group(), oldConsumer, RedisStreamCommands.XClaimOptions.minIdle(Duration.ofSeconds(10)).ids(recordIds));
                 if (log.isDebugEnabled()) {
