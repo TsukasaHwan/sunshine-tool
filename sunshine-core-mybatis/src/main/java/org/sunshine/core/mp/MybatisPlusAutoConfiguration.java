@@ -1,11 +1,14 @@
 package org.sunshine.core.mp;
 
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.autoconfigure.MybatisPlusInnerInterceptorAutoConfiguration;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.DynamicTableNameInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -20,24 +23,20 @@ import java.util.List;
  * @author Teamo
  * @since 2023/3/31
  */
-@AutoConfiguration
 @EnableTransactionManagement
+@AutoConfiguration(before = MybatisPlusInnerInterceptorAutoConfiguration.class)
 public class MybatisPlusAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(MybatisPlusInterceptor.class)
-    public MybatisPlusInterceptor mybatisPlusInterceptor(@Autowired(required = false) DynamicTableNameHandler dynamicTableNameHandler,
-                                                         @Autowired(required = false) List<InnerInterceptor> innerInterceptorList) {
+    public MybatisPlusInterceptor mybatisPlusInterceptor(List<InnerInterceptor> innerInterceptorList) {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
-        if (dynamicTableNameHandler != null) {
-            DynamicTableNameInnerInterceptor dynamicTableNameInnerInterceptor = new DynamicTableNameInnerInterceptor();
-            dynamicTableNameInnerInterceptor.setTableNameHandler(dynamicTableNameHandler);
-            dynamicTableNameInnerInterceptor.setHook(DynamicTableSuffixContextHolder::clear);
-            interceptor.addInnerInterceptor(dynamicTableNameInnerInterceptor);
+        boolean havePageInterceptor = innerInterceptorList.stream()
+                .anyMatch(innerInterceptor -> innerInterceptor instanceof PaginationInnerInterceptor);
+        if (!havePageInterceptor) {
+            innerInterceptorList.add(new PaginationInnerInterceptor(DbType.MYSQL));
         }
-        if (innerInterceptorList != null && !innerInterceptorList.isEmpty()) {
-            innerInterceptorList.forEach(interceptor::addInnerInterceptor);
-        }
+        innerInterceptorList.forEach(interceptor::addInnerInterceptor);
         return interceptor;
     }
 
@@ -51,5 +50,15 @@ public class MybatisPlusAutoConfiguration {
     @ConditionalOnMissingBean(InsertBatchSqlInjector.class)
     public InsertBatchSqlInjector insertBatchSqlInjector() {
         return new InsertBatchSqlInjector();
+    }
+
+    @Bean
+    @ConditionalOnBean(DynamicTableNameHandler.class)
+    @ConditionalOnMissingBean(DynamicTableNameInnerInterceptor.class)
+    public DynamicTableNameInnerInterceptor dynamicTableNameInnerInterceptor(DynamicTableNameHandler dynamicTableNameHandler) {
+        DynamicTableNameInnerInterceptor dynamicTableNameInnerInterceptor = new DynamicTableNameInnerInterceptor();
+        dynamicTableNameInnerInterceptor.setTableNameHandler(dynamicTableNameHandler);
+        dynamicTableNameInnerInterceptor.setHook(DynamicTableSuffixContextHolder::clear);
+        return dynamicTableNameInnerInterceptor;
     }
 }
