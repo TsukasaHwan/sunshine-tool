@@ -1,10 +1,9 @@
 package org.sunshine.core.mp;
 
-import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.DynamicTableNameInnerInterceptor;
-import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -14,6 +13,8 @@ import org.sunshine.core.mp.extension.injector.InsertBatchSqlInjector;
 import org.sunshine.core.mp.extension.plugin.DynamicTableNameHandler;
 import org.sunshine.core.mp.extension.plugin.DynamicTableSuffixContextHolder;
 import org.sunshine.core.mp.handler.AutoFillMetaObjectHandler;
+
+import java.util.List;
 
 /**
  * @author Teamo
@@ -25,7 +26,8 @@ public class MybatisPlusAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(MybatisPlusInterceptor.class)
-    public MybatisPlusInterceptor mybatisPlusInterceptor(@Autowired(required = false) DynamicTableNameHandler dynamicTableNameHandler) {
+    public MybatisPlusInterceptor mybatisPlusInterceptor(@Autowired(required = false) DynamicTableNameHandler dynamicTableNameHandler,
+                                                         @Autowired(required = false) List<InnerInterceptor> innerInterceptorList) {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
         if (dynamicTableNameHandler != null) {
             DynamicTableNameInnerInterceptor dynamicTableNameInnerInterceptor = new DynamicTableNameInnerInterceptor();
@@ -33,7 +35,9 @@ public class MybatisPlusAutoConfiguration {
             dynamicTableNameInnerInterceptor.setHook(DynamicTableSuffixContextHolder::clear);
             interceptor.addInnerInterceptor(dynamicTableNameInnerInterceptor);
         }
-        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
+        if (innerInterceptorList != null && !innerInterceptorList.isEmpty()) {
+            innerInterceptorList.forEach(interceptor::addInnerInterceptor);
+        }
         return interceptor;
     }
 
