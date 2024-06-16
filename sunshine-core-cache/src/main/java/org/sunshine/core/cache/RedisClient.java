@@ -7,10 +7,7 @@ import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -105,6 +102,14 @@ public interface RedisClient {
      * @return
      */
     Long decr(String key, long delta);
+
+    /**
+     * 批量获取
+     *
+     * @param keys 键
+     * @return 获取多个按键。值按请求的键的顺序排列，缺少字段值使用null在由此产生的列表。
+     */
+    List<Object> multiGet(Collection<String> keys);
 
     // ================================Map=================================//
 
