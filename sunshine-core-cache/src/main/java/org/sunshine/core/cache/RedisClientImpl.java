@@ -57,7 +57,6 @@ public record RedisClientImpl(RedisTemplate<String, Object> redisTemplate) imple
     @Override
     public void set(String key, Object value, long time) {
         if (time > 0) {
-            redisTemplate.opsForValue().multiGet()
             redisTemplate.opsForValue().set(key, value, time, TimeUnit.SECONDS);
         } else {
             set(key, value);
@@ -93,7 +92,6 @@ public record RedisClientImpl(RedisTemplate<String, Object> redisTemplate) imple
     public List<Object> multiGet(Collection<String> keys) {
         return redisTemplate.opsForValue().multiGet(keys);
     }
-
 
     @Override
     public Optional<Object> hget(String key, String item) {
