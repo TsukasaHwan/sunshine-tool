@@ -294,11 +294,11 @@ public class RedisClientImpl implements RedisClient {
     }
 
     @Override
-    public Set<String> scan(String pattern) {
+    public List<String> scan(String pattern) {
         if (pattern == null || "".equals(pattern)) {
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
-        Set<String> keys = new HashSet<>();
+        List<String> keys = new ArrayList<>();
         ScanOptions scanOptions = ScanOptions.scanOptions()
                 .match(pattern)
                 .build();
@@ -312,7 +312,7 @@ public class RedisClientImpl implements RedisClient {
 
     @Override
     public void batchDel(String pattern) {
-        Set<String> keys = scan(pattern);
+        List<String> keys = scan(pattern);
         redisTemplate.delete(keys);
     }
 
