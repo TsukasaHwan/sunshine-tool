@@ -62,6 +62,7 @@ public class RedisClientImpl implements RedisClient {
     @Override
     public void set(String key, Object value, long time) {
         if (time > 0) {
+            redisTemplate.opsForValue().multiGet()
             redisTemplate.opsForValue().set(key, value, time, TimeUnit.SECONDS);
         } else {
             set(key, value);
@@ -91,6 +92,11 @@ public class RedisClientImpl implements RedisClient {
             throw new RuntimeException("递减因子必须大于0");
         }
         return redisTemplate.opsForValue().increment(key, -delta);
+    }
+
+    @Override
+    public List<Object> multiGet(Collection<String> keys) {
+        return redisTemplate.opsForValue().multiGet(keys);
     }
 
 
