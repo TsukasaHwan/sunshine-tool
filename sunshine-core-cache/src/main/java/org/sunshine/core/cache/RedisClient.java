@@ -2,7 +2,6 @@ package org.sunshine.core.cache;
 
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.connection.RedisStreamCommands;
-import org.springframework.data.redis.connection.stream.Record;
 import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
@@ -418,19 +417,19 @@ public interface RedisClient {
     Set<ZSetOperations.TypedTuple<Object>> zsReverseRangeWithScores(String key, long start, long end);
 
     /**
-     * 根据前缀批量获取key
+     * 根据通配符批量获取key
      *
-     * @param prefix
-     * @return
+     * @param pattern 通配符
+     * @return 所有的键
      */
-    Set<String> batchGetKeys(String prefix);
+    Set<String> scan(String pattern);
 
     /**
-     * 根据前缀批量删除key
+     * 根据通配符批量删除key
      *
-     * @param prefix 前缀
+     * @param pattern 通配符
      */
-    void batchDel(String prefix);
+    void batchDel(String pattern);
 
     /**
      * 获取Stream组信息

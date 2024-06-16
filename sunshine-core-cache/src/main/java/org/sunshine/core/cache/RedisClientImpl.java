@@ -4,7 +4,9 @@ import org.springframework.data.domain.Range;
 import org.springframework.data.redis.connection.RedisStreamCommands;
 import org.springframework.data.redis.connection.stream.Record;
 import org.springframework.data.redis.connection.stream.*;
+import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.ZSetOperations;
 
 import java.util.*;
@@ -283,14 +285,26 @@ public record RedisClientImpl(RedisTemplate<String, Object> redisTemplate) imple
     }
 
     @Override
-    public Set<String> batchGetKeys(String prefix) {
-        return prefix == null ? null : redisTemplate.keys(prefix);
+    public Set<String> scan(String pattern) {
+        if (pattern == null || "".equals(pattern)) {
+            return Collections.emptySet();
+        }
+        Set<String> keys = new HashSet<>();
+        ScanOptions scanOptions = ScanOptions.scanOptions()
+                .match(pattern)
+                .build();
+        try (Cursor<String> cursor = redisTemplate.scan(scanOptions)) {
+            while (cursor.hasNext()) {
+                keys.add(cursor.next());
+            }
+        }
+        return keys;
     }
 
     @Override
-    public void batchDel(String prefix) {
-        Set<String> keys = batchGetKeys(prefix);
-        if (keys != null && keys.size() > 0) {
+    public void batchDel(String pattern) {
+        Set<String> keys = scan(pattern);
+        if (keys.size() > 0) {
             redisTemplate.delete(keys);
         }
     }
