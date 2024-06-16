@@ -309,9 +309,7 @@ public class RedisClientImpl implements RedisClient {
     @Override
     public void batchDel(String pattern) {
         Set<String> keys = scan(pattern);
-        if (keys.size() > 0) {
-            redisTemplate.delete(keys);
-        }
+        redisTemplate.delete(keys);
     }
 
     @Override
