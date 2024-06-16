@@ -428,7 +428,7 @@ public interface RedisClient {
      * @param pattern 通配符
      * @return 所有的键
      */
-    Set<String> scan(String pattern);
+    List<String> scan(String pattern);
 
     /**
      * 根据通配符批量删除key
