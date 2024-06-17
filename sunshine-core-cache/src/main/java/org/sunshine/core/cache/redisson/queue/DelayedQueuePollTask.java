@@ -30,6 +30,8 @@ class DelayedQueuePollTask<T> implements Runnable {
             return;
         }
         RBlockingDeque<T> blockingDeque = redissonClient.getBlockingDeque(delayedQueueListener.delayedQueueKey());
+        // 解决消息丢失问题，发送subscribe命令订阅redis队列
+        redissonClient.getDelayedQueue(blockingDeque);
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 T message = blockingDeque.take();
