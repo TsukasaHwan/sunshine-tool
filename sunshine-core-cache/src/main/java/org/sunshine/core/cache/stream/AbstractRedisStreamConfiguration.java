@@ -68,7 +68,7 @@ public abstract class AbstractRedisStreamConfiguration {
                 .batchSize(batchSize)
                 .keySerializer(RedisSerializer.string())
                 .hashKeySerializer(RedisSerializer.string())
-                .hashValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class))
+                .hashValueSerializer(new Jackson2JsonRedisSerializer<>(clazz))
                 .objectMapper(new ObjectHashMapper())
                 // 传递的数据类型
                 .targetType(clazz)
