@@ -98,7 +98,7 @@ public class RedissonLockUtils {
         } catch (Throwable e) {
             errorConsumer.accept(e);
         } finally {
-            unlock(isLocked, lockKey);
+            unlock(lockKey);
         }
     }
 
