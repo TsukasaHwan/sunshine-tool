@@ -18,7 +18,7 @@ import java.util.Scanner;
  * @author Teamo
  * @since 2022/01/07
  */
-public class MyBatisPlusFastAutoGenerator {
+public class MybatisPlusFastAutoGenerator {
 
     public static void generate(String url, String username, String password) {
         String module = scanner("模块名称：");
