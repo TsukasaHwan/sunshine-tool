@@ -40,6 +40,7 @@ public class MybatisPlusFastAutoGenerator {
                             .addTablePrefix(scanner.apply("表前缀："))
                             .addInclude(getTables(scanner.apply("请输入表名，多个以英文逗号分隔，所有输入 all：")))
                             .entityBuilder()
+                            .enableFileOverride()
                             .enableLombok()
                             .disableSerialVersionUID()
                             .addTableFills(new Column(scanner.apply("创建时间字段名："), FieldFill.INSERT))
