@@ -171,7 +171,7 @@ public record RedisClientImpl(RedisTemplate<String, Object> redisTemplate) imple
     }
 
     @Override
-    public Long sSet(String key, long time, Object... values) {
+    public Long sSetWitExpire(String key, long time, Object... values) {
         Long count = redisTemplate.opsForSet().add(key, values);
         if (time > 0) {
             expire(key, time);

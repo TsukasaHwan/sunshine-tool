@@ -240,7 +240,7 @@ public interface RedisClient {
      * @param values 值可以是多个
      * @return 成功个数
      */
-    Long sSet(String key, long time, Object... values);
+    Long sSetWitExpire(String key, long time, Object... values);
 
     /**
      * 获取set缓存的长度
