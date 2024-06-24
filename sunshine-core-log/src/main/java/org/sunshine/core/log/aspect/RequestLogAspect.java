@@ -113,21 +113,13 @@ public class RequestLogAspect {
                         break;
                     }
                 }
-                if (isSkip.get()) {
-                    paramMap.put(parameterName, "此参数不能序列化为json");
-                } else {
-                    paramMap.put(parameterName, list);
-                }
+                paramMap.put(parameterName, isSkip.get() ? "此参数不能序列化为json" : list);
             } else {
                 Field field = null;
                 if (Objects.nonNull(value)) {
                     field = ReflectionUtils.findField(value.getClass(), null, MultipartFile.class);
                 }
-                if (Objects.nonNull(field)) {
-                    paramMap.put(parameterName, "此参数不能序列化为json");
-                } else {
-                    paramMap.put(parameterName, value);
-                }
+                paramMap.put(parameterName, Objects.nonNull(field) ? "此参数不能序列化为json" : value);
             }
         }
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
