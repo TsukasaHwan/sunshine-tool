@@ -75,7 +75,11 @@ public class RequestLogAspect {
             }
             Object value = args[i];
             if (Objects.nonNull(requestBody) && Objects.nonNull(value)) {
-                paramMap.putAll(BeanMap.create(value));
+                if (value instanceof List) {
+                    paramMap.put(parameterName, value);
+                } else {
+                    paramMap.putAll(BeanMap.create(value));
+                }
                 continue;
             }
             if (value instanceof HttpServletRequest) {
