@@ -58,8 +58,6 @@ public class MybatisPlusFastAutoGenerator {
                             .formatServiceImplFileName("I%sServiceImpl")
                             .enableFileOverride()
                             .mapperBuilder()
-                            .enableBaseResultMap()
-                            .enableBaseColumnList()
                             .formatMapperFileName("%sMapper")
                             .formatXmlFileName("%sMapper")
                             .enableFileOverride()
