@@ -43,12 +43,7 @@ public class DistributedLockAspect {
         if (StringUtils.isEmpty(lockName)) {
             if (args.length > 0) {
                 if (StringUtils.isNotEmpty(param)) {
-                    Object arg;
-                    if (annotation.argNum() > 0) {
-                        arg = args[annotation.argNum() - 1];
-                    } else {
-                        arg = args[0];
-                    }
+                    Object arg = annotation.argNum() > 0 ? args[annotation.argNum() - 1] : args[0];
                     lockName = String.valueOf(getParam(arg, param));
                 } else if (annotation.argNum() > 0) {
                     lockName = args[annotation.argNum() - 1].toString();
