@@ -40,14 +40,12 @@ public class DistributedLockAspect {
         String lockName = annotation.name();
         String param = annotation.param();
 
-        if (StringUtils.isEmpty(lockName)) {
-            if (args.length > 0) {
-                if (StringUtils.isNotEmpty(param)) {
-                    Object arg = annotation.argNum() > 0 ? args[annotation.argNum() - 1] : args[0];
-                    lockName = String.valueOf(getParam(arg, param));
-                } else if (annotation.argNum() > 0) {
-                    lockName = args[annotation.argNum() - 1].toString();
-                }
+        if (StringUtils.isEmpty(lockName) && args.length > 0) {
+            if (StringUtils.isNotEmpty(param)) {
+                Object arg = annotation.argNum() > 0 ? args[annotation.argNum() - 1] : args[0];
+                lockName = String.valueOf(getParam(arg, param));
+            } else if (annotation.argNum() > 0) {
+                lockName = args[annotation.argNum() - 1].toString();
             }
         }
 
