@@ -1,2 +1,3 @@
 org.sunshine.core.cache.config.RedissonAutoConfiguration
 org.sunshine.core.cache.config.CacheAutoConfiguration
+org.sunshine.core.cache.config.RedisStreamAutoConfiguration

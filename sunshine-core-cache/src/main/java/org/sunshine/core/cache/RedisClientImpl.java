@@ -1,9 +1,5 @@
 package org.sunshine.core.cache;
 
-import org.springframework.data.domain.Range;
-import org.springframework.data.redis.connection.RedisStreamCommands;
-import org.springframework.data.redis.connection.stream.Record;
-import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
@@ -309,89 +305,5 @@ public record RedisClientImpl(RedisTemplate<String, Object> redisTemplate) imple
     public void batchDel(String pattern) {
         List<String> keys = scan(pattern);
         redisTemplate.delete(keys);
-    }
-
-    @Override
-    public StreamInfo.XInfoGroups streamGroups(String stream) {
-        return redisTemplate.opsForStream().groups(stream);
-    }
-
-    @Override
-    public boolean streamCreateGroup(String stream, String group) {
-        String result = redisTemplate.opsForStream().createGroup(stream, group);
-        return "OK".equals(result);
-    }
-
-    @Override
-    public StreamInfo.XInfoConsumers streamConsumers(String stream, String group) {
-        return redisTemplate.opsForStream().consumers(stream, group);
-    }
-
-    @Override
-    public RecordId streamAdd(StringRecord record) {
-        return redisTemplate.opsForStream().add(record);
-    }
-
-    @Override
-    public RecordId streamAdd(Record<String, ?> record) {
-        return redisTemplate.opsForStream().add(record);
-    }
-
-    @Override
-    public RecordId streamAdd(String stream, Map<String, ?> value) {
-        return redisTemplate.opsForStream().add(stream, value);
-    }
-
-    @Override
-    public <T> List<ObjectRecord<String, T>> streamRangeAll(Class<T> clazz, String stream) {
-        return streamRange(clazz, stream, Range.unbounded());
-    }
-
-    @Override
-    public <T> List<ObjectRecord<String, T>> streamRange(Class<T> clazz, String stream, Range<String> range) {
-        return redisTemplate.opsForStream().range(clazz, stream, range);
-    }
-
-    @Override
-    public Optional<PendingMessagesSummary> streamPending(String stream, String group) {
-        return Optional.ofNullable(redisTemplate.opsForStream().pending(stream, group));
-    }
-
-    @Override
-    public PendingMessages streamPending(String stream, Consumer consumer) {
-        return redisTemplate.opsForStream().pending(stream, consumer);
-    }
-
-    @Override
-    public PendingMessages streamPending(String stream, Consumer consumer, Range<?> range, long count) {
-        return redisTemplate.opsForStream().pending(stream, consumer, range, count);
-    }
-
-    @Override
-    public List<MapRecord<String, Object, Object>> streamClaim(String stream, String consumerGroup, String newOwner, RedisStreamCommands.XClaimOptions xClaimOptions) {
-        return redisTemplate.opsForStream().claim(stream, consumerGroup, newOwner, xClaimOptions);
-    }
-
-    @Override
-    public Long streamAck(String group, Record<String, ?> record) {
-        return redisTemplate.opsForStream().acknowledge(group, record);
-    }
-
-    @Override
-    public Long streamAck(String stream, String group, String... recordIds) {
-        return redisTemplate.opsForStream().acknowledge(stream, group, recordIds);
-    }
-
-    @Override
-    public Long streamAck(String stream, String group, RecordId... recordIds) {
-        return redisTemplate.opsForStream().acknowledge(stream, group, recordIds);
-    }
-
-    @Override
-    public Long streamTrim(String stream, long limit) {
-        if (limit < 0) {
-            throw new RuntimeException("流保留数必须大于或等于0");
-        }
-        return redisTemplate.opsForStream().trim(stream, limit);
     }
 }
