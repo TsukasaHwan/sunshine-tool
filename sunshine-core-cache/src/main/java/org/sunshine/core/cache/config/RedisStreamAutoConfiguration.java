@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.stream.Consumer;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.connection.stream.ReadOffset;
@@ -37,12 +36,8 @@ public class RedisStreamAutoConfiguration {
 
     private final RedisProperties redisProperties;
 
-    private final RedisConnectionFactory redisConnectionFactory;
-
-    public RedisStreamAutoConfiguration(RedisProperties redisProperties,
-                                        RedisConnectionFactory redisConnectionFactory) {
+    public RedisStreamAutoConfiguration(RedisProperties redisProperties) {
         this.redisProperties = redisProperties;
-        this.redisConnectionFactory = redisConnectionFactory;
     }
 
     @Bean
@@ -75,7 +70,7 @@ public class RedisStreamAutoConfiguration {
         Assert.isTrue(options.getPollTimeout().compareTo(redisProperties.getTimeout()) < 0, "Poll timeout must be smaller than 'spring.redis.timeout'!");
 
         StreamMessageListenerContainer<String, ObjectRecord<String, String>> container = StreamMessageListenerContainer
-                .create(redisConnectionFactory, options);
+                .create(redisMQTemplate.redisTemplate().getRequiredConnectionFactory(), options);
 
         String consumerName = buildConsumerName();
         listeners.parallelStream().forEach(listener -> {
