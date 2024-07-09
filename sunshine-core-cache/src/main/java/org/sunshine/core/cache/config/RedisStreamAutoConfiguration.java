@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.support.spring6.data.redis.FastJsonRedisSerializer;
 import com.alibaba.ttl.TtlRunnable;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -52,6 +53,7 @@ public class RedisStreamAutoConfiguration {
      * @return 完整配置的消息监听容器
      */
     @ConditionalOnBean(AbstractStreamListener.class)
+    @ConditionalOnMissingBean(StreamMessageListenerContainer.class)
     @Bean(initMethod = "start", destroyMethod = "stop")
     public StreamMessageListenerContainer<String, ObjectRecord<String, String>> streamMessageListenerContainer(List<AbstractStreamListener<?>> listeners,
                                                                                                                RedisMQTemplate redisMQTemplate) {
