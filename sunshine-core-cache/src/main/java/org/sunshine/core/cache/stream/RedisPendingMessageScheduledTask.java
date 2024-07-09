@@ -39,19 +39,15 @@ public class RedisPendingMessageScheduledTask {
 
     @Scheduled(cron = "30 * * * * ?")
     public void run() {
-        DistributedTaskScheduling scheduling = this::handleDeadLetter;
+        DistributedTaskScheduling scheduling = this::handlePendingMessage;
         scheduling.execute(LOCK_KEY);
     }
 
-    /**
-     * 处理死信
-     */
-    private void handleDeadLetter() {
+    private void handlePendingMessage() {
         StreamOperations<String, Object, Object> ops = redisMQTemplate.redisTemplate().opsForStream();
         listeners.forEach(listener -> {
             String streamKey = listener.getStreamKey();
             String group = listener.getGroup();
-            // 处理死信队列
             // 获取group中的pending消息信息
             PendingMessagesSummary pendingMessagesSummary = ops.pending(streamKey, group);
             if (pendingMessagesSummary == null) {
@@ -67,16 +63,13 @@ public class RedisPendingMessageScheduledTask {
             Map<String, List<RecordId>> oldConsumerTransferMessageMap = new HashMap<>();
             // 遍历每个消费者中的pending消息
             pendingMessagesPerConsumer.forEach((consumer, consumerTotalPendingMessages) -> {
-                // 待重试的 RecordId
                 if (consumerTotalPendingMessages == 0) {
                     return;
                 }
                 // 读取消费者pending队列
                 PendingMessages pendingMessages = ops.pending(streamKey, Consumer.from(group, consumer));
                 List<RecordId> transferGroupMessageList = new ArrayList<>(pendingMessages.size());
-                // 遍历所有pending消息的详情
                 pendingMessages.forEach(pendingMessage -> {
-                    // 消息的ID
                     RecordId recordId = pendingMessage.getId();
                     // 消息从消费组中获取，到此刻的时间
                     Duration elapsedTimeSinceLastDelivery = pendingMessage.getElapsedTimeSinceLastDelivery();
