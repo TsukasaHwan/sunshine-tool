@@ -9,7 +9,7 @@ import org.springframework.data.redis.connection.RedisStreamCommands;
 import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.stream.StreamListener;
 import org.sunshine.core.cache.RedisMQTemplate;
-import org.sunshine.core.tool.util.Exceptions;
+import org.sunshine.core.tool.util.BeanUtils;
 import org.sunshine.core.tool.util.TypeUtils;
 
 import java.lang.reflect.Type;
@@ -42,11 +42,7 @@ public abstract class AbstractStreamListener<T extends AbstractStreamMessage>
 
     protected AbstractStreamListener() {
         this.messageType = getMessageClass();
-        try {
-            this.streamKey = messageType.getDeclaredConstructor().newInstance().getStreamKey();
-        } catch (Exception e) {
-            throw Exceptions.unchecked(e);
-        }
+        this.streamKey = BeanUtils.newInstance(this.messageType).getStreamKey();
     }
 
     public abstract void onMessage(T message);

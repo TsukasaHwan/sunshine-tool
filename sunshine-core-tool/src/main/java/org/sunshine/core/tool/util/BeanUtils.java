@@ -91,9 +91,8 @@ public class BeanUtils extends org.springframework.beans.BeanUtils {
      * @param <T>   泛型标记
      * @return 对象
      */
-    @SuppressWarnings("unchecked")
-    public static <T> T newInstance(Class<?> clazz) {
-        return (T) instantiateClass(clazz);
+    public static <T> T newInstance(Class<T> clazz) {
+        return instantiateClass(clazz);
     }
 
     /**
@@ -103,10 +102,11 @@ public class BeanUtils extends org.springframework.beans.BeanUtils {
      * @param <T>      泛型标记
      * @return 对象
      */
+    @SuppressWarnings("unchecked")
     public static <T> T newInstance(String clazzStr) {
         try {
             Class<?> clazz = Class.forName(clazzStr);
-            return newInstance(clazz);
+            return (T) newInstance(clazz);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
