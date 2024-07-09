@@ -21,6 +21,7 @@ import org.springframework.util.Assert;
 import org.sunshine.core.cache.RedisMQTemplate;
 import org.sunshine.core.cache.RedisMQTemplateImpl;
 import org.sunshine.core.cache.stream.AbstractStreamListener;
+import org.sunshine.core.cache.stream.RedisPendingMessageScheduledTask;
 import org.sunshine.core.tool.util.INetUtils;
 
 import java.lang.management.ManagementFactory;
@@ -99,6 +100,14 @@ public class RedisStreamAutoConfiguration {
             container.register(streamReadRequest, listener);
         });
         return container;
+    }
+
+    @Bean
+    @ConditionalOnBean(AbstractStreamListener.class)
+    @ConditionalOnMissingBean(RedisPendingMessageScheduledTask.class)
+    public RedisPendingMessageScheduledTask redisPendingMessageScheduledTask(List<AbstractStreamListener<?>> listeners,
+                                                                             RedisMQTemplate redisMQTemplate) {
+        return new RedisPendingMessageScheduledTask(listeners, redisMQTemplate);
     }
 
     /**
