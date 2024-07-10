@@ -54,7 +54,7 @@
         <mybatis-plus-generator.version>3.5.7</mybatis-plus-generator.version>
 
         <fastjson.version>2.0.51</fastjson.version>
-        <redisson.version>3.30.0</redisson.version>
+        <redisson.version>3.32.0</redisson.version>
         <knife4j.version>4.5.0</knife4j.version>
 
         <tea-openapi.version>0.2.8</tea-openapi.version>
