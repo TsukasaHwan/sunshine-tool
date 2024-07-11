@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
 @EnableWebSecurity
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(JwtSecurityProperties.class)
-@EnableMethodSecurity(securedEnabled = true, prePostEnabled = true)
+@EnableMethodSecurity(securedEnabled = true)
 @Import(DefaultSecurityConfiguration.class)
 public class JwtSecurityConfiguration {
 
