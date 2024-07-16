@@ -4,19 +4,17 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.http.HttpMethod;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.condition.PathPatternsRequestCondition;
 import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-import org.sunshine.core.tool.util.RegexUtils;
-import org.sunshine.core.tool.util.StringPool;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 /**
  * @author Teamo
@@ -24,11 +22,9 @@ import java.util.regex.Pattern;
  */
 public abstract class AbstractSecurityAnnotationSupport implements InitializingBean, ApplicationContextAware {
 
-    private static final Pattern PATTERN = Pattern.compile("\\{(.*?)}");
-
     protected ApplicationContext context;
 
-    protected MultiValueMap<HttpMethod, String> antPatterns = new LinkedMultiValueMap<>();
+    protected List<AntPathRequestMatcher> antPatterns = new ArrayList<>();
 
     /**
      * Is there any annotation
@@ -80,15 +76,15 @@ public abstract class AbstractSecurityAnnotationSupport implements InitializingB
                 return;
             }
 
-            patterns.forEach(pattern -> antPatterns.add(httpMethod, RegexUtils.replaceAll(pattern, PATTERN, StringPool.ASTERISK)));
+            patterns.forEach(pattern -> antPatterns.add(AntPathRequestMatcher.antMatcher(httpMethod, pattern)));
         });
     }
 
-    public MultiValueMap<HttpMethod, String> getAntPatterns() {
+    public List<AntPathRequestMatcher> getAntPatterns() {
         return antPatterns;
     }
 
-    public void setAntPatterns(MultiValueMap<HttpMethod, String> antPatterns) {
+    public void setAntPatterns(List<AntPathRequestMatcher> antPatterns) {
         this.antPatterns = antPatterns;
     }
 }

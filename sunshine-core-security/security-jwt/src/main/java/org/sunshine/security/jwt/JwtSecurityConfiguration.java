@@ -12,6 +12,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -71,20 +72,20 @@ public class JwtSecurityConfiguration {
 
         List<AntPathRequestMatcher> antPathRequestMatchers = new ArrayList<>(16);
 
-        List<String> permitAllPaths = jwtSecurityProperties.getPermitAllPaths();
+        List<String> permitAllPaths = jwtSecurityProperties.getPermitAllPaths().stream().distinct().collect(Collectors.toList());
         http.authorizeHttpRequests(authorize -> {
             if (!permitAllPaths.isEmpty()) {
-                authorize.antMatchers(permitAllPaths.toArray(new String[0])).permitAll();
-                antPathRequestMatchers.addAll(permitAllPaths.stream().distinct().map(AntPathRequestMatcher::new).collect(Collectors.toList()));
+                authorize.requestMatchers(permitAllPaths.toArray(new String[0])).permitAll();
+                antPathRequestMatchers.addAll(permitAllPaths.stream().map(AntPathRequestMatcher::antMatcher).toList());
             }
-            securityAnnotationSupportList.forEach(annotationSupport -> annotationSupport.getAntPatterns().forEach((httpMethod, antPatterns) -> {
-                Set<String> antPatternsSet = new LinkedHashSet<>(antPatterns);
-                antPatternsSet.removeIf(permitAllPaths::contains);
-                if (!antPatternsSet.isEmpty()) {
-                    authorize.antMatchers(httpMethod, antPatternsSet.toArray(new String[0])).permitAll();
-                    antPathRequestMatchers.addAll(antPatternsSet.stream().map(path -> new AntPathRequestMatcher(path, httpMethod.toString())).collect(Collectors.toList()));
+            securityAnnotationSupportList.forEach(annotationSupport -> {
+                List<AntPathRequestMatcher> antPatterns = annotationSupport.getAntPatterns();
+                antPatterns.removeIf(matcher -> permitAllPaths.contains(matcher.getPattern()));
+                if (!antPatterns.isEmpty()) {
+                    authorize.requestMatchers(antPatterns.toArray(new AntPathRequestMatcher[0])).permitAll();
+                    antPathRequestMatchers.addAll(antPatterns);
                 }
-            }));
+            });
             authorize.anyRequest().authenticated();
         });
 

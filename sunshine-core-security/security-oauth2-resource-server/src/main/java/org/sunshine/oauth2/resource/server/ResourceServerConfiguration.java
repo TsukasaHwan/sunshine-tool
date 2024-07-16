@@ -25,9 +25,8 @@ import org.sunshine.security.core.handler.CommonAuthenticationEntryPoint;
 import org.sunshine.security.core.oauth2.TokenConstant;
 import org.sunshine.security.core.support.AbstractSecurityAnnotationSupport;
 
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Teamo
@@ -51,18 +50,18 @@ public class ResourceServerConfiguration {
                                                    List<AbstractSecurityAnnotationSupport> securityAnnotationSupportList,
                                                    Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter) throws Exception {
         http.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        List<String> permitAllPaths = properties.getPermitAllPaths();
+        List<String> permitAllPaths = properties.getPermitAllPaths().stream().distinct().collect(Collectors.toList());
         http.authorizeHttpRequests(authorize -> {
             if (!permitAllPaths.isEmpty()) {
-                authorize.antMatchers(permitAllPaths.toArray(new String[0])).permitAll();
+                authorize.requestMatchers(permitAllPaths.toArray(new String[0])).permitAll();
             }
-            securityAnnotationSupportList.forEach(annotationSupport -> annotationSupport.getAntPatterns().forEach((httpMethod, antPatterns) -> {
-                Set<String> antPatternsSet = new LinkedHashSet<>(antPatterns);
-                antPatternsSet.removeIf(permitAllPaths::contains);
-                if (!antPatternsSet.isEmpty()) {
-                    authorize.antMatchers(httpMethod, antPatternsSet.toArray(new String[0])).permitAll();
+            securityAnnotationSupportList.forEach(annotationSupport -> {
+                List<AntPathRequestMatcher> antPatterns = annotationSupport.getAntPatterns();
+                antPatterns.removeIf(matcher -> permitAllPaths.contains(matcher.getPattern()));
+                if (!antPatterns.isEmpty()) {
+                    authorize.requestMatchers(antPatterns.toArray(new AntPathRequestMatcher[0])).permitAll();
                 }
-            }));
+            });
             authorize.anyRequest().authenticated();
         });
 
