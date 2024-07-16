@@ -32,8 +32,21 @@ public abstract class SecurityUtils extends BaseSecurityUtils {
     }
 
     /**
+     * 获取指定类型主体
+     *
+     * @param authentication Authentication
+     * @param clazz          class
+     * @param <T>            泛型
+     * @return 实际类型
+     */
+    public static <T extends UserDetails> T getPrincipal(Authentication authentication, Class<T> clazz) {
+        return clazz.cast(getPrincipal(authentication));
+    }
+
+    /**
      * 获取主体
      *
+     * @param authentication Authentication
      * @return UserDetails
      */
     public static UserDetails getPrincipal(Authentication authentication) {
