@@ -1,15 +1,19 @@
 local limit = tonumber(ARGV[1])
-local expire_time = ARGV[2]
-local result = redis.call('SETNX', KEYS[1], 1);
+local expire_time = tonumber(ARGV[2])
 
-if result == 1 then
+local current_count = redis.call('GET', KEYS[1])
+
+if not current_count then
+    redis.call('SET', KEYS[1], 1)
     redis.call('EXPIRE', KEYS[1], expire_time)
     return 1
 else
-    if tonumber(redis.call('GET', KEYS[1])) >= limit then
+    current_count = tonumber(current_count)
+
+    if current_count >= limit then
         return 0
     else
-        limit = redis.call('INCR', KEYS[1])
-        return limit
+        local new_count = redis.call('INCR', KEYS[1])
+        return new_count
     end
-end;
+end
