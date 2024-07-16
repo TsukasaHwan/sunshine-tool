@@ -42,7 +42,9 @@ import org.sunshine.security.jwt.properties.JwtSecurityProperties;
 import org.sunshine.security.jwt.userdetails.JwtUserDetailsService;
 import org.sunshine.security.jwt.util.JwtClaimsUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Teamo
@@ -71,20 +73,20 @@ public class JwtSecurityConfiguration {
 
         List<AntPathRequestMatcher> antPathRequestMatchers = new ArrayList<>(16);
 
-        List<String> permitAllPaths = jwtSecurityProperties.getPermitAllPaths();
+        List<String> permitAllPaths = jwtSecurityProperties.getPermitAllPaths().stream().distinct().toList();
         http.authorizeHttpRequests(authorize -> {
             if (!permitAllPaths.isEmpty()) {
                 authorize.requestMatchers(permitAllPaths.toArray(new String[0])).permitAll();
-                antPathRequestMatchers.addAll(permitAllPaths.stream().distinct().map(AntPathRequestMatcher::new).toList());
+                antPathRequestMatchers.addAll(permitAllPaths.stream().map(AntPathRequestMatcher::antMatcher).toList());
             }
-            securityAnnotationSupportList.forEach(annotationSupport -> annotationSupport.getAntPatterns().forEach((httpMethod, antPatterns) -> {
-                Set<String> antPatternsSet = new LinkedHashSet<>(antPatterns);
-                antPatternsSet.removeIf(permitAllPaths::contains);
-                if (!antPatternsSet.isEmpty()) {
-                    authorize.requestMatchers(httpMethod, antPatternsSet.toArray(new String[0])).permitAll();
-                    antPathRequestMatchers.addAll(antPatternsSet.stream().map(path -> new AntPathRequestMatcher(path, httpMethod.toString())).toList());
+            securityAnnotationSupportList.forEach(annotationSupport -> {
+                List<AntPathRequestMatcher> antPatterns = annotationSupport.getAntPatterns();
+                antPatterns.removeIf(matcher -> permitAllPaths.contains(matcher.getPattern()));
+                if (!antPatterns.isEmpty()) {
+                    authorize.requestMatchers(antPatterns.toArray(new AntPathRequestMatcher[0])).permitAll();
+                    antPathRequestMatchers.addAll(antPatterns);
                 }
-            }));
+            });
             authorize.anyRequest().authenticated();
         });
 

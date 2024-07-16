@@ -15,15 +15,14 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.sunshine.oauth2.authorization.server.properties.OAuth2AuthorizationServerProperties;
 import org.sunshine.security.core.DefaultSecurityConfiguration;
 import org.sunshine.security.core.handler.CommonAccessDeniedHandler;
 import org.sunshine.security.core.handler.CommonAuthenticationEntryPoint;
 import org.sunshine.security.core.support.AbstractSecurityAnnotationSupport;
 
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author Teamo
@@ -47,18 +46,18 @@ public class OAuth2WebSecurityConfiguration {
                                                    List<AbstractSecurityAnnotationSupport> securityAnnotationSupportList) throws Exception {
         http.sessionManagement(sessionManagementConfigurer -> sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        List<String> permitAllPaths = properties.getPermitAllPaths();
+        List<String> permitAllPaths = properties.getPermitAllPaths().stream().distinct().toList();
         http.authorizeHttpRequests(registry -> {
             if (!permitAllPaths.isEmpty()) {
                 registry.requestMatchers(permitAllPaths.toArray(new String[0])).permitAll();
             }
-            securityAnnotationSupportList.forEach(annotationSupport -> annotationSupport.getAntPatterns().forEach((httpMethod, antPatterns) -> {
-                Set<String> antPatternsSet = new LinkedHashSet<>(antPatterns);
-                antPatternsSet.removeIf(permitAllPaths::contains);
-                if (!antPatternsSet.isEmpty()) {
-                    registry.requestMatchers(httpMethod, antPatternsSet.toArray(new String[0])).permitAll();
+            securityAnnotationSupportList.forEach(annotationSupport -> {
+                List<AntPathRequestMatcher> antPatterns = annotationSupport.getAntPatterns();
+                antPatterns.removeIf(matcher -> permitAllPaths.contains(matcher.getPattern()));
+                if (!antPatterns.isEmpty()) {
+                    registry.requestMatchers(antPatterns.toArray(new AntPathRequestMatcher[0])).permitAll();
                 }
-            }));
+            });
             registry.anyRequest().authenticated();
         });
 
