@@ -27,10 +27,6 @@ import java.util.concurrent.TimeUnit;
 @Aspect
 public class RateLimitAspect {
 
-    private final static ResourceScriptSource FIXED_WINDOW_LUA = new ResourceScriptSource(new ClassPathResource("scripts/fixed_window.lua"));
-
-    private final static ResourceScriptSource SLIDING_WINDOW_LUA = new ResourceScriptSource(new ClassPathResource("scripts/sliding_window.lua"));
-
     private final RedisTemplate<String, Object> redisTemplate;
 
     public RateLimitAspect(RedisTemplate<String, Object> redisTemplate) {
@@ -68,19 +64,31 @@ public class RateLimitAspect {
         DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>();
         TimeUnit unit = rateLimit.unit();
         redisScript.setResultType(Long.class);
+        RateLimitManager instance = RateLimitManager.INSTANCE;
         if (type.equals(RateLimit.RateLimitType.FIXED_WINDOW)) {
             // 固定窗口
-            redisScript.setScriptSource(FIXED_WINDOW_LUA);
+            redisScript.setScriptSource(instance.getScriptSource(RateLimit.RateLimitType.FIXED_WINDOW));
             result = redisTemplate.execute(redisScript, keys, rateLimit.limit(), unit.toSeconds(rateLimit.windowSize()));
         } else if (type.equals(RateLimit.RateLimitType.SLIDING_WINDOW)) {
             // 滑动窗口
             long currentTime = System.currentTimeMillis();
             long windowStart = currentTime - unit.toMillis(rateLimit.windowSize());
-            redisScript.setScriptSource(SLIDING_WINDOW_LUA);
+            redisScript.setScriptSource(instance.getScriptSource(RateLimit.RateLimitType.SLIDING_WINDOW));
             result = redisTemplate.execute(redisScript, keys, currentTime, windowStart, rateLimit.limit());
         } else {
             throw new IllegalArgumentException("Invalid rate limit type: " + type);
         }
         return result;
+    }
+
+    private enum RateLimitManager {
+        INSTANCE;
+
+        public ResourceScriptSource getScriptSource(RateLimit.RateLimitType type) {
+            return switch (type) {
+                case FIXED_WINDOW -> new ResourceScriptSource(new ClassPathResource("scripts/fixed_window.lua"));
+                case SLIDING_WINDOW -> new ResourceScriptSource(new ClassPathResource("scripts/sliding_window.lua"));
+            };
+        }
     }
 }
