@@ -18,6 +18,8 @@ import org.sunshine.core.tool.util.StringUtils;
 import org.sunshine.core.tool.util.WebUtils;
 
 import java.lang.reflect.Method;
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -64,16 +66,16 @@ public class RateLimitAspect {
         DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>();
         TimeUnit unit = rateLimit.unit();
         redisScript.setResultType(Long.class);
-        RateLimitManager instance = RateLimitManager.INSTANCE;
+        RateLimitScriptSingleton scriptSingleton = RateLimitScriptSingleton.INSTANCE;
         if (type.equals(RateLimit.RateLimitType.FIXED_WINDOW)) {
             // 固定窗口
-            redisScript.setScriptSource(instance.getScriptSource(RateLimit.RateLimitType.FIXED_WINDOW));
+            redisScript.setScriptSource(scriptSingleton.getScriptSource(RateLimit.RateLimitType.FIXED_WINDOW));
             result = redisTemplate.execute(redisScript, keys, rateLimit.limit(), unit.toSeconds(rateLimit.windowSize()));
         } else if (type.equals(RateLimit.RateLimitType.SLIDING_WINDOW)) {
             // 滑动窗口
             long currentTime = System.currentTimeMillis();
             long windowStart = currentTime - unit.toMillis(rateLimit.windowSize());
-            redisScript.setScriptSource(instance.getScriptSource(RateLimit.RateLimitType.SLIDING_WINDOW));
+            redisScript.setScriptSource(scriptSingleton.getScriptSource(RateLimit.RateLimitType.SLIDING_WINDOW));
             result = redisTemplate.execute(redisScript, keys, currentTime, windowStart, rateLimit.limit());
         } else {
             throw new IllegalArgumentException("Invalid rate limit type: " + type);
@@ -81,14 +83,18 @@ public class RateLimitAspect {
         return result;
     }
 
-    private enum RateLimitManager {
+    private enum RateLimitScriptSingleton {
         INSTANCE;
 
+        private final Map<RateLimit.RateLimitType, ResourceScriptSource> scriptSources = new EnumMap<>(RateLimit.RateLimitType.class);
+
+        {
+            scriptSources.put(RateLimit.RateLimitType.FIXED_WINDOW, new ResourceScriptSource(new ClassPathResource("scripts/fixed_window.lua")));
+            scriptSources.put(RateLimit.RateLimitType.SLIDING_WINDOW, new ResourceScriptSource(new ClassPathResource("scripts/sliding_window.lua")));
+        }
+
         public ResourceScriptSource getScriptSource(RateLimit.RateLimitType type) {
-            return switch (type) {
-                case FIXED_WINDOW -> new ResourceScriptSource(new ClassPathResource("scripts/fixed_window.lua"));
-                case SLIDING_WINDOW -> new ResourceScriptSource(new ClassPathResource("scripts/sliding_window.lua"));
-            };
+            return scriptSources.get(type);
         }
     }
 }
