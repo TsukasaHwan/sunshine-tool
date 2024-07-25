@@ -24,7 +24,6 @@ import org.sunshine.core.cache.stream.AbstractStreamListener;
 import org.sunshine.core.cache.stream.RedisPendingMessageScheduledTask;
 import org.sunshine.core.tool.util.INetUtils;
 
-import java.lang.management.ManagementFactory;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -116,7 +115,7 @@ public class RedisStreamAutoConfiguration {
      * @return 本机IP@PID
      */
     private static String buildConsumerName() {
-        long currentPID = Long.parseLong(ManagementFactory.getRuntimeMXBean().getName().split("@")[0]);
+        long currentPID = ProcessHandle.current().pid();
         return String.format("%s@%d", INetUtils.getHostIp(), currentPID);
     }
 
