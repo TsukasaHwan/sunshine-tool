@@ -7,6 +7,7 @@ import org.springframework.data.redis.connection.RedisStreamCommands;
 import org.springframework.data.redis.connection.stream.Record;
 import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.core.StreamOperations;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.sunshine.core.cache.RedisMQTemplate;
 import org.sunshine.core.cache.support.scheduling.DistributedTaskScheduling;
@@ -22,6 +23,7 @@ import java.util.Map;
  * @author Teamo
  * @since 2024/7/9
  */
+@EnableScheduling
 public class RedisPendingMessageScheduledTask {
 
     private final static Logger log = LoggerFactory.getLogger(RedisPendingMessageScheduledTask.class);
