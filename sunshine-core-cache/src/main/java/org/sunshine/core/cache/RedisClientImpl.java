@@ -1,8 +1,5 @@
 package org.sunshine.core.cache;
 
-import org.springframework.data.domain.Range;
-import org.springframework.data.redis.connection.RedisStreamCommands;
-import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
@@ -314,5 +311,10 @@ public class RedisClientImpl implements RedisClient {
     public void batchDel(String pattern) {
         List<String> keys = scan(pattern);
         redisTemplate.delete(keys);
+    }
+
+    @Override
+    public RedisTemplate<String, Object> redisTemplate() {
+        return this.redisTemplate;
     }
 }

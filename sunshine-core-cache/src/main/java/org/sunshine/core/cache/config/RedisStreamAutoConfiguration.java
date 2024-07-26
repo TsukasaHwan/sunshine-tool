@@ -1,6 +1,6 @@
 package org.sunshine.core.cache.config;
 
-import com.alibaba.fastjson2.support.spring6.data.redis.FastJsonRedisSerializer;
+import com.alibaba.fastjson2.support.spring.data.redis.FastJsonRedisSerializer;
 import com.alibaba.ttl.TtlRunnable;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -24,6 +24,7 @@ import org.sunshine.core.cache.stream.AbstractStreamListener;
 import org.sunshine.core.cache.stream.RedisPendingMessageScheduledTask;
 import org.sunshine.core.tool.util.INetUtils;
 
+import java.lang.management.ManagementFactory;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -115,7 +116,7 @@ public class RedisStreamAutoConfiguration {
      * @return 本机IP@PID
      */
     private static String buildConsumerName() {
-        long currentPID = ProcessHandle.current().pid();
+        long currentPID = Long.parseLong(ManagementFactory.getRuntimeMXBean().getName().split("@")[0]);
         return String.format("%s@%d", INetUtils.getHostIp(), currentPID);
     }
 

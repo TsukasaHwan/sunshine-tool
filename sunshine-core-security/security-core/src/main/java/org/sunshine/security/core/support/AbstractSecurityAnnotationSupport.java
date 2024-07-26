@@ -76,7 +76,7 @@ public abstract class AbstractSecurityAnnotationSupport implements InitializingB
                 return;
             }
 
-            patterns.forEach(pattern -> antPatterns.add(AntPathRequestMatcher.antMatcher(httpMethod, pattern)));
+            patterns.forEach(pattern -> antPatterns.add(new AntPathRequestMatcher(pattern, httpMethod.name())));
         });
     }
 

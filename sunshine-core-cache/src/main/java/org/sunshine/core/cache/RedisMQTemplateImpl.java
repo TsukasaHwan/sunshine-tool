@@ -10,8 +10,18 @@ import org.sunshine.core.cache.stream.AbstractStreamMessage;
  * @author Teamo
  * @since 2024/7/8
  */
-public record RedisMQTemplateImpl(RedisTemplate<String, Object> redisTemplate)
-        implements RedisMQTemplate {
+public class RedisMQTemplateImpl implements RedisMQTemplate {
+
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    public RedisMQTemplateImpl(RedisTemplate<String, Object> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
+
+    @Override
+    public RedisTemplate<String, Object> redisTemplate() {
+        return this.redisTemplate;
+    }
 
     @Override
     public <T extends AbstractStreamMessage> RecordId send(T message) {

@@ -17,6 +17,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.sunshine.oauth2.resource.server.properties.OAuth2ResourceServerProperties;
 import org.sunshine.security.core.SecurityComponentConfiguration;
 import org.sunshine.security.core.enums.RoleEnum;
@@ -53,7 +54,7 @@ public class ResourceServerConfiguration {
         List<String> permitAllPaths = properties.getPermitAllPaths().stream().distinct().collect(Collectors.toList());
         http.authorizeHttpRequests(authorize -> {
             if (!permitAllPaths.isEmpty()) {
-                authorize.requestMatchers(permitAllPaths.toArray(new String[0])).permitAll();
+                authorize.antMatchers(permitAllPaths.toArray(new String[0])).permitAll();
             }
             securityAnnotationSupportList.forEach(annotationSupport -> {
                 List<AntPathRequestMatcher> antPatterns = annotationSupport.getAntPatterns();

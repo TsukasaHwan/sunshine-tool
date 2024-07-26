@@ -12,7 +12,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -42,7 +41,9 @@ import org.sunshine.security.jwt.userdetails.JwtUserDetailsService;
 import org.sunshine.security.jwt.util.JwtClaimsUtils;
 
 import javax.annotation.security.PermitAll;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -75,8 +76,8 @@ public class JwtSecurityConfiguration {
         List<String> permitAllPaths = jwtSecurityProperties.getPermitAllPaths().stream().distinct().collect(Collectors.toList());
         http.authorizeHttpRequests(authorize -> {
             if (!permitAllPaths.isEmpty()) {
-                authorize.requestMatchers(permitAllPaths.toArray(new String[0])).permitAll();
-                antPathRequestMatchers.addAll(permitAllPaths.stream().map(AntPathRequestMatcher::antMatcher).toList());
+                authorize.antMatchers(permitAllPaths.toArray(new String[0])).permitAll();
+                antPathRequestMatchers.addAll(permitAllPaths.stream().map(AntPathRequestMatcher::new).collect(Collectors.toList()));
             }
             securityAnnotationSupportList.forEach(annotationSupport -> {
                 List<AntPathRequestMatcher> antPatterns = annotationSupport.getAntPatterns();

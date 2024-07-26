@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.connection.RedisStreamCommands;
-import org.springframework.data.redis.connection.stream.Record;
 import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.core.StreamOperations;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -18,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Teamo
@@ -100,7 +100,7 @@ public class RedisPendingMessageScheduledTask {
             oldConsumerTransferMessageMap.forEach((oldConsumer, recordIds) -> {
                 // 根据当前consumer去获取另外一个consumer
                 StreamInfo.XInfoConsumers consumers = ops.consumers(streamKey, group);
-                List<StreamInfo.XInfoConsumer> newConsumers = consumers.stream().filter(consumer -> !consumer.consumerName().equals(oldConsumer)).toList();
+                List<StreamInfo.XInfoConsumer> newConsumers = consumers.stream().filter(consumer -> !consumer.consumerName().equals(oldConsumer)).collect(Collectors.toList());
                 newConsumers.forEach(consumer -> {
                     List<MapRecord<String, Object, Object>> mapRecords = ops.claim(streamKey, group, oldConsumer, RedisStreamCommands.XClaimOptions.minIdle(Duration.ofSeconds(10)).ids(recordIds));
                     mapRecords.forEach(entries -> log.info("转移消息 id: {}, value: {}", entries.getId(), entries.getValue()));

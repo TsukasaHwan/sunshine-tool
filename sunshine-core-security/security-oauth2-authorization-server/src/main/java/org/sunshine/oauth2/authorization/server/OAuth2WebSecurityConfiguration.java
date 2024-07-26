@@ -15,15 +15,14 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.sunshine.oauth2.authorization.server.properties.OAuth2AuthorizationServerProperties;
 import org.sunshine.security.core.DefaultSecurityConfiguration;
 import org.sunshine.security.core.handler.CommonAccessDeniedHandler;
 import org.sunshine.security.core.handler.CommonAuthenticationEntryPoint;
 import org.sunshine.security.core.support.AbstractSecurityAnnotationSupport;
 
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -33,7 +32,7 @@ import java.util.stream.Collectors;
 @EnableWebSecurity
 @Configuration(proxyBeanMethods = false)
 @Import(DefaultSecurityConfiguration.class)
-@EnableMethodSecurity(securedEnabled = true, prePostEnabled = true)
+@EnableMethodSecurity(securedEnabled = true)
 @EnableConfigurationProperties(OAuth2AuthorizationServerProperties.class)
 public class OAuth2WebSecurityConfiguration {
 
@@ -51,7 +50,7 @@ public class OAuth2WebSecurityConfiguration {
         List<String> permitAllPaths = properties.getPermitAllPaths().stream().distinct().collect(Collectors.toList());
         http.authorizeHttpRequests(registry -> {
             if (!permitAllPaths.isEmpty()) {
-                registry.requestMatchers(permitAllPaths.toArray(new String[0])).permitAll();
+                registry.antMatchers(permitAllPaths.toArray(new String[0])).permitAll();
             }
             securityAnnotationSupportList.forEach(annotationSupport -> {
                 List<AntPathRequestMatcher> antPatterns = annotationSupport.getAntPatterns();
