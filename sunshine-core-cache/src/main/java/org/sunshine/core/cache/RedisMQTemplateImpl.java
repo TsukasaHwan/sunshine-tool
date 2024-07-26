@@ -20,4 +20,13 @@ public record RedisMQTemplateImpl(RedisTemplate<String, Object> redisTemplate)
         );
     }
 
+    @Override
+    public <T extends AbstractStreamMessage> RecordId send(RecordId recordId, T message) {
+        return redisTemplate.opsForStream().add(
+                Record.of(JSON.toJSONString(message))
+                        .withId(recordId)
+                        .withStreamKey(message.getStreamKey())
+        );
+    }
+
 }
