@@ -25,4 +25,14 @@ public interface RedisMQTemplate {
      * @return {@link RecordId}
      */
     <T extends AbstractStreamMessage> RecordId send(T message);
+
+    /**
+     * 发送消息。
+     *
+     * @param recordId 消息ID
+     * @param message  消息{@link AbstractStreamMessage}
+     * @param <T>      消息类型
+     * @return {@link RecordId}
+     */
+    <T extends AbstractStreamMessage> RecordId send(RecordId recordId, T message);
 }
