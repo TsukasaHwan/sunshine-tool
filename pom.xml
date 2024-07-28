@@ -70,6 +70,8 @@
         <javapoet.version>1.12.1</javapoet.version>
 
         <captcha.version>1.0.6</captcha.version>
+
+        <bcprov-jdk18on.version>1.78.1</bcprov-jdk18on.version>
     </properties>
 
     <dependencyManagement>
