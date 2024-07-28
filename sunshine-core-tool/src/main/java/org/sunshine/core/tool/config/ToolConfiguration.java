@@ -57,11 +57,11 @@ public class ToolConfiguration implements WebMvcConfigurer {
         return RestClient.builder()
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .requestFactory(clientHttpRequestFactory)
-                .messageConverters(converter -> {
+                .messageConverters(converters -> converters.forEach(converter -> {
                     if (converter instanceof StringHttpMessageConverter stringHttpMessageConverter) {
                         stringHttpMessageConverter.setDefaultCharset(StandardCharsets.UTF_8);
                     }
-                })
+                }))
                 .build();
     }
 
