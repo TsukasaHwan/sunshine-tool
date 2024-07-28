@@ -11,7 +11,6 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.security.Security;
 
 /**
@@ -39,7 +38,7 @@ public class SM2Util {
      */
     public static AsymmetricCipherKeyPair generateKeyPair() {
         ECKeyPairGenerator generator = new ECKeyPairGenerator();
-        generator.init(new ECKeyGenerationParameters(DOMAIN_PARAMS, new SecureRandom()));
+        generator.init(new ECKeyGenerationParameters(DOMAIN_PARAMS, Holder.SECURE_RANDOM));
         return generator.generateKeyPair();
     }
 
@@ -65,7 +64,7 @@ public class SM2Util {
     public static byte[] encrypt(String input, ECPublicKeyParameters publicKey) {
         try {
             SM2Engine engine = new SM2Engine();
-            engine.init(true, new ParametersWithRandom(publicKey, new SecureRandom()));
+            engine.init(true, new ParametersWithRandom(publicKey, Holder.SECURE_RANDOM));
             byte[] inputBytes = input.getBytes();
             return engine.processBlock(inputBytes, 0, inputBytes.length);
         } catch (Exception e) {
@@ -134,7 +133,7 @@ public class SM2Util {
     public static byte[] sign(String input, ECPrivateKeyParameters privateKey) {
         try {
             SM2Signer signer = new SM2Signer();
-            signer.init(true, new ParametersWithRandom(privateKey, new SecureRandom()));
+            signer.init(true, new ParametersWithRandom(privateKey, Holder.SECURE_RANDOM));
             byte[] inputBytes = input.getBytes();
             signer.update(inputBytes, 0, inputBytes.length);
             return signer.generateSignature();
