@@ -37,7 +37,7 @@ public class AsyncConfiguration implements AsyncConfigurer {
         //线程池中任务的等待时间，如果超过这个时候还没有销毁就强制销毁
         executor.setAwaitTerminationSeconds(60);
         //线程名称的前缀
-        executor.setThreadNamePrefix("async-executor-");
+        executor.setThreadNamePrefix("async-thread-");
         // setRejectedExecutionHandler：当pool已经达到max size的时候，如何处理新任务
         // CallerRunsPolicy：不在新线程中执行任务，而是由调用者所在的线程来执行
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());

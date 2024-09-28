@@ -2,6 +2,7 @@ package org.sunshine.core.cache.config;
 
 import com.alibaba.fastjson2.support.spring6.data.redis.FastJsonRedisSerializer;
 import com.alibaba.ttl.TtlRunnable;
+import org.springframework.beans.BeanUtils;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -20,25 +21,29 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.Assert;
 import org.sunshine.core.cache.RedisMQTemplate;
 import org.sunshine.core.cache.RedisMQTemplateImpl;
+import org.sunshine.core.cache.properties.RedisStreamProperties;
 import org.sunshine.core.cache.stream.AbstractStreamListener;
 import org.sunshine.core.cache.stream.RedisPendingMessageScheduledTask;
 import org.sunshine.core.tool.util.INetUtils;
 
 import java.util.List;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.RejectedExecutionHandler;
 
 /**
  * @author Teamo
  * @since 2023/5/26
  */
 @AutoConfiguration(after = CacheAutoConfiguration.class)
-@EnableConfigurationProperties(RedisProperties.class)
+@EnableConfigurationProperties({RedisProperties.class, RedisStreamProperties.class})
 public class RedisStreamAutoConfiguration {
 
     private final RedisProperties redisProperties;
+    private final RedisStreamProperties redisStreamProperties;
 
-    public RedisStreamAutoConfiguration(RedisProperties redisProperties) {
+    public RedisStreamAutoConfiguration(RedisProperties redisProperties,
+                                        RedisStreamProperties redisStreamProperties) {
         this.redisProperties = redisProperties;
+        this.redisStreamProperties = redisStreamProperties;
     }
 
     @Bean
@@ -57,17 +62,17 @@ public class RedisStreamAutoConfiguration {
     @Bean(initMethod = "start", destroyMethod = "stop")
     public StreamMessageListenerContainer<String, ObjectRecord<String, String>> streamMessageListenerContainer(List<AbstractStreamListener<?>> listeners,
                                                                                                                RedisMQTemplate redisMQTemplate) {
-        StreamMessageListenerContainer.StreamMessageListenerContainerOptions<String, ObjectRecord<String, String>> options =
-                StreamMessageListenerContainer.StreamMessageListenerContainerOptions.builder()
-                        // 批量抓取消息
-                        .batchSize(10)
-                        .keySerializer(RedisSerializer.string())
-                        .hashKeySerializer(RedisSerializer.string())
-                        .hashValueSerializer(new FastJsonRedisSerializer<>(String.class))
-                        .objectMapper(new ObjectHashMapper())
-                        .targetType(String.class)
-                        .executor(getExecutor())
-                        .build();
+        StreamMessageListenerContainer.StreamMessageListenerContainerOptionsBuilder<String, ObjectRecord<String, String>> optionsBuilder = StreamMessageListenerContainer.StreamMessageListenerContainerOptions.builder()
+                .batchSize(redisStreamProperties.getBatchSize())
+                .keySerializer(RedisSerializer.string())
+                .hashKeySerializer(RedisSerializer.string())
+                .hashValueSerializer(new FastJsonRedisSerializer<>(String.class))
+                .objectMapper(new ObjectHashMapper())
+                .targetType(String.class);
+        if (redisStreamProperties.getThreadPool().isEnable()) {
+            optionsBuilder.executor(redisStreamThreadPoolExecutor());
+        }
+        StreamMessageListenerContainer.StreamMessageListenerContainerOptions<String, ObjectRecord<String, String>> options = optionsBuilder.build();
 
         Assert.isTrue(options.getPollTimeout().compareTo(redisProperties.getTimeout()) < 0, "Poll timeout must be smaller than 'spring.redis.timeout'!");
 
@@ -120,31 +125,22 @@ public class RedisStreamAutoConfiguration {
     }
 
     /**
-     * 获取线程池
+     * 配置一个用于Redis Stream操作的线程池执行器
      *
-     * @return 线程池
+     * @return 配置好的ThreadPoolTaskExecutor实例
      */
-    private ThreadPoolTaskExecutor getExecutor() {
-        int corePoolSize = Runtime.getRuntime().availableProcessors() * 2;
+    private ThreadPoolTaskExecutor redisStreamThreadPoolExecutor() {
+        RedisStreamProperties.ThreadPool threadPool = redisStreamProperties.getThreadPool();
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        //核心线程池数量
-        executor.setCorePoolSize(corePoolSize);
-        //最大线程数量
-        executor.setMaxPoolSize(Math.max(corePoolSize * 4, 512));
-        //线程池的队列容量
-        executor.setQueueCapacity(500);
-        //当线程超过corePoolSize，线程存活时间
-        executor.setKeepAliveSeconds(60);
-        //用来设置线程池关闭的时候等待所有任务都完成再继续销毁其他的Bean
-        executor.setWaitForTasksToCompleteOnShutdown(true);
-        //线程池中任务的等待时间，如果超过这个时候还没有销毁就强制销毁
-        executor.setAwaitTerminationSeconds(120);
-        //线程名称的前缀
-        executor.setThreadNamePrefix("redis-stream-executor-");
-        // setRejectedExecutionHandler：当pool已经达到max size的时候，如何处理新任务
-        // CallerRunsPolicy：不在新线程中执行任务，而是由调用者所在的线程来执行
-        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-        // 解决子线程无法获取父线程的上下文数据
+        executor.setCorePoolSize(threadPool.getCorePoolSize());
+        executor.setMaxPoolSize(threadPool.getMaxPoolSize());
+        executor.setQueueCapacity(threadPool.getQueueCapacity());
+        executor.setKeepAliveSeconds(threadPool.getKeepAliveSeconds());
+        executor.setWaitForTasksToCompleteOnShutdown(threadPool.getWaitForJobsToCompleteOnShutdown());
+        executor.setAwaitTerminationSeconds(threadPool.getAwaitTerminationSeconds());
+        executor.setThreadNamePrefix(threadPool.getThreadNamePrefix());
+        RejectedExecutionHandler rejectedExecutionHandler = BeanUtils.instantiateClass(threadPool.getRejectedExecutionHandler());
+        executor.setRejectedExecutionHandler(rejectedExecutionHandler);
         executor.setTaskDecorator(TtlRunnable::get);
         executor.initialize();
         return executor;
