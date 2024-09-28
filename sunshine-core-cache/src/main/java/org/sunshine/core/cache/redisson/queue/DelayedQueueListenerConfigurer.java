@@ -31,8 +31,17 @@ public class DelayedQueueListenerConfigurer implements InitializingBean, Disposa
 
     @Override
     public void destroy() throws Exception {
-        if (delayedThreadPoolExecutor != null) {
+        if (delayedThreadPoolExecutor == null) {
+            return;
+        }
+        delayedThreadPoolExecutor.shutdown();
+        try {
+            if (!delayedThreadPoolExecutor.awaitTermination(60, TimeUnit.SECONDS)) {
+                delayedThreadPoolExecutor.shutdownNow();
+            }
+        } catch (InterruptedException ex) {
             delayedThreadPoolExecutor.shutdownNow();
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -41,7 +50,7 @@ public class DelayedQueueListenerConfigurer implements InitializingBean, Disposa
         Assert.notEmpty(delayedQueueListenerList, "delayedQueueListenerList must not be empty!");
 
         ThreadFactory namedThreadFactory = new ThreadFactoryBuilder().setNameFormat("delayed-queue-pool-%d").build();
-        int numberOfJob = delayedQueueListenerList.size();
+        int numberOfJob = delayedQueueListenerList.stream().filter(DelayedQueueListener::isEnable).toList().size();
         delayedThreadPoolExecutor = new ThreadPoolExecutor(
                 numberOfJob,
                 numberOfJob,
