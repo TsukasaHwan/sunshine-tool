@@ -37,7 +37,7 @@ public abstract class AbstractSecurityAnnotationSupport implements InitializingB
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        RequestMappingHandlerMapping mapping = context.getBean(RequestMappingHandlerMapping.class);
+        RequestMappingHandlerMapping mapping = context.getBean("requestMappingHandlerMapping", RequestMappingHandlerMapping.class);
         mapping.getHandlerMethods().forEach((requestMappingInfo, handlerMethod) -> {
             boolean hasAnnotation = hasAnnotation(requestMappingInfo, handlerMethod);
             if (hasAnnotation) {
