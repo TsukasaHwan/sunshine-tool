@@ -46,6 +46,7 @@ public class RedissonAutoConfiguration {
      */
     @Bean(destroyMethod = "shutdown")
     @ConditionalOnMissingBean(RedissonClient.class)
+    @SuppressWarnings("deprecation")
     public RedissonClient redissonClient() {
         Config config = new Config();
         SingleServerConfig singleServerConfig = config.useSingleServer();

@@ -114,6 +114,7 @@ public class CacheAutoConfiguration {
      * @param redisSerializer redis序列化器
      * @return 一个完整配置的redis序列化器
      */
+    @SuppressWarnings("deprecation")
     private RedisSerializer<?> getRedisSerializer(RedisSerializer<?> redisSerializer) {
         Assert.notNull(redisSerializer, "RedisSerializer must not be null!");
         if (redisSerializer instanceof Jackson2JsonRedisSerializer<?>) {
