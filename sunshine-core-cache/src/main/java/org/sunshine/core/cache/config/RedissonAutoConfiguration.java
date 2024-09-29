@@ -82,7 +82,7 @@ public class RedissonAutoConfiguration {
         return new DistributedLockAspect();
     }
 
-    @Bean
+    @Bean(destroyMethod = "destroy")
     @ConditionalOnBean(DelayedQueueListener.class)
     public DelayedQueueListenerConfigurer delayedQueueListenerConfigurer(List<DelayedQueueListener<?>> delayedQueueListenerList, RedissonClient redissonClient) {
         return new DelayedQueueListenerConfigurer(delayedQueueListenerList, redissonClient);
