@@ -4,6 +4,9 @@ import org.redisson.api.RBlockingDeque;
 import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sunshine.core.tool.support.Try;
+
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @author Teamo
@@ -17,15 +20,16 @@ class DelayedQueuePollTask<T> implements Runnable {
 
     private final DelayedQueueListener<T> delayedQueueListener;
 
+    private ThreadPoolExecutor delayedThreadPoolExecutor;
+
     public DelayedQueuePollTask(RedissonClient redissonClient, DelayedQueueListener<T> delayedQueueListener) {
         this.redissonClient = redissonClient;
         this.delayedQueueListener = delayedQueueListener;
+        this.delayedThreadPoolExecutor = delayedQueueListener.getThreadPoolExecutor();
     }
 
     @Override
     public void run() {
-        String threadName = "delayed-queue-listener-" + delayedQueueListener.getClass().getSimpleName();
-        Thread.currentThread().setName(threadName);
         if (!delayedQueueListener.isEnable()) {
             return;
         }
@@ -35,7 +39,7 @@ class DelayedQueuePollTask<T> implements Runnable {
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 T message = blockingDeque.take();
-                delayedQueueListener.consume(message);
+                consume(message);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             } catch (Exception e) {
@@ -43,6 +47,31 @@ class DelayedQueuePollTask<T> implements Runnable {
             } finally {
                 delayedQueueListener.whenExceptionFinally();
             }
+        }
+    }
+
+    /**
+     * 销毁线程池
+     */
+    public void destroy() {
+        if (delayedThreadPoolExecutor == null) {
+            return;
+        }
+        delayedThreadPoolExecutor.shutdown();
+        delayedThreadPoolExecutor = null;
+    }
+
+    /**
+     * 消费消息
+     *
+     * @param message 消息
+     * @throws Exception 异常
+     */
+    private void consume(T message) throws Exception {
+        if (delayedThreadPoolExecutor != null) {
+            delayedThreadPoolExecutor.execute(Try.run(() -> delayedQueueListener.consume(message), throwable -> log.error(throwable.getMessage(), throwable)));
+        } else {
+            delayedQueueListener.consume(message);
         }
     }
 }

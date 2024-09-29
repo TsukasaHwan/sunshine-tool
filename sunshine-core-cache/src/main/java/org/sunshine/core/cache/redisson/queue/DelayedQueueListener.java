@@ -1,5 +1,7 @@
 package org.sunshine.core.cache.redisson.queue;
 
+import java.util.concurrent.ThreadPoolExecutor;
+
 /**
  * @author Teamo
  * @since 2022/11/09
@@ -29,6 +31,15 @@ public interface DelayedQueueListener<T> {
      * @throws Exception Exception
      */
     void consume(T message) throws Exception;
+
+    /**
+     * 默认线程池
+     *
+     * @return ThreadPoolExecutor
+     */
+    default ThreadPoolExecutor getThreadPoolExecutor() {
+        return null;
+    }
 
     /**
      * 发生异常时最终处理
