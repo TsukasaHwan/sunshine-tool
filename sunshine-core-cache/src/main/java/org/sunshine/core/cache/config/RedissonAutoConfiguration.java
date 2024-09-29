@@ -33,6 +33,9 @@ import java.util.List;
 @ConditionalOnProperty(prefix = "spring.data.redis", name = "redisson.enable", havingValue = "true")
 @EnableConfigurationProperties({RedisProperties.class, RedissonProperties.class})
 public class RedissonAutoConfiguration {
+
+    private static final String REDIS_PROTOCOL_PREFIX = "redis://";
+
     private final RedisProperties redisProperties;
 
     public RedissonAutoConfiguration(RedisProperties redisProperties) {
@@ -50,7 +53,7 @@ public class RedissonAutoConfiguration {
     public RedissonClient redissonClient() {
         Config config = new Config();
         SingleServerConfig singleServerConfig = config.useSingleServer();
-        singleServerConfig.setAddress("redis://" + redisProperties.getHost() + ":" + redisProperties.getPort());
+        singleServerConfig.setAddress(REDIS_PROTOCOL_PREFIX + redisProperties.getHost() + ":" + redisProperties.getPort());
         singleServerConfig.setTimeout((int) redisProperties.getTimeout().toMillis());
         singleServerConfig.setDatabase(redisProperties.getDatabase());
         String password = redisProperties.getPassword();
