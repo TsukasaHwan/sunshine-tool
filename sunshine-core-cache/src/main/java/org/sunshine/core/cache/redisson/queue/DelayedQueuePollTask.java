@@ -20,7 +20,7 @@ class DelayedQueuePollTask<T> implements Runnable {
 
     private final DelayedQueueListener<T> delayedQueueListener;
 
-    private ThreadPoolExecutor delayedThreadPoolExecutor;
+    private final ThreadPoolExecutor delayedThreadPoolExecutor;
 
     public DelayedQueuePollTask(RedissonClient redissonClient, DelayedQueueListener<T> delayedQueueListener) {
         this.redissonClient = redissonClient;
@@ -58,7 +58,6 @@ class DelayedQueuePollTask<T> implements Runnable {
             return;
         }
         delayedThreadPoolExecutor.shutdown();
-        delayedThreadPoolExecutor = null;
     }
 
     /**
