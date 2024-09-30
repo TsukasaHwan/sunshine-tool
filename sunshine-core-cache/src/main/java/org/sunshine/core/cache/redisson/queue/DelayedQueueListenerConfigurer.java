@@ -43,7 +43,7 @@ public class DelayedQueueListenerConfigurer implements InitializingBean, Disposa
 
     @Override
     public void destroy() throws Exception {
-        delayedQueueListenerList.stream().filter(DelayedQueueListener::isEnable).forEach(delayedQueueListener -> {
+        delayedQueueListenerList.forEach(delayedQueueListener -> {
             DelayedQueuePollTask<?> delayedQueuePollTask = context.getBean(getDelayedQueuePollTaskBeanName(delayedQueueListener), DelayedQueuePollTask.class);
             delayedQueuePollTask.destroy();
         });
