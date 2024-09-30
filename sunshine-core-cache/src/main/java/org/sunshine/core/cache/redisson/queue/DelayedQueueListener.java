@@ -42,8 +42,8 @@ public interface DelayedQueueListener<T> {
     }
 
     /**
-     * 发生异常时最终处理
+     * 最终处理
      */
-    default void whenExceptionFinally() {
+    default void whenFinally() {
     }
 }

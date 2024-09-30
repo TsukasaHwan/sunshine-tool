@@ -45,7 +45,7 @@ class DelayedQueuePollTask<T> implements Runnable {
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
             } finally {
-                delayedQueueListener.whenExceptionFinally();
+                delayedQueueListener.whenFinally();
             }
         }
     }
