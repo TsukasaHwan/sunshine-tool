@@ -22,20 +22,20 @@ public class AsyncConfiguration implements AsyncConfigurer {
 
     @Override
     public Executor getAsyncExecutor() {
-        int corePoolSize = Runtime.getRuntime().availableProcessors() * 2;
+        int corePoolSize = Runtime.getRuntime().availableProcessors() * 2 + 1;
         ThreadPoolTaskExecutor executor = new ThreadPoolExecutorMdcWrapper();
         //核心线程池数量
         executor.setCorePoolSize(corePoolSize);
         //最大线程数量
-        executor.setMaxPoolSize(Math.max(corePoolSize * 4, 256));
+        executor.setMaxPoolSize(corePoolSize);
         //线程池的队列容量
         executor.setQueueCapacity(200);
         //当线程超过corePoolSize，线程存活时间
-        executor.setKeepAliveSeconds(10);
+        executor.setKeepAliveSeconds(60);
         //用来设置线程池关闭的时候等待所有任务都完成再继续销毁其他的Bean
         executor.setWaitForTasksToCompleteOnShutdown(true);
         //线程池中任务的等待时间，如果超过这个时候还没有销毁就强制销毁
-        executor.setAwaitTerminationSeconds(60);
+        executor.setAwaitTerminationSeconds(120);
         //线程名称的前缀
         executor.setThreadNamePrefix("async-thread-");
         // setRejectedExecutionHandler：当pool已经达到max size的时候，如何处理新任务
