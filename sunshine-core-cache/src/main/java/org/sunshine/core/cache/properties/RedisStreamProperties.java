@@ -49,29 +49,29 @@ public class RedisStreamProperties {
 
         /**
          * 核心线程数。
-         * <p>默认值为为核心处理器数量的两倍。
+         * <p>默认值为为核心处理器数量的两倍加一。
          * <p><b>可以在运行时修改此设置，例如通过JMX。</b>
          */
-        private int corePoolSize = Runtime.getRuntime().availableProcessors() * 2;
+        private int corePoolSize = Runtime.getRuntime().availableProcessors() * 2 + 1;
 
         /**
          * 最大线程数。
-         * <p>默认值为核心线程数的四倍，并确保最小值为512。
+         * <p>默认值为核心线程数。
          * <p><b>可以在运行时修改此设置，例如通过JMX。</b>
          */
-        private int maxPoolSize = Math.max(corePoolSize * 4, 512);
+        private int maxPoolSize = corePoolSize;
 
         /**
          * 队列容量。
-         * <p>默认值为500。
+         * <p>默认值为100。
          * <p>任何正值都将导致LinkedBlockingQueue实例;
          * 任何其他值都将导致SynchronousQueue实例。
          */
-        private int queueCapacity = 500;
+        private int queueCapacity = 100;
 
         /**
          * 线程存活时间（单位：秒）
-         * <p>默认值为30秒。
+         * <p>默认值为60秒。
          * <p><b>可以在运行时修改此设置，例如通过JMX。</b>
          */
         private int keepAliveSeconds = 60;
