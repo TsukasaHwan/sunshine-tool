@@ -1,3 +1,2 @@
-org.sunshine.core.common.config.AsyncConfiguration
 org.sunshine.core.common.config.UndertowByteBufferPoolFactoryCustomizer
 org.sunshine.core.common.config.DefaultWebConfiguration
