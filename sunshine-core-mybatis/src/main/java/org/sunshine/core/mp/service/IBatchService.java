@@ -1,11 +1,11 @@
 package org.sunshine.core.mp.service;
 
-import org.sunshine.core.mp.repository.IBatchRepository;
+import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
  * @author Teamo
  * @since 2023/5/6
  */
-public interface IBatchService<T> extends IBatchRepository<T> {
+public interface IBatchService<T> extends IService<T> {
 
 }
