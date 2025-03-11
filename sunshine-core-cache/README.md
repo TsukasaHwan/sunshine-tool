@@ -32,9 +32,9 @@
     - ```java
        /**
         * 分布式锁注解
-        * param为要作为锁key值后缀的参数属性值名称，如果参数为pojo则取第argNum下的属性名称为couponId参数值（默认为第一个）
+        * value属性作为锁键值，而key属性可以使用SPEL表达式，如#testPojo.id，如若设置了key属性，则锁的键值为value + key
         * tryLock是否使用尝试锁默认为false
-        * 在指定时间内如果未获取倒锁则不执行方法，最长等待时间默认为5秒可以使用，锁释放时间默认为10秒
+        * 在指定时间内如果未获取到锁则不执行方法，最长等待时间默认为5秒，锁释放时间默认为10秒
         */
        public class Test {
          
@@ -44,7 +44,7 @@
             * @param testPojo
             * @return
             */
-           @DistributedLock(prefix = "lock:", param = "id", argNum = 1, tryLock = true)
+           @DistributedLock(value = "lock:", key = "#testPojo.id", tryLock = true)
            public Result<Void> lock(TestPojo testPojo) {
                return Result.ok();
            }
@@ -210,15 +210,7 @@
            */
           @Scheduled(cron = "0 0 0/1 * * ?")
           public void clearTest1Stream() {
-              this.clearStream();
-          }
-   
-          /**
-           * 定时处理死信
-           */
-          @Scheduled(cron = "0/5 * * * * ?")
-          public void handleTest1DeadLetter() {
-              this.handleDeadLetter();
+              this.trim(500);
           }
       }
    ```

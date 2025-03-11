@@ -15,38 +15,15 @@ import java.util.concurrent.TimeUnit;
 public @interface DistributedLock {
 
     /**
-     * 锁的名称。
-     * 如果lockName可以确定，直接设置该属性。
+     * 锁的key。
      */
-    String name() default "";
+    String value();
 
     /**
-     * lockName前缀
+     * 锁的key。（如果配置了，则锁的键值为value + key）
+     * 支持SpEL表达式。
      */
-    String prefix() default "";
-
-    /**
-     * lockName后缀
-     */
-    String suffix() default "";
-
-    /**
-     * 获得锁名时拼接前后缀用到的分隔符
-     */
-    String separator() default "";
-
-    /**
-     * <pre>
-     *     获取注解的方法参数列表的某个参数对象的某个属性值来作为lockName。因为有时候lockName是不固定的。
-     *     当param不为空时，可以通过argNum参数来设置具体是参数列表的第几个参数，不设置则默认取第一个。
-     * </pre>
-     */
-    String param() default "";
-
-    /**
-     * 将方法第argNum个参数作为锁
-     */
-    int argNum() default 0;
+    String key() default "";
 
     /**
      * 是否使用尝试锁。
