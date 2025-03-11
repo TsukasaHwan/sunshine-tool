@@ -4,16 +4,17 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.expression.ExpressionParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
+import org.springframework.expression.spel.support.SimpleEvaluationContext;
 import org.sunshine.core.cache.annotation.DistributedLock;
 import org.sunshine.core.cache.redisson.util.RedissonLockUtils;
 import org.sunshine.core.tool.util.ClassUtils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Teamo
@@ -22,104 +23,130 @@ import java.util.concurrent.TimeUnit;
 @Aspect
 public class DistributedLockAspect {
 
+    private static final Logger logger = LoggerFactory.getLogger(DistributedLockAspect.class);
+    private static final SpelExpressionParser PARSER = new SpelExpressionParser();
+
     @Around("@annotation(org.sunshine.core.cache.annotation.DistributedLock)")
     public Object around(ProceedingJoinPoint pjp) throws Throwable {
-        Method method = ((MethodSignature) pjp.getSignature()).getMethod();
-        DistributedLock distributedLock = ClassUtils.getAnnotation(method, DistributedLock.class);
-        String value = distributedLock.value();
-        StringBuffer sb = new StringBuffer(value);
-
-        String key = distributedLock.key();
-        if (key != null && !key.isBlank()) {
-            StandardEvaluationContext context = new StandardEvaluationContext(pjp.getTarget());
-            String[] parameterNames = getParameterNames(method);
-            if (parameterNames != null) {
-                Object[] args = pjp.getArgs();
-                for (int i = 0; i < parameterNames.length; i++) {
-                    context.setVariable(parameterNames[i], args[i]);
-                }
-            }
-            ExpressionParser parser = new SpelExpressionParser();
-            sb.append(parser.parseExpression(key).getValue(context, String.class));
-        }
-
-        return lock(pjp, sb.toString(), distributedLock);
-    }
-
-    /**
-     * 加锁操作
-     *
-     * @param pjp             连接点
-     * @param lockName        锁名称
-     * @param distributedLock 分布式锁参数
-     * @return {Object}
-     */
-    private Object lock(ProceedingJoinPoint pjp, final String lockName, DistributedLock distributedLock) throws Throwable {
-        if (distributedLock.tryLock()) {
-            return tryLock(pjp, distributedLock, lockName);
-        } else {
-            return lock(pjp, lockName);
-        }
-    }
-
-    /**
-     * 普通锁
-     *
-     * @param pjp      连接点
-     * @param lockName 锁名称
-     * @return {Object}
-     */
-    private Object lock(ProceedingJoinPoint pjp, final String lockName) throws Throwable {
         try {
-            RedissonLockUtils.lock(lockName);
-            return pjp.proceed();
-        } finally {
-            if (RedissonLockUtils.isHeldByCurrentThread(lockName)) {
-                RedissonLockUtils.unlock(lockName);
-            }
+            Method method = ((MethodSignature) pjp.getSignature()).getMethod();
+            DistributedLock distributedLock = ClassUtils.getAnnotation(method, DistributedLock.class);
+
+            String lockKey = buildLockKey(pjp, method, distributedLock);
+            return executeWithLock(pjp, distributedLock, lockKey);
+
+        } catch (Exception e) {
+            logger.error("Distributed lock processing failed", e);
+            throw e;
         }
     }
 
     /**
-     * 尝试锁
+     * 构建分布式锁的key
      *
-     * @param pjp             连接点
-     * @param distributedLock 分布式锁参数
-     * @param lockName        锁名称
-     * @return {Object}
+     * @param pjp       ProceedingJoinPoint
+     * @param method    Method
+     * @param distributedLock DistributedLock
+     * @return String
      */
-    private Object tryLock(ProceedingJoinPoint pjp, DistributedLock distributedLock, final String lockName) throws Throwable {
-        long waitTime = distributedLock.waitTime();
-        long leaseTime = distributedLock.leaseTime();
-        TimeUnit timeUnit = distributedLock.timeUnit();
-        boolean lock = false;
-        try {
-            lock = RedissonLockUtils.tryLock(lockName, waitTime, leaseTime, timeUnit);
-            if (lock) {
-                return pjp.proceed();
-            }
-        } finally {
-            RedissonLockUtils.unlock(lock, lockName);
+    private String buildLockKey(ProceedingJoinPoint pjp, Method method, DistributedLock distributedLock) {
+        StringBuffer sb = new StringBuffer(distributedLock.value());
+
+        if (distributedLock.key() != null && !distributedLock.key().isBlank()) {
+            EvaluationContext context = SimpleEvaluationContext.forReadOnlyDataBinding()
+                    .withRootObject(pjp.getTarget())
+                    .withInstanceMethods()
+                    .build();
+
+            setMethodParameters(context, method, pjp.getArgs());
+
+            String dynamicPart = PARSER.parseExpression(distributedLock.key())
+                    .getValue(context, String.class);
+            sb.append(dynamicPart);
         }
-        return null;
+        return sb.toString();
     }
 
     /**
-     * 获取方法参数名称
+     * 设置方法参数
      *
-     * @param method 方法
-     * @return {String[]}
+     * @param context EvaluationContext
+     * @param method Method
+     * @param args Object[]
      */
-    private String[] getParameterNames(Method method) {
+    private void setMethodParameters(EvaluationContext context, Method method, Object[] args) {
         Parameter[] parameters = method.getParameters();
-        String[] parameterNames = new String[parameters.length];
         for (int i = 0; i < parameters.length; i++) {
             Parameter param = parameters[i];
-            if (!param.isNamePresent()) {
-                return null;
+            if (param.isNamePresent()) {
+                context.setVariable(param.getName(), args[i]);
             }
-            parameterNames[i] = param.getName();
         }
-        return parameterNames;
+    }
+
+    /**
+     * 执行分布式锁
+     *
+     * @param pjp ProceedingJoinPoint
+     * @param distributedLock DistributedLock
+     * @param lockKey String
+     * @return Object
+     * @throws Throwable Throwable
+     */
+    private Object executeWithLock(ProceedingJoinPoint pjp, DistributedLock distributedLock, String lockKey) throws Throwable {
+        if (distributedLock.tryLock()) {
+            return handleTryLock(pjp, distributedLock, lockKey);
+        } else {
+            return handleBlockingLock(pjp, lockKey);
+        }
+    }
+
+    /**
+     * 处理尝试获取锁
+     *
+     * @param pjp ProceedingJoinPoint
+     * @param distributedLock DistributedLock
+     * @param lockKey String
+     * @return Object
+     * @throws Throwable Throwable
+     */
+    private Object handleTryLock(ProceedingJoinPoint pjp, DistributedLock distributedLock, String lockKey) throws Throwable {
+        boolean locked = false;
+        try {
+            locked = RedissonLockUtils.tryLock(
+                    lockKey,
+                    distributedLock.waitTime(),
+                    distributedLock.leaseTime(),
+                    distributedLock.timeUnit()
+            );
+
+            if (locked) {
+                return pjp.proceed();
+            }
+            logger.warn("Failed to acquire lock: {}", lockKey);
+            return null;
+
+        } finally {
+            RedissonLockUtils.unlock(locked, lockKey);
+        }
+    }
+
+    /**
+     * 处理阻塞获取锁
+     *
+     * @param pjp ProceedingJoinPoint
+     * @param lockKey String
+     * @return Object
+     * @throws Throwable Throwable
+     */
+    private Object handleBlockingLock(ProceedingJoinPoint pjp, String lockKey) throws Throwable {
+        try {
+            RedissonLockUtils.lock(lockKey);
+            return pjp.proceed();
+        } finally {
+            if (RedissonLockUtils.isHeldByCurrentThread(lockKey)) {
+                RedissonLockUtils.unlock(lockKey);
+            }
+        }
     }
 }
