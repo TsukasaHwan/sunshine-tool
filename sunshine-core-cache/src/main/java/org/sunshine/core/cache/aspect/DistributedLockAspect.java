@@ -44,13 +44,13 @@ public class DistributedLockAspect {
     /**
      * 构建分布式锁的key
      *
-     * @param pjp       ProceedingJoinPoint
-     * @param method    Method
+     * @param pjp             ProceedingJoinPoint
+     * @param method          Method
      * @param distributedLock DistributedLock
      * @return String
      */
     private String buildLockKey(ProceedingJoinPoint pjp, Method method, DistributedLock distributedLock) {
-        StringBuffer sb = new StringBuffer(distributedLock.value());
+        StringBuilder sb = new StringBuilder(distributedLock.value());
 
         if (distributedLock.key() != null && !distributedLock.key().isBlank()) {
             EvaluationContext context = SimpleEvaluationContext.forReadOnlyDataBinding()
@@ -71,8 +71,8 @@ public class DistributedLockAspect {
      * 设置方法参数
      *
      * @param context EvaluationContext
-     * @param method Method
-     * @param args Object[]
+     * @param method  Method
+     * @param args    Object[]
      */
     private void setMethodParameters(EvaluationContext context, Method method, Object[] args) {
         Parameter[] parameters = method.getParameters();
@@ -87,9 +87,9 @@ public class DistributedLockAspect {
     /**
      * 执行分布式锁
      *
-     * @param pjp ProceedingJoinPoint
+     * @param pjp             ProceedingJoinPoint
      * @param distributedLock DistributedLock
-     * @param lockKey String
+     * @param lockKey         String
      * @return Object
      * @throws Throwable Throwable
      */
@@ -104,9 +104,9 @@ public class DistributedLockAspect {
     /**
      * 处理尝试获取锁
      *
-     * @param pjp ProceedingJoinPoint
+     * @param pjp             ProceedingJoinPoint
      * @param distributedLock DistributedLock
-     * @param lockKey String
+     * @param lockKey         String
      * @return Object
      * @throws Throwable Throwable
      */
@@ -134,7 +134,7 @@ public class DistributedLockAspect {
     /**
      * 处理阻塞获取锁
      *
-     * @param pjp ProceedingJoinPoint
+     * @param pjp     ProceedingJoinPoint
      * @param lockKey String
      * @return Object
      * @throws Throwable Throwable
