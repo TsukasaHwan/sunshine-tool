@@ -31,7 +31,7 @@ public class DistributedLockAspect {
 
         String key = distributedLock.key();
         if (key != null && !key.isBlank()) {
-            StandardEvaluationContext context = new StandardEvaluationContext();
+            StandardEvaluationContext context = new StandardEvaluationContext(pjp.getTarget());
             String[] parameterNames = getParameterNames(method);
             if (parameterNames != null) {
                 Object[] args = pjp.getArgs();
