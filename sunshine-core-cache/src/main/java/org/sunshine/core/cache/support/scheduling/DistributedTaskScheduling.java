@@ -29,7 +29,7 @@ public interface DistributedTaskScheduling {
      * @param lockKey 锁名称
      */
     default void execute(String lockKey) {
-        RedissonLockUtils.tryLock(lockKey, Try.accept(lock -> {
+        RedissonLockUtils.tryLockWithoutResult(lockKey, Try.accept(lock -> {
             if (lock) {
                 this.task();
             }

@@ -4,6 +4,7 @@ import org.sunshine.core.cache.redisson.Locker;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * @author Teamo
@@ -90,7 +91,7 @@ public class RedissonLockUtils {
      * @param lockConsumer  锁消费者
      * @param errorConsumer 异常消费者
      */
-    public static void tryLock(String lockKey, Consumer<Boolean> lockConsumer, Consumer<Throwable> errorConsumer) {
+    public static void tryLockWithoutResult(String lockKey, Consumer<Boolean> lockConsumer, Consumer<Throwable> errorConsumer) {
         boolean isLocked = false;
         try {
             isLocked = tryLock(lockKey);
@@ -102,6 +103,31 @@ public class RedissonLockUtils {
                 unlock(lockKey);
             }
         }
+    }
+
+    /**
+     * 尝试获取锁并执行回调函数，处理结果或异常，最后释放锁
+     *
+     * @param lockKey       锁的唯一标识键，用于区分不同的锁资源
+     * @param callback      带锁状态的回调函数，参数为是否成功获取锁的布尔值，返回泛型结果对象
+     * @param errorConsumer 异常处理器，用于捕获并处理回调函数执行期间抛出的异常
+     * @param <R>           泛型返回类型，与回调函数的返回类型保持一致
+     * @return 回调函数的执行结果（若成功执行），否则返回null
+     */
+    public static <R> R tryLock(String lockKey, Function<Boolean, R> callback, Consumer<Throwable> errorConsumer) {
+        boolean isLocked = false;
+        R r = null;
+        try {
+            isLocked = tryLock(lockKey);
+            r = callback.apply(isLocked);
+        } catch (Throwable e) {
+            errorConsumer.accept(e);
+        } finally {
+            if (isLocked) {
+                unlock(lockKey);
+            }
+        }
+        return r;
     }
 
     /**
@@ -128,7 +154,7 @@ public class RedissonLockUtils {
      * @param lockConsumer  锁消费者
      * @param errorConsumer 异常消费者
      */
-    public static void tryLock(String lockKey, long waitTime, long leaseTime, TimeUnit unit, Consumer<Boolean> lockConsumer, Consumer<Throwable> errorConsumer) {
+    public static void tryLockWithoutResult(String lockKey, long waitTime, long leaseTime, TimeUnit unit, Consumer<Boolean> lockConsumer, Consumer<Throwable> errorConsumer) {
         boolean isLocked = false;
         try {
             isLocked = tryLock(lockKey, waitTime, leaseTime, unit);
@@ -138,6 +164,32 @@ public class RedissonLockUtils {
         } finally {
             unlock(isLocked, lockKey);
         }
+    }
+
+    /**
+     * 带锁尝试执行的通用方法模板（包含异常处理和资源清理）
+     *
+     * @param lockKey       分布式锁的键值标识
+     * @param waitTime      锁等待的最大时间（单位由unit参数决定
+     * @param leaseTime     锁持有的最大时间（单位由unit参数决定
+     * @param unit          时间单位枚举（TimeUnit）
+     * @param callback      带锁状态的回调函数，接收锁获取状态参数，返回业务处理结果
+     * @param errorConsumer 异常处理器，用于捕获并处理回调函数中的异常
+     * @param <R>           回调函数返回值的泛型类型
+     * @return callback的执行结果（成功时返回业务结果，失败返回null）
+     */
+    public static <R> R tryLock(String lockKey, long waitTime, long leaseTime, TimeUnit unit, Function<Boolean, R> callback, Consumer<Throwable> errorConsumer) {
+        boolean isLocked = false;
+        R r = null;
+        try {
+            isLocked = tryLock(lockKey, waitTime, leaseTime, unit);
+            r = callback.apply(isLocked);
+        } catch (Throwable e) {
+            errorConsumer.accept(e);
+        } finally {
+            unlock(isLocked, lockKey);
+        }
+        return r;
     }
 
     /**
