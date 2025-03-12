@@ -28,17 +28,11 @@ public class DistributedLockAspect {
 
     @Around("@annotation(org.sunshine.core.cache.annotation.DistributedLock)")
     public Object around(ProceedingJoinPoint pjp) throws Throwable {
-        try {
-            Method method = ((MethodSignature) pjp.getSignature()).getMethod();
-            DistributedLock distributedLock = ClassUtils.getAnnotation(method, DistributedLock.class);
+        Method method = ((MethodSignature) pjp.getSignature()).getMethod();
+        DistributedLock distributedLock = ClassUtils.getAnnotation(method, DistributedLock.class);
 
-            String lockKey = buildLockKey(pjp, method, distributedLock);
-            return executeWithLock(pjp, distributedLock, lockKey);
-
-        } catch (Exception e) {
-            logger.error("Distributed lock processing failed", e);
-            throw e;
-        }
+        String lockKey = buildLockKey(pjp, method, distributedLock);
+        return executeWithLock(pjp, distributedLock, lockKey);
     }
 
     /**
