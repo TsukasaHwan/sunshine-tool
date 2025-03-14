@@ -28,7 +28,6 @@ public interface DistributedTask {
     default void runWithLock(String lockKey, RedissonLockTemplate template) {
         template.tryLockWithoutResult(lockKey, Try.accept(isLocked -> {
             if (!isLocked) {
-                log.error("执行分布式任务失败，未获取到锁：{}", lockKey);
                 return;
             }
             this.execute();
