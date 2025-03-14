@@ -5,8 +5,8 @@ import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.core.StreamOperations;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.sunshine.core.cache.RedisMQTemplate;
-import org.sunshine.core.cache.redisson.support.DistributedTask;
-import org.sunshine.core.cache.redisson.support.DistributedTaskExecutor;
+import org.sunshine.core.cache.redisson.DistributedTask;
+import org.sunshine.core.cache.redisson.DistributedTaskExecutor;
 import org.sunshine.core.tool.util.CollectionUtils;
 
 import java.util.List;
@@ -18,17 +18,12 @@ import java.util.Map;
  */
 public class StreamDeadLetterQueueProcessor {
 
-    private final List<AbstractStreamListener<?>> listeners;
-
-    private final RedisMQTemplate redisMQTemplate;
-
-    private final DistributedTaskExecutor distributedTaskExecutor;
-
-    private static final String DEAD_LETTER_MAIN_LOCK = "lock:redis-stream:dead-letter:main";
-
     public static final String TRIM_LOCK_TEMPLATE = "lock:redis-stream:trim:%s";
-
     public static final String DEAD_LETTER_SUB_LOCK_TEMPLATE = "lock:redis-stream:dead-letter:%s";
+    private static final String DEAD_LETTER_MAIN_LOCK = "lock:redis-stream:dead-letter:main";
+    private final List<AbstractStreamListener<?>> listeners;
+    private final RedisMQTemplate redisMQTemplate;
+    private final DistributedTaskExecutor distributedTaskExecutor;
 
     public StreamDeadLetterQueueProcessor(List<AbstractStreamListener<?>> listeners,
                                           RedisMQTemplate redisMQTemplate,

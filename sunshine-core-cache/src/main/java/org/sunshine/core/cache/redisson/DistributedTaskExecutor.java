@@ -1,4 +1,4 @@
-package org.sunshine.core.cache.redisson.support;
+package org.sunshine.core.cache.redisson;
 
 /**
  * 分布式任务执行器
@@ -23,6 +23,16 @@ public class DistributedTaskExecutor {
     }
 
     /**
+     * 构建器
+     *
+     * @param template RedissonLockTemplate
+     * @return DistributedTaskExecutor
+     */
+    public static DistributedTaskExecutor builder(RedissonLockTemplate template) {
+        return new DistributedTaskExecutor(template);
+    }
+
+    /**
      * 设置分布式任务
      *
      * @param task 分布式任务
@@ -40,15 +50,5 @@ public class DistributedTaskExecutor {
      */
     public void execute(String lockKey) {
         task.runWithLock(lockKey, template);
-    }
-
-    /**
-     * 构建器
-     *
-     * @param template RedissonLockTemplate
-     * @return DistributedTaskExecutor
-     */
-    public static DistributedTaskExecutor builder(RedissonLockTemplate template) {
-        return new DistributedTaskExecutor(template);
     }
 }

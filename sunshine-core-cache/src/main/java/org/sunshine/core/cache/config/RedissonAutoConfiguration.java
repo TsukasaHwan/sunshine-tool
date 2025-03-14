@@ -17,10 +17,10 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.sunshine.core.cache.aspect.DistributedLockAspect;
 import org.sunshine.core.cache.properties.RedissonProperties;
+import org.sunshine.core.cache.redisson.DistributedTaskExecutor;
+import org.sunshine.core.cache.redisson.RedissonLockTemplate;
 import org.sunshine.core.cache.redisson.queue.DelayedQueueListener;
 import org.sunshine.core.cache.redisson.queue.DelayedQueueListenerConfigurer;
-import org.sunshine.core.cache.redisson.support.DistributedTaskExecutor;
-import org.sunshine.core.cache.redisson.support.RedissonLockTemplate;
 import org.sunshine.core.tool.util.StringUtils;
 
 import java.util.List;

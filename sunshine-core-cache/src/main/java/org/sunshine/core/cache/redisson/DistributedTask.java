@@ -1,4 +1,4 @@
-package org.sunshine.core.cache.redisson.support;
+package org.sunshine.core.cache.redisson;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

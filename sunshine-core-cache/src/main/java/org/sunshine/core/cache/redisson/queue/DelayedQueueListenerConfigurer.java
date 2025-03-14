@@ -22,13 +22,10 @@ import java.util.concurrent.TimeUnit;
  */
 public class DelayedQueueListenerConfigurer implements InitializingBean, DisposableBean, ApplicationContextAware {
 
-    private ApplicationContext context;
-
-    private ThreadPoolExecutor delayedThreadPoolExecutor;
-
     private final List<DelayedQueueListener<?>> delayedQueueListenerList;
-
     private final RedissonClient redissonClient;
+    private ApplicationContext context;
+    private ThreadPoolExecutor delayedThreadPoolExecutor;
 
     public DelayedQueueListenerConfigurer(List<DelayedQueueListener<?>> delayedQueueListenerList, RedissonClient redissonClient) {
         this.delayedQueueListenerList = delayedQueueListenerList;

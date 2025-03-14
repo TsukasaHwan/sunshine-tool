@@ -22,7 +22,7 @@ import org.springframework.util.Assert;
 import org.sunshine.core.cache.RedisMQTemplate;
 import org.sunshine.core.cache.RedisMQTemplateImpl;
 import org.sunshine.core.cache.properties.RedisStreamProperties;
-import org.sunshine.core.cache.redisson.support.DistributedTaskExecutor;
+import org.sunshine.core.cache.redisson.DistributedTaskExecutor;
 import org.sunshine.core.cache.stream.AbstractStreamListener;
 import org.sunshine.core.cache.stream.StreamDeadLetterQueueProcessor;
 import org.sunshine.core.tool.util.INetUtils;
@@ -45,6 +45,16 @@ public class RedisStreamAutoConfiguration {
                                         RedisStreamProperties redisStreamProperties) {
         this.redisProperties = redisProperties;
         this.redisStreamProperties = redisStreamProperties;
+    }
+
+    /**
+     * 构建消费者名称
+     *
+     * @return 本机IP@PID
+     */
+    private static String buildConsumerName() {
+        long currentPID = ProcessHandle.current().pid();
+        return String.format("%s@%d", INetUtils.getHostIp(), currentPID);
     }
 
     @Bean
@@ -113,16 +123,6 @@ public class RedisStreamAutoConfiguration {
                                                                          RedisMQTemplate redisMQTemplate,
                                                                          DistributedTaskExecutor distributedTaskExecutor) {
         return new StreamDeadLetterQueueProcessor(listeners, redisMQTemplate, distributedTaskExecutor);
-    }
-
-    /**
-     * 构建消费者名称
-     *
-     * @return 本机IP@PID
-     */
-    private static String buildConsumerName() {
-        long currentPID = ProcessHandle.current().pid();
-        return String.format("%s@%d", INetUtils.getHostIp(), currentPID);
     }
 
     /**

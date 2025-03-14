@@ -17,16 +17,11 @@ import java.lang.reflect.Type;
 public abstract class AbstractStreamListener<T extends AbstractStreamMessage>
         implements StreamListener<String, ObjectRecord<String, String>> {
 
-    private RedisMQTemplate redisMQTemplate;
-
     private final Class<T> messageType;
-
     private final String streamKey;
-
     private final AbstractStreamMessage.TrimConfig trimConfig;
-
     private final AbstractStreamMessage.DeadLetterConfig deadLetterConfig;
-
+    private RedisMQTemplate redisMQTemplate;
     /**
      * Redis 消费组，默认使用 spring.application.name 名字
      */

@@ -10,7 +10,7 @@ import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.SimpleEvaluationContext;
 import org.sunshine.core.cache.annotation.DistributedLock;
-import org.sunshine.core.cache.redisson.support.RedissonLockTemplate;
+import org.sunshine.core.cache.redisson.RedissonLockTemplate;
 import org.sunshine.core.tool.util.ClassUtils;
 
 import java.lang.reflect.Method;
