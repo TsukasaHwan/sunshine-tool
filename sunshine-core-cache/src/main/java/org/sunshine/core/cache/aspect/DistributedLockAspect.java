@@ -10,7 +10,7 @@ import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.SimpleEvaluationContext;
 import org.sunshine.core.cache.annotation.DistributedLock;
-import org.sunshine.core.cache.redisson.util.RedissonLockUtils;
+import org.sunshine.core.cache.redisson.support.RedissonLockTemplate;
 import org.sunshine.core.tool.util.ClassUtils;
 
 import java.lang.reflect.Method;
@@ -26,6 +26,12 @@ public class DistributedLockAspect {
     private static final Logger logger = LoggerFactory.getLogger(DistributedLockAspect.class);
 
     private static final SpelExpressionParser PARSER = new SpelExpressionParser();
+
+    private final RedissonLockTemplate redissonLockTemplate;
+
+    public DistributedLockAspect(RedissonLockTemplate redissonLockTemplate) {
+        this.redissonLockTemplate = redissonLockTemplate;
+    }
 
     @Around("@annotation(org.sunshine.core.cache.annotation.DistributedLock)")
     public Object around(ProceedingJoinPoint pjp) throws Throwable {
@@ -108,7 +114,7 @@ public class DistributedLockAspect {
     private Object handleTryLock(ProceedingJoinPoint pjp, DistributedLock distributedLock, String lockKey) throws Throwable {
         boolean locked = false;
         try {
-            locked = RedissonLockUtils.tryLock(
+            locked = redissonLockTemplate.tryLock(
                     lockKey,
                     distributedLock.waitTime(),
                     distributedLock.leaseTime(),
@@ -122,7 +128,7 @@ public class DistributedLockAspect {
             return null;
 
         } finally {
-            RedissonLockUtils.unlock(locked, lockKey);
+            redissonLockTemplate.unlock(locked, lockKey);
         }
     }
 
@@ -136,11 +142,11 @@ public class DistributedLockAspect {
      */
     private Object handleBlockingLock(ProceedingJoinPoint pjp, String lockKey) throws Throwable {
         try {
-            RedissonLockUtils.lock(lockKey);
+            redissonLockTemplate.lock(lockKey);
             return pjp.proceed();
         } finally {
-            if (RedissonLockUtils.isHeldByCurrentThread(lockKey)) {
-                RedissonLockUtils.unlock(lockKey);
+            if (redissonLockTemplate.isHeldByCurrentThread(lockKey)) {
+                redissonLockTemplate.unlock(lockKey);
             }
         }
     }

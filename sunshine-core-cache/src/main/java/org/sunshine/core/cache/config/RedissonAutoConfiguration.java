@@ -17,10 +17,10 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.sunshine.core.cache.aspect.DistributedLockAspect;
 import org.sunshine.core.cache.properties.RedissonProperties;
-import org.sunshine.core.cache.redisson.RedissonLocker;
 import org.sunshine.core.cache.redisson.queue.DelayedQueueListener;
 import org.sunshine.core.cache.redisson.queue.DelayedQueueListenerConfigurer;
-import org.sunshine.core.cache.redisson.util.RedissonLockUtils;
+import org.sunshine.core.cache.redisson.support.DistributedTaskExecutor;
+import org.sunshine.core.cache.redisson.support.RedissonLockTemplate;
 import org.sunshine.core.tool.util.StringUtils;
 
 import java.util.List;
@@ -71,20 +71,23 @@ public class RedissonAutoConfiguration {
     }
 
     @Bean
-    public RedissonLocker redissonLocker(RedissonClient redissonClient) {
-        RedissonLocker locker = new RedissonLocker(redissonClient);
-        RedissonLockUtils.setLocker(locker);
-        return locker;
+    public RedissonLockTemplate redissonLockTemplate(RedissonClient redissonClient) {
+        return new RedissonLockTemplate(redissonClient);
     }
 
     @Bean
-    public DistributedLockAspect distributedLockAspect() {
-        return new DistributedLockAspect();
+    public DistributedLockAspect distributedLockAspect(RedissonLockTemplate redissonLockTemplate) {
+        return new DistributedLockAspect(redissonLockTemplate);
     }
 
     @Bean(destroyMethod = "destroy")
     @ConditionalOnBean(DelayedQueueListener.class)
     public DelayedQueueListenerConfigurer delayedQueueListenerConfigurer(List<DelayedQueueListener<?>> delayedQueueListenerList, RedissonClient redissonClient) {
         return new DelayedQueueListenerConfigurer(delayedQueueListenerList, redissonClient);
+    }
+
+    @Bean
+    public DistributedTaskExecutor distributedLockedTaskExecutor(RedissonLockTemplate redissonLockTemplate) {
+        return DistributedTaskExecutor.builder(redissonLockTemplate);
     }
 }

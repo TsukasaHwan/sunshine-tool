@@ -22,8 +22,9 @@ import org.springframework.util.Assert;
 import org.sunshine.core.cache.RedisMQTemplate;
 import org.sunshine.core.cache.RedisMQTemplateImpl;
 import org.sunshine.core.cache.properties.RedisStreamProperties;
+import org.sunshine.core.cache.redisson.support.DistributedTaskExecutor;
 import org.sunshine.core.cache.stream.AbstractStreamListener;
-import org.sunshine.core.cache.stream.RedisPendingMessageScheduledTask;
+import org.sunshine.core.cache.stream.StreamDeadLetterQueueProcessor;
 import org.sunshine.core.tool.util.INetUtils;
 
 import java.util.List;
@@ -33,7 +34,7 @@ import java.util.concurrent.RejectedExecutionHandler;
  * @author Teamo
  * @since 2023/5/26
  */
-@AutoConfiguration(after = CacheAutoConfiguration.class)
+@AutoConfiguration(after = {CacheAutoConfiguration.class, RedissonAutoConfiguration.class})
 @EnableConfigurationProperties({RedisProperties.class, RedisStreamProperties.class})
 public class RedisStreamAutoConfiguration {
 
@@ -107,11 +108,11 @@ public class RedisStreamAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnBean(AbstractStreamListener.class)
-    @ConditionalOnMissingBean(RedisPendingMessageScheduledTask.class)
-    public RedisPendingMessageScheduledTask redisPendingMessageScheduledTask(List<AbstractStreamListener<?>> listeners,
-                                                                             RedisMQTemplate redisMQTemplate) {
-        return new RedisPendingMessageScheduledTask(listeners, redisMQTemplate);
+    @ConditionalOnBean({StreamMessageListenerContainer.class, DistributedTaskExecutor.class})
+    public StreamDeadLetterQueueProcessor streamDeadLetterQueueProcessor(List<AbstractStreamListener<?>> listeners,
+                                                                         RedisMQTemplate redisMQTemplate,
+                                                                         DistributedTaskExecutor distributedTaskExecutor) {
+        return new StreamDeadLetterQueueProcessor(listeners, redisMQTemplate, distributedTaskExecutor);
     }
 
     /**

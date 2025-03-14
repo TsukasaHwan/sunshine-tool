@@ -1,0 +1,47 @@
+package org.sunshine.core.cache.redisson.support;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.sunshine.core.tool.support.Try;
+
+/**
+ * 分布式定时任务接口
+ *
+ * @author Teamo
+ * @since 2021/11/10
+ */
+@FunctionalInterface
+public interface DistributedTask {
+
+    Logger log = LoggerFactory.getLogger(DistributedTask.class);
+
+    /**
+     * 任务
+     *
+     * @throws Exception Exception
+     */
+    void execute() throws Exception;
+
+    /**
+     * 带锁执行方法（默认实现）
+     */
+    default void runWithLock(String lockKey, RedissonLockTemplate template) {
+        template.tryLockWithoutResult(lockKey, Try.accept(isLocked -> {
+            if (!isLocked) {
+                log.error("执行分布式任务失败，未获取到锁：{}", lockKey);
+                return;
+            }
+            this.execute();
+        }), this::handleError);
+    }
+
+    /**
+     * 错误处理
+     *
+     * @param throwable Throwable
+     */
+    default void handleError(Throwable throwable) {
+        log.error(throwable.getMessage(), throwable);
+    }
+
+}

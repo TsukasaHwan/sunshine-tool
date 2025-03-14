@@ -19,6 +19,12 @@ public class RedisStreamProperties {
     private int batchSize = 10;
 
     /**
+     * 死信队列任务执行cron表达式。
+     * <p>默认为30秒执行一次
+     */
+    private String deadLetterTaskCron;
+
+    /**
      * 线程池配置。
      */
     private ThreadPool threadPool = new ThreadPool();
@@ -29,6 +35,14 @@ public class RedisStreamProperties {
 
     public void setBatchSize(int batchSize) {
         this.batchSize = batchSize;
+    }
+
+    public String getDeadLetterTaskCron() {
+        return deadLetterTaskCron;
+    }
+
+    public void setDeadLetterTaskCron(String deadLetterTaskCron) {
+        this.deadLetterTaskCron = deadLetterTaskCron;
     }
 
     public ThreadPool getThreadPool() {
