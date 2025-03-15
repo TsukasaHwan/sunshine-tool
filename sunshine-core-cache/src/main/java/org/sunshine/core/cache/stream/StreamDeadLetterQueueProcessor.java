@@ -1,5 +1,7 @@
 package org.sunshine.core.cache.stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.core.StreamOperations;
@@ -17,6 +19,8 @@ import java.util.Map;
  * @since 2024/7/9
  */
 public class StreamDeadLetterQueueProcessor {
+
+    private static final Logger logger = LoggerFactory.getLogger(StreamDeadLetterQueueProcessor.class);
 
     public static final String TRIM_LOCK_TEMPLATE = "lock:redis-stream:trim:%s";
     public static final String DEAD_LETTER_SUB_LOCK_TEMPLATE = "lock:redis-stream:dead-letter:%s";
@@ -114,6 +118,8 @@ public class StreamDeadLetterQueueProcessor {
                         .ofObject(records.get(0).getValue())
                         .withStreamKey(streamKey));
                 streamOperations.acknowledge(group, records.get(0));
+                logger.info("[RETRY_SUCCESS] 消息{}重新投递成功，流键：{}，消费者组：{}",
+                        recordId, streamKey, group);
             });
         });
     }
