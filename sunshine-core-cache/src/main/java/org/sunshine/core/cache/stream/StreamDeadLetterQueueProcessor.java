@@ -109,8 +109,14 @@ public class StreamDeadLetterQueueProcessor {
                 }
 
                 RecordId recordId = pendingMessage.getId();
+
+                logger.info("[RETRY_PREPARE] 开始重新投递消息{}，流键：{}，消费者组：{}，超时时间：{}",
+                        recordId, streamKey, group, pendingMessage.getElapsedTimeSinceLastDelivery());
+
                 List<MapRecord<String, Object, Object>> records = streamOperations.range(streamKey, Range.just(recordId.getValue()));
                 if (CollectionUtils.isEmpty(records)) {
+                    logger.warn("[RECORD_NOT_FOUND] 未找到消息记录{}, 流键：{}, 消费者组：{}",
+                            recordId, streamKey, group);
                     return;
                 }
                 // 重新投递
