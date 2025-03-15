@@ -115,8 +115,7 @@ public class StreamDeadLetterQueueProcessor {
 
                 List<MapRecord<String, Object, Object>> records = streamOperations.range(streamKey, Range.just(recordId.getValue()));
                 if (CollectionUtils.isEmpty(records)) {
-                    logger.warn("[RECORD_NOT_FOUND] 未找到消息记录{}, 流键：{}",
-                            recordId, streamKey);
+                    logger.warn("[RECORD_NOT_FOUND] 未找到消息记录{}, 流键：{}", recordId, streamKey);
                     return;
                 }
                 // 重新投递
@@ -124,8 +123,7 @@ public class StreamDeadLetterQueueProcessor {
                         .ofObject(records.get(0).getValue())
                         .withStreamKey(streamKey));
                 streamOperations.acknowledge(group, records.get(0));
-                logger.info("[RETRY_SUCCESS] 消息{}重新投递成功，流键：{}，消费者组：{}",
-                        recordId, streamKey, group);
+                logger.info("[RETRY_SUCCESS] 消息{}重新投递成功，流键：{}", recordId, streamKey);
             });
         });
     }
