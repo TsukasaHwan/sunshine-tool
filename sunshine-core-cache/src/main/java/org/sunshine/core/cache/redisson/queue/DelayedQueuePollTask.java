@@ -1,7 +1,6 @@
 package org.sunshine.core.cache.redisson.queue;
 
 import org.redisson.api.RBlockingDeque;
-import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.sunshine.core.tool.support.Try;
 
@@ -12,8 +11,6 @@ import java.util.concurrent.ThreadPoolExecutor;
  * @since 2024/3/11
  */
 class DelayedQueuePollTask<T> implements Runnable {
-
-    private final static String LOCK_TEMPLATE = "lock:redis-delayed-queue:%s";
 
     private final RedissonClient redissonClient;
 
@@ -36,26 +33,16 @@ class DelayedQueuePollTask<T> implements Runnable {
         // 解决消息丢失问题，发送subscribe命令订阅redis队列
         redissonClient.getDelayedQueue(blockingDeque);
 
-        RLock lock = redissonClient.getLock(String.format(LOCK_TEMPLATE, delayedQueueListener.delayedQueueKey()));
-        boolean isLocked = false;
         T message;
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 message = blockingDeque.take();
-                isLocked = lock.tryLock();
-                if (!isLocked) {
-                    continue;
-                }
                 consume(message);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 delayedQueueListener.handleException(e);
             } catch (Exception e) {
                 delayedQueueListener.handleException(e);
-            } finally {
-                if (isLocked) {
-                    lock.unlock();
-                }
             }
         }
     }
