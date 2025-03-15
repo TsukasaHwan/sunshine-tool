@@ -60,14 +60,23 @@ public class RedissonLockTemplate implements RedissonLockOperations, Initializin
     }
 
     @Override
-    public <R> R tryLock(String key, Function<Boolean, R> callback, Consumer<Throwable> exConsumer) {
-        boolean isLocked = false;
+    public <R> R tryLock(String key, Function<Boolean, R> callback, Consumer<Exception> exConsumer) {
         R r = null;
+        try {
+            r = tryLock(key, callback);
+        } catch (Exception e) {
+            exConsumer.accept(e);
+        }
+        return r;
+    }
+
+    @Override
+    public <R> R tryLock(String key, Function<Boolean, R> callback) {
+        boolean isLocked = false;
+        R r;
         try {
             isLocked = tryLock(key);
             r = callback.apply(isLocked);
-        } catch (Throwable e) {
-            exConsumer.accept(e);
         } finally {
             if (isLocked) {
                 unlock(key);
@@ -89,14 +98,23 @@ public class RedissonLockTemplate implements RedissonLockOperations, Initializin
     }
 
     @Override
-    public <R> R tryLock(String key, long waitTime, long leaseTime, TimeUnit unit, Function<Boolean, R> callback, Consumer<Throwable> exConsumer) {
-        boolean isLocked = false;
+    public <R> R tryLock(String key, long waitTime, long leaseTime, TimeUnit unit, Function<Boolean, R> callback, Consumer<Exception> exConsumer) {
         R r = null;
+        try {
+            r = tryLock(key, waitTime, leaseTime, unit, callback);
+        } catch (Exception e) {
+            exConsumer.accept(e);
+        }
+        return r;
+    }
+
+    @Override
+    public <R> R tryLock(String key, long waitTime, long leaseTime, TimeUnit unit, Function<Boolean, R> callback) {
+        boolean isLocked = false;
+        R r;
         try {
             isLocked = tryLock(key, waitTime, leaseTime, unit);
             r = callback.apply(isLocked);
-        } catch (Throwable e) {
-            exConsumer.accept(e);
         } finally {
             unlock(isLocked, key);
         }

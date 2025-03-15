@@ -59,7 +59,7 @@ public interface RedissonLockOperations {
      * @param callback   加锁结果回调函数（参数为加锁是否成功）
      * @param exConsumer 异常处理回调函数
      */
-    default void tryLockWithoutResult(String key, Consumer<Boolean> callback, Consumer<Throwable> exConsumer) {
+    default void tryLockWithoutResult(String key, Consumer<Boolean> callback, Consumer<Exception> exConsumer) {
         tryLock(key, isLocked -> {
             callback.accept(isLocked);
             return null;
@@ -75,7 +75,28 @@ public interface RedissonLockOperations {
      * @param <R>        回调函数的返回值类型
      * @return 回调函数执行后的返回值
      */
-    <R> R tryLock(String key, Function<Boolean, R> callback, Consumer<Throwable> exConsumer);
+    <R> R tryLock(String key, Function<Boolean, R> callback, Consumer<Exception> exConsumer);
+
+    /**
+     * 尝试加锁并执行回调（无返回值版本）
+     *
+     * @param key      要尝试加锁的键名
+     * @param callback 加锁结果回调函数（参数为加锁是否成功）
+     */
+    default void tryLockWithoutResult(String key, Consumer<Boolean> callback) {
+        tryLock(key, isLocked -> {
+            callback.accept(isLocked);
+            return null;
+        });
+    }
+
+    /**
+     * 尝试获取指定键的锁并通过回调返回结果（无返回值版本）
+     *
+     * @param key      锁的唯一标识键
+     * @param callback 获取锁结果的回调函数（接收Boolean类型结果）
+     */
+    <R> R tryLock(String key, Function<Boolean, R> callback);
 
     /**
      * 尝试获取指定键的锁
@@ -98,7 +119,7 @@ public interface RedissonLockOperations {
      * @param callback   获取锁结果的回调函数（接收Boolean类型结果）
      * @param exConsumer 异常处理回调函数
      */
-    default void tryLockWithoutResult(String key, long waitTime, long leaseTime, TimeUnit unit, Consumer<Boolean> callback, Consumer<Throwable> exConsumer) {
+    default void tryLockWithoutResult(String key, long waitTime, long leaseTime, TimeUnit unit, Consumer<Boolean> callback, Consumer<Exception> exConsumer) {
         tryLock(key, waitTime, leaseTime, unit, isLocked -> {
             callback.accept(isLocked);
             return null;
@@ -117,7 +138,36 @@ public interface RedissonLockOperations {
      * @param <R>        回调函数返回结果的类型
      * @return 回调函数返回的自定义结果
      */
-    <R> R tryLock(String key, long waitTime, long leaseTime, TimeUnit unit, Function<Boolean, R> callback, Consumer<Throwable> exConsumer);
+    <R> R tryLock(String key, long waitTime, long leaseTime, TimeUnit unit, Function<Boolean, R> callback, Consumer<Exception> exConsumer);
+
+    /**
+     * 异步尝试获取锁并通过回调返回结果（无返回值版本）
+     *
+     * @param key       锁的唯一标识键
+     * @param waitTime  获取锁的最大等待时间
+     * @param leaseTime 锁的持有时间
+     * @param unit      时间单位
+     * @param callback  获取锁结果的回调函数（接收Boolean类型结果）
+     */
+    default void tryLockWithoutResult(String key, long waitTime, long leaseTime, TimeUnit unit, Consumer<Boolean> callback) {
+        tryLock(key, waitTime, leaseTime, unit, isLocked -> {
+            callback.accept(isLocked);
+            return null;
+        });
+    }
+
+    /**
+     * 尝试获取锁并通过回调函数返回自定义结果（泛型版本）
+     *
+     * @param key       锁的唯一标识键
+     * @param waitTime  获取锁的最大等待时间
+     * @param leaseTime 锁的持有时间
+     * @param unit      时间单位
+     * @param callback  成功获取锁后的回调函数（接收Boolean状态并返回自定义结果）
+     * @param <R>       回调函数返回结果的类型
+     * @return 回调函数返回的自定义结果
+     */
+    <R> R tryLock(String key, long waitTime, long leaseTime, TimeUnit unit, Function<Boolean, R> callback);
 
     /**
      * 检查指定键的锁是否已被持有（不区分持有线程）
