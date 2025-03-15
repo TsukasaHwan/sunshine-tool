@@ -115,7 +115,7 @@ public class StreamDeadLetterQueueProcessor {
 
                 List<MapRecord<String, Object, Object>> records = streamOperations.range(streamKey, Range.just(recordId.getValue()));
                 if (CollectionUtils.isEmpty(records)) {
-                    logger.warn("[RECORD_NOT_FOUND] 未找到消息记录{}, 流键：{}", recordId, streamKey);
+                    logger.warn("[RECORD_NOT_FOUND] 未找到消息记录{}，流键：{}", recordId, streamKey);
                     return;
                 }
                 // 重新投递
