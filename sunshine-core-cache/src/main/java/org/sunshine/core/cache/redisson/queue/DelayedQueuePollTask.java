@@ -38,9 +38,10 @@ class DelayedQueuePollTask<T> implements Runnable {
 
         RLock lock = redissonClient.getLock(String.format(LOCK_TEMPLATE, delayedQueueListener.delayedQueueKey()));
         boolean isLocked = false;
+        T message;
         while (!Thread.currentThread().isInterrupted()) {
             try {
-                T message = blockingDeque.take();
+                message = blockingDeque.take();
                 isLocked = lock.tryLock();
                 if (!isLocked) {
                     continue;
