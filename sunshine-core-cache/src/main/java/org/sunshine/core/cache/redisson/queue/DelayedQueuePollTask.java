@@ -40,7 +40,6 @@ class DelayedQueuePollTask<T> implements Runnable {
                 consume(message);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                delayedQueueListener.handleException(e);
             } catch (Exception e) {
                 delayedQueueListener.handleException(e);
             }
