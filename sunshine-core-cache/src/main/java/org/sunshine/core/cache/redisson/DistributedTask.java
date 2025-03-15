@@ -31,7 +31,7 @@ public interface DistributedTask {
                 return;
             }
             this.execute();
-        }), this::handelException);
+        }), this::handleException);
     }
 
     /**
@@ -39,7 +39,7 @@ public interface DistributedTask {
      *
      * @param exception Exception
      */
-    default void handelException(Exception exception) {
+    default void handleException(Exception exception) {
         log.error(exception.getMessage(), exception);
     }
 
