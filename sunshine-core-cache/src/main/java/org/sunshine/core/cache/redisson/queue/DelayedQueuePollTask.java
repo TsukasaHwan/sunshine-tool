@@ -1,9 +1,8 @@
 package org.sunshine.core.cache.redisson.queue;
 
 import org.redisson.api.RBlockingDeque;
+import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sunshine.core.tool.support.Try;
 
 import java.util.concurrent.ThreadPoolExecutor;
@@ -14,7 +13,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 class DelayedQueuePollTask<T> implements Runnable {
 
-    private final static Logger log = LoggerFactory.getLogger(DelayedQueuePollTask.class);
+    private final static String LOCK_TEMPLATE = "lock:redis-delayed-queue:%s";
 
     private final RedissonClient redissonClient;
 
@@ -36,16 +35,26 @@ class DelayedQueuePollTask<T> implements Runnable {
         RBlockingDeque<T> blockingDeque = redissonClient.getBlockingDeque(delayedQueueListener.delayedQueueKey());
         // 解决消息丢失问题，发送subscribe命令订阅redis队列
         redissonClient.getDelayedQueue(blockingDeque);
+
+        RLock lock = redissonClient.getLock(String.format(LOCK_TEMPLATE, delayedQueueListener.delayedQueueKey()));
+        boolean isLocked = false;
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 T message = blockingDeque.take();
+                isLocked = lock.tryLock();
+                if (!isLocked) {
+                    continue;
+                }
                 consume(message);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
             } catch (Exception e) {
-                log.error(e.getMessage(), e);
+                if (e instanceof InterruptedException) {
+                    Thread.currentThread().interrupt();
+                }
+                delayedQueueListener.handleException(e);
             } finally {
-                delayedQueueListener.whenFinally();
+                if (isLocked) {
+                    lock.unlock();
+                }
             }
         }
     }
@@ -68,7 +77,7 @@ class DelayedQueuePollTask<T> implements Runnable {
      */
     private void consume(T message) throws Exception {
         if (delayedThreadPoolExecutor != null) {
-            delayedThreadPoolExecutor.execute(Try.run(() -> delayedQueueListener.consume(message), throwable -> log.error(throwable.getMessage(), throwable)));
+            delayedThreadPoolExecutor.execute(Try.run(() -> delayedQueueListener.consume(message)));
         } else {
             delayedQueueListener.consume(message);
         }

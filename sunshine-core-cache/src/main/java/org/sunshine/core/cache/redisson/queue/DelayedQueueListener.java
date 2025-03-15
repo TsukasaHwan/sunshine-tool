@@ -42,8 +42,10 @@ public interface DelayedQueueListener<T> {
     }
 
     /**
-     * 最终处理
+     * 异常处理
+     *
+     * @param e Exception
      */
-    default void whenFinally() {
+    default void handleException(Exception e) {
     }
 }
