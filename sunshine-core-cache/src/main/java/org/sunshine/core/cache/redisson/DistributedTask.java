@@ -31,16 +31,16 @@ public interface DistributedTask {
                 return;
             }
             this.execute();
-        }), this::handleError);
+        }), this::handelException);
     }
 
     /**
-     * 错误处理
+     * 异常处理
      *
-     * @param throwable Throwable
+     * @param exception Exception
      */
-    default void handleError(Throwable throwable) {
-        log.error(throwable.getMessage(), throwable);
+    default void handelException(Exception exception) {
+        log.error(exception.getMessage(), exception);
     }
 
 }
