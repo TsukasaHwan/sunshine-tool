@@ -13,11 +13,6 @@ public class DistributedTaskExecutor {
      */
     private final RedissonLockTemplate template;
 
-    /**
-     * 分布式任务
-     */
-    private DistributedTask task;
-
     public DistributedTaskExecutor(RedissonLockTemplate template) {
         this.template = template;
     }
@@ -33,22 +28,15 @@ public class DistributedTaskExecutor {
     }
 
     /**
-     * 设置分布式任务
-     *
-     * @param task 分布式任务
-     * @return DistributedTaskExecutor
-     */
-    public synchronized DistributedTaskExecutor task(DistributedTask task) {
-        this.task = task;
-        return this;
-    }
-
-    /**
      * 执行分布式任务
      *
+     * @param task    分布式任务
      * @param lockKey 锁键
      */
-    public synchronized void execute(String lockKey) {
+    public synchronized void execute(DistributedTask task, String lockKey) {
+        if (task == null) {
+            throw new IllegalArgumentException("task must not be null");
+        }
         task.runWithLock(lockKey, template);
     }
 }

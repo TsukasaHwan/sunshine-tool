@@ -44,8 +44,7 @@ public class StreamDeadLetterQueueProcessor {
     public void scheduleMainDeadLetterTask() {
         DistributedTask distributedTask = () -> listeners.forEach(this::processPendingDeadLetters);
 
-        distributedTaskExecutor.task(distributedTask)
-                .execute(DEAD_LETTER_MAIN_LOCK);
+        distributedTaskExecutor.execute(distributedTask, DEAD_LETTER_MAIN_LOCK);
     }
 
     /**
@@ -58,8 +57,7 @@ public class StreamDeadLetterQueueProcessor {
                 .opsForStream()
                 .trim(listener.getStreamKey(), listener.getTrimConfig().getMaxCount());
 
-        distributedTaskExecutor.task(distributedTask)
-                .execute(String.format(TRIM_LOCK_TEMPLATE, listener.getStreamKey()));
+        distributedTaskExecutor.execute(distributedTask, String.format(TRIM_LOCK_TEMPLATE, listener.getStreamKey()));
     }
 
     /**
@@ -70,8 +68,7 @@ public class StreamDeadLetterQueueProcessor {
     public void scheduleDeadLetterTask(AbstractStreamListener<?> listener) {
         DistributedTask distributedTask = () -> this.processPendingDeadLetters(listener);
 
-        distributedTaskExecutor.task(distributedTask)
-                .execute(String.format(DEAD_LETTER_SUB_LOCK_TEMPLATE, listener.getStreamKey()));
+        distributedTaskExecutor.execute(distributedTask, String.format(DEAD_LETTER_SUB_LOCK_TEMPLATE, listener.getStreamKey()));
     }
 
     /**
