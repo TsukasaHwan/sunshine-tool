@@ -121,11 +121,12 @@ public class DistributedLockAspect {
                     distributedLock.timeUnit()
             );
 
-            if (locked) {
-                return pjp.proceed();
+            if (!locked) {
+                logger.warn("Failed to acquire lock: {}", lockKey);
+                return null;
             }
-            logger.warn("Failed to acquire lock: {}", lockKey);
-            return null;
+
+            return pjp.proceed();
 
         } finally {
             redissonLockTemplate.unlock(locked, lockKey);
@@ -145,9 +146,7 @@ public class DistributedLockAspect {
             redissonLockTemplate.lock(lockKey);
             return pjp.proceed();
         } finally {
-            if (redissonLockTemplate.isHeldByCurrentThread(lockKey)) {
-                redissonLockTemplate.unlock(lockKey);
-            }
+            redissonLockTemplate.unlock(lockKey);
         }
     }
 }
