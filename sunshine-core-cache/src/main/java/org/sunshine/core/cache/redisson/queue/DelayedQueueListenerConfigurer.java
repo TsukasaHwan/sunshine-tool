@@ -65,16 +65,18 @@ public class DelayedQueueListenerConfigurer implements InitializingBean, Disposa
                 numberOfJob,
                 0L,
                 TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue<>(numberOfJob),
+                new LinkedBlockingQueue<>(),
                 namedThreadFactory
         );
         GenericApplicationContext appContext = (GenericApplicationContext) context;
-        delayedQueueListenerList.forEach(delayedQueueListener -> {
-            String beanName = getDelayedQueuePollTaskBeanName(delayedQueueListener);
-            appContext.registerBean(beanName, DelayedQueuePollTask.class, redissonClient, delayedQueueListener);
-            DelayedQueuePollTask<?> delayedQueuePollTask = (DelayedQueuePollTask<?>) context.getBean(beanName);
-            delayedThreadPoolExecutor.execute(delayedQueuePollTask);
-        });
+        delayedQueueListenerList.stream()
+                .filter(DelayedQueueListener::isEnable)
+                .forEach(delayedQueueListener -> {
+                    String beanName = getDelayedQueuePollTaskBeanName(delayedQueueListener);
+                    appContext.registerBean(beanName, DelayedQueuePollTask.class, redissonClient, delayedQueueListener);
+                    DelayedQueuePollTask<?> delayedQueuePollTask = (DelayedQueuePollTask<?>) context.getBean(beanName);
+                    delayedThreadPoolExecutor.execute(delayedQueuePollTask);
+                });
     }
 
     private String getDelayedQueuePollTaskBeanName(DelayedQueueListener<?> delayedQueueListener) {
