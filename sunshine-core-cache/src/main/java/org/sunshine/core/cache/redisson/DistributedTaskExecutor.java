@@ -38,7 +38,7 @@ public class DistributedTaskExecutor {
      * @param task 分布式任务
      * @return DistributedTaskExecutor
      */
-    public DistributedTaskExecutor task(DistributedTask task) {
+    public synchronized DistributedTaskExecutor task(DistributedTask task) {
         this.task = task;
         return this;
     }
@@ -48,7 +48,7 @@ public class DistributedTaskExecutor {
      *
      * @param lockKey 锁键
      */
-    public void execute(String lockKey) {
+    public synchronized void execute(String lockKey) {
         task.runWithLock(lockKey, template);
     }
 }
