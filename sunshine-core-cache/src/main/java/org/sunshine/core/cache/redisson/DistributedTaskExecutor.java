@@ -33,7 +33,7 @@ public class DistributedTaskExecutor {
      * @param task    分布式任务
      * @param lockKey 锁键
      */
-    public synchronized void execute(DistributedTask task, String lockKey) {
+    public void execute(DistributedTask task, String lockKey) {
         if (task == null) {
             throw new IllegalArgumentException("task must not be null");
         }
