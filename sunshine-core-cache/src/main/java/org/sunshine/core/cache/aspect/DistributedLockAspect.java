@@ -146,7 +146,9 @@ public class DistributedLockAspect {
             redissonLockTemplate.lock(lockKey);
             return pjp.proceed();
         } finally {
-            redissonLockTemplate.unlock(lockKey);
+            if (redissonLockTemplate.isHeldByCurrentThread(lockKey)) {
+                redissonLockTemplate.unlock(lockKey);
+            }
         }
     }
 }
