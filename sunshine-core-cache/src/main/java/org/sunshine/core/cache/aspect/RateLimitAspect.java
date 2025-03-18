@@ -70,19 +70,14 @@ public class RateLimitAspect {
             case FIXED_WINDOW -> {
                 // 固定窗口
                 redisScript.setScriptSource(scriptSingleton.getScriptSource(RateLimit.RateLimitType.FIXED_WINDOW));
-                args = new Object[2];
-                args[0] = rateLimit.limit();
-                args[1] = unit.toSeconds(rateLimit.windowSize());
+                args = new Object[]{rateLimit.limit(), unit.toSeconds(rateLimit.windowSize())};
             }
             case SLIDING_WINDOW -> {
                 // 滑动窗口
                 redisScript.setScriptSource(scriptSingleton.getScriptSource(RateLimit.RateLimitType.SLIDING_WINDOW));
                 long currentTime = System.currentTimeMillis();
                 long windowStart = currentTime - unit.toMillis(rateLimit.windowSize());
-                args = new Object[3];
-                args[0] = currentTime;
-                args[1] = windowStart;
-                args[2] = rateLimit.limit();
+                args = new Object[]{currentTime, windowStart, rateLimit.limit()};
             }
             default -> throw new IllegalArgumentException("Invalid rate limit type: " + type);
         }
