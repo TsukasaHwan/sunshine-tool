@@ -51,36 +51,22 @@ public class RateLimitAspect {
             }
         }
         List<String> keys = Collections.singletonList(rateLimit.prefix() + key + StringPool.COLON + request.getRequestURI());
-        Long result = selectLimitType(keys, rateLimit);
+        Long result = executeScript(keys, rateLimit);
         if (result == null || result.equals(0L)) {
             throw new BusinessException(rateLimit.msg());
         }
         return joinPoint.proceed();
     }
 
-    private Long selectLimitType(List<String> keys, RateLimit rateLimit) {
+    private Long executeScript(List<String> keys, RateLimit rateLimit) {
         RateLimit.RateLimitType type = rateLimit.type();
         DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>();
         redisScript.setResultType(Long.class);
 
-        TimeUnit unit = rateLimit.unit();
         RateLimitScriptSingleton scriptSingleton = RateLimitScriptSingleton.INSTANCE;
-        Object[] args;
-        switch (type) {
-            case FIXED_WINDOW -> {
-                // 固定窗口
-                redisScript.setScriptSource(scriptSingleton.getScriptSource(RateLimit.RateLimitType.FIXED_WINDOW));
-                args = new Object[]{rateLimit.limit(), unit.toSeconds(rateLimit.windowSize())};
-            }
-            case SLIDING_WINDOW -> {
-                // 滑动窗口
-                redisScript.setScriptSource(scriptSingleton.getScriptSource(RateLimit.RateLimitType.SLIDING_WINDOW));
-                long currentTime = System.currentTimeMillis();
-                long windowStart = currentTime - unit.toMillis(rateLimit.windowSize());
-                args = new Object[]{currentTime, windowStart, rateLimit.limit()};
-            }
-            default -> throw new IllegalArgumentException("Invalid rate limit type: " + type);
-        }
+        Object[] args = scriptSingleton.getArgs(rateLimit);
+        ResourceScriptSource scriptSource = scriptSingleton.getScriptSource(type);
+        redisScript.setScriptSource(scriptSource);
 
         return redisTemplate.execute(redisScript, keys, args);
     }
@@ -97,6 +83,22 @@ public class RateLimitAspect {
 
         public ResourceScriptSource getScriptSource(RateLimit.RateLimitType type) {
             return scriptSources.get(type);
+        }
+
+        public Object[] getArgs(RateLimit rateLimit) {
+            RateLimit.RateLimitType type = rateLimit.type();
+            TimeUnit unit = rateLimit.unit();
+            switch (type) {
+                case FIXED_WINDOW -> {
+                    return new Object[]{rateLimit.limit(), unit.toSeconds(rateLimit.windowSize())};
+                }
+                case SLIDING_WINDOW -> {
+                    long currentTime = System.currentTimeMillis();
+                    long windowStart = currentTime - unit.toMillis(rateLimit.windowSize());
+                    return new Object[]{currentTime, windowStart, rateLimit.limit()};
+                }
+                default -> throw new IllegalArgumentException("Invalid rate limit type: " + type);
+            }
         }
     }
 }
