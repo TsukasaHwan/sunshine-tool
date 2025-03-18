@@ -70,17 +70,17 @@ public interface RedisClient {
 
     // ================ Set ================
 
-    Set<Object> setGetAll(String key);
+    Set<Object> setMembers(String key);
 
-    Boolean setHasKey(String key, Object value);
+    Boolean setIsMember(String key, Object value);
 
-    Long setAdd(String key, Object... values);
+    Long setAddMembers(String key, Object... values);
 
-    Long setAddWithExpire(String key, long time, TimeUnit timeUnit, Object... values);
+    Long setAddMembersWithExpire(String key, long time, TimeUnit timeUnit, Object... values);
 
-    Long setGetSize(String key);
+    Long setSize(String key);
 
-    Long setRemove(String key, Object... values);
+    Long setRemoveMembers(String key, Object... values);
 
     // ================ List ================
 

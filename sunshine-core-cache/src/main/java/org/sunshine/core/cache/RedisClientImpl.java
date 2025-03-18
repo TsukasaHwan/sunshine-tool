@@ -186,22 +186,22 @@ public record RedisClientImpl(RedisTemplate<String, Object> redisTemplate) imple
     }
 
     @Override
-    public Set<Object> setGetAll(String key) {
+    public Set<Object> setMembers(String key) {
         return redisTemplate.opsForSet().members(key);
     }
 
     @Override
-    public Boolean setHasKey(String key, Object value) {
+    public Boolean setIsMember(String key, Object value) {
         return redisTemplate.opsForSet().isMember(key, value);
     }
 
     @Override
-    public Long setAdd(String key, Object... values) {
+    public Long setAddMembers(String key, Object... values) {
         return redisTemplate.opsForSet().add(key, values);
     }
 
     @Override
-    public Long setAddWithExpire(String key, long time, TimeUnit timeUnit, Object... values) {
+    public Long setAddMembersWithExpire(String key, long time, TimeUnit timeUnit, Object... values) {
         Long count = redisTemplate.opsForSet().add(key, values);
         if (time > 0) {
             expire(key, time, timeUnit);
@@ -210,12 +210,12 @@ public record RedisClientImpl(RedisTemplate<String, Object> redisTemplate) imple
     }
 
     @Override
-    public Long setGetSize(String key) {
+    public Long setSize(String key) {
         return redisTemplate.opsForSet().size(key);
     }
 
     @Override
-    public Long setRemove(String key, Object... values) {
+    public Long setRemoveMembers(String key, Object... values) {
         return redisTemplate.opsForSet().remove(key, values);
     }
 
