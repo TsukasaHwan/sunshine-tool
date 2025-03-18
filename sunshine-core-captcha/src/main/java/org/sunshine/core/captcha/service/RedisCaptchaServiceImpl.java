@@ -4,6 +4,8 @@ import com.xingyuv.captcha.service.CaptchaCacheService;
 import jakarta.annotation.Resource;
 import org.sunshine.core.cache.RedisClient;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * @author Teamo
  * @since 2023/8/7
@@ -15,7 +17,7 @@ public class RedisCaptchaServiceImpl implements CaptchaCacheService {
 
     @Override
     public void set(String key, String value, long expiresInSeconds) {
-        redisClient.set(key, value, expiresInSeconds);
+        redisClient.setValueWithExpire(key, value, expiresInSeconds, TimeUnit.SECONDS);
     }
 
     @Override
@@ -25,12 +27,12 @@ public class RedisCaptchaServiceImpl implements CaptchaCacheService {
 
     @Override
     public void delete(String key) {
-        redisClient.del(key);
+        redisClient.delete(key);
     }
 
     @Override
     public String get(String key) {
-        return (String) redisClient.get(key).orElse(null);
+        return (String) redisClient.getValue(key).orElse(null);
     }
 
     @Override
@@ -40,6 +42,6 @@ public class RedisCaptchaServiceImpl implements CaptchaCacheService {
 
     @Override
     public Long increment(String key, long val) {
-        return redisClient.incr(key, val);
+        return redisClient.increment(key, val);
     }
 }

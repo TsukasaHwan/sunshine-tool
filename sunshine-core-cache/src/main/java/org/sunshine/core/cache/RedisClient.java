@@ -3,6 +3,7 @@ package org.sunshine.core.cache;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -11,433 +12,119 @@ import java.util.concurrent.TimeUnit;
  * @since 2020/03/30
  */
 public interface RedisClient {
+    // ================ Key Value ================
 
-    /**
-     * 指定缓存失效时间
-     *
-     * @param key  键
-     * @param time 时间(秒)
-     * @return 是否成功
-     */
-    Boolean expire(String key, long time);
+    Boolean expire(String key, long time, TimeUnit timeUnit);
 
-    /**
-     * 根据key 获取过期时间
-     *
-     * @param key 键 不能为null
-     * @return 时间(秒) 返回0代表为永久有效
-     */
-    Long getExpire(String key);
+    Long getExpire(String key, TimeUnit timeUnit);
 
-    /**
-     * 判断key是否存在
-     *
-     * @param key 键
-     * @return true 存在 false不存在
-     */
     Boolean hasKey(String key);
 
-    /**
-     * 删除缓存
-     *
-     * @param key 可以传一个值 或多个
-     */
-    void del(String... key);
+    void delete(String... keys);
 
-    // ============================String=============================//
+    Optional<Object> getValue(String key);
 
-    /**
-     * 普通缓存获取
-     *
-     * @param key 键
-     * @return 值
-     */
-    Optional<Object> get(String key);
+    void setValue(String key, Object value);
 
-    /**
-     * 普通缓存放入
-     *
-     * @param key   键
-     * @param value 值
-     */
-    void set(String key, Object value);
+    void setValueWithExpire(String key, Object value, long time, TimeUnit timeUnit);
 
-    /**
-     * 普通缓存放入并设置时间
-     *
-     * @param key   键
-     * @param value 值
-     * @param time  时间(秒) time要大于0 如果time小于等于0 将设置无限期
-     */
-    void set(String key, Object value, long time);
+    void setValueWithExpire(String key, Object value, Duration duration);
 
-    /**
-     * 普通缓存放入并设置时间
-     *
-     * @param key      键
-     * @param value    值
-     * @param time     时间 time要大于0 如果time小于等于0 将设置无限期
-     * @param timeUnit 时间单位
-     */
-    void set(String key, Object value, long time, TimeUnit timeUnit);
+    Long increment(String key);
 
-    /**
-     * 递增
-     *
-     * @param key
-     * @param delta 要增加几(大于0)
-     * @return
-     */
-    Long incr(String key, long delta);
+    Long increment(String key, long delta);
 
-    /**
-     * 递减
-     *
-     * @param key   键
-     * @param delta 要减少几(小于0)
-     * @return
-     */
-    Long decr(String key, long delta);
+    Double increment(String key, double delta);
 
-    /**
-     * 批量获取
-     *
-     * @param keys 键
-     * @return 获取多个按键。值按请求的键的顺序排列，缺少字段值使用null在由此产生的列表。
-     */
-    List<Object> multiGet(Collection<String> keys);
+    Long decrement(String key, long delta);
 
-    // ================================Map=================================//
+    Double decrement(String key, double delta);
 
-    /**
-     * HashGet
-     *
-     * @param key  键 不能为null
-     * @param item 项 不能为null
-     * @return 值
-     */
-    Optional<Object> hget(String key, String item);
+    List<Object> getMultipleValues(Collection<String> keys);
 
-    /**
-     * 获取hashKey对应的所有键值
-     *
-     * @param key 键
-     * @return 对应的多个键值
-     */
-    Map<Object, Object> hmget(String key);
+    // ================ Hash ================
 
-    /**
-     * HashSet
-     *
-     * @param key 键
-     * @param map 对应多个键值
-     */
-    void hmset(String key, Map<String, Object> map);
+    Optional<Object> hashGet(String key, String item);
 
-    /**
-     * HashSet 并设置时间
-     *
-     * @param key  键
-     * @param map  对应多个键值
-     * @param time 时间(秒)
-     */
-    void hmset(String key, Map<String, Object> map, long time);
+    Map<Object, Object> hashGetAll(String key);
 
-    /**
-     * 向一张hash表中放入数据,如果不存在将创建
-     *
-     * @param key   键
-     * @param item  项
-     * @param value 值
-     */
-    void hset(String key, String item, Object value);
+    void hashPutAll(String key, Map<String, Object> map);
 
-    /**
-     * 向一张hash表中放入数据,如果不存在将创建
-     *
-     * @param key   键
-     * @param item  项
-     * @param value 值
-     * @param time  时间(秒) 注意:如果已存在的hash表有时间,这里将会替换原有的时间
-     */
-    void hset(String key, String item, Object value, long time);
+    void hashPutAllWithExpire(String key, Map<String, Object> map, long time, TimeUnit timeUnit);
 
-    /**
-     * 删除hash表中的值
-     *
-     * @param key  键 不能为null
-     * @param item 项 可以使多个 不能为null
-     * @return
-     */
-    Long hdel(String key, Object... item);
+    void hashPut(String key, String item, Object value);
 
-    /**
-     * 判断hash表中是否有该项的值
-     *
-     * @param key  键 不能为null
-     * @param item 项 不能为null
-     * @return true 存在 false不存在
-     */
-    Boolean hHasKey(String key, String item);
+    void hashPutWithExpire(String key, String item, Object value, long time, TimeUnit timeUnit);
 
-    /**
-     * hash递增 如果不存在,就会创建一个 并把新增后的值返回
-     *
-     * @param key  键
-     * @param item 项
-     * @param by   要增加几(大于0)
-     * @return
-     */
-    Double hincr(String key, String item, double by);
+    Long hashDelete(String key, Object... items);
 
-    /**
-     * hash递减
-     *
-     * @param key  键
-     * @param item 项
-     * @param by   要减少记(小于0)
-     * @return
-     */
-    Double hdecr(String key, String item, double by);
+    Boolean hashHasKey(String key, String item);
 
-    // ============================set=============================//
+    Long hashIncrement(String key, String item, long by);
 
-    /**
-     * 根据key获取Set中的所有值
-     *
-     * @param key 键
-     * @return
-     */
-    Set<Object> sGet(String key);
+    Long hashDecrement(String key, String item, long by);
 
-    /**
-     * 根据value从一个set中查询,是否存在
-     *
-     * @param key   键
-     * @param value 值
-     * @return true 存在 false不存在
-     */
-    Boolean sHasKey(String key, Object value);
+    Double hashIncrement(String key, String item, double by);
 
-    /**
-     * 将数据放入set缓存
-     *
-     * @param key    键
-     * @param values 值 可以是多个
-     * @return 成功个数
-     */
-    Long sSet(String key, Object... values);
+    Double hashDecrement(String key, String item, double by);
 
-    /**
-     * 将set数据放入缓存
-     *
-     * @param key    键
-     * @param time   时间(秒)
-     * @param values 值可以是多个
-     * @return 成功个数
-     */
-    Long sSetWitExpire(String key, long time, Object... values);
+    // ================ Set ================
 
-    /**
-     * 获取set缓存的长度
-     *
-     * @param key 键
-     * @return
-     */
-    Long sSize(String key);
+    Set<Object> getSetMembers(String key);
 
-    /**
-     * 移除值为value的
-     *
-     * @param key    键
-     * @param values 值可以是多个
-     * @return 移除的个数
-     */
-    Long sDel(String key, Object... values);
+    Boolean setHasKey(String key, Object value);
 
-    // ===============================list=================================//
+    Long setAdd(String key, Object... values);
 
-    /**
-     * 获取list缓存的内容
-     *
-     * @param key   键
-     * @param start 开始
-     * @param end   结束 0 到 -1代表所有值
-     * @return
-     */
-    List<Object> lGet(String key, long start, long end);
+    Long setAddWithExpire(String key, long time, TimeUnit timeUnit, Object... values);
 
-    /**
-     * 获取list缓存的长度
-     *
-     * @param key 键
-     * @return
-     */
-    Long lSize(String key);
+    Long setGetSize(String key);
 
-    /**
-     * 通过索引 获取list中的值
-     *
-     * @param key   键
-     * @param index 索引 index>=0时， 0 表头，1 第二个元素，依次类推；index<0时，-1，表尾，-2倒数第二个元素，依次类推
-     * @return
-     */
-    Optional<Object> lIndex(String key, long index);
+    Long setRemove(String key, Object... values);
 
-    /**
-     * 将list放入缓存
-     *
-     * @param key   键
-     * @param value 值
-     * @return
-     */
-    Long lSet(String key, Object value);
+    // ================ List ================
 
-    /**
-     * 将list放入缓存
-     *
-     * @param key   键
-     * @param value 值
-     * @param time  时间(秒)
-     * @return
-     */
-    Long lSet(String key, Object value, long time);
+    List<Object> listRange(String key, long start, long end);
 
-    /**
-     * 将list放入缓存
-     *
-     * @param key   键
-     * @param value 值
-     * @return
-     */
-    Long lSet(String key, List<Object> value);
+    Long listGetSize(String key);
 
-    /**
-     * 将list放入缓存
-     *
-     * @param key   键
-     * @param value 值
-     * @param time  时间(秒)
-     * @return
-     */
-    Long lSet(String key, List<Object> value, long time);
+    Optional<Object> listGetIndex(String key, long index);
 
-    /**
-     * 根据索引修改list中的某条数据
-     *
-     * @param key   键
-     * @param index 索引
-     * @param value 值
-     */
-    void lUpdateIndex(String key, long index, Object value);
+    Long listRightPush(String key, Object value);
 
-    /**
-     * 移除N个值为value
-     *
-     * @param key   键
-     * @param count 移除多少个
-     * @param value 值
-     * @return 移除的个数
-     */
-    Long lDel(String key, long count, Object value);
+    Long listRightPushWithExpire(String key, Object value, long time, TimeUnit timeUnit);
 
-    /**
-     * zSet添加或更新
-     *
-     * @param key   键
-     * @param value 值
-     * @param score 分数
-     * @return
-     */
-    Boolean zsSet(String key, Object value, double score);
+    Long listRightPushAll(String key, List<Object> values);
 
-    /**
-     * 使用加法操作分数
-     *
-     * @param key   键
-     * @param value 值
-     * @param score 要加的分数
-     * @return
-     */
-    Double zsIncrScore(String key, Object value, double score);
+    Long listRightPushAllWithExpire(String key, List<Object> values, long time, TimeUnit timeUnit);
 
-    /**
-     * 使用减法操作分数
-     *
-     * @param key   键
-     * @param value 值
-     * @param score 要减的分数
-     * @return
-     */
-    Double zsDecrScore(String key, Object value, double score);
+    void listUpdateIndex(String key, long index, Object value);
 
-    /**
-     * 批量更新或者添加到zSet
-     *
-     * @param key    键
-     * @param tuples 要更新的分数
-     * @return
-     */
-    Long zsBatchSet(String key, Set<ZSetOperations.TypedTuple<Object>> tuples);
+    Long listRemove(String key, long count, Object value);
 
-    /**
-     * 获取倒序排名
-     *
-     * @param key   键
-     * @param value 值
-     * @return
-     */
-    Long zsReverseRank(String key, Object value);
+    // ================ ZSet ================
 
-    /**
-     * 获取分数
-     *
-     * @param key   键
-     * @param value 值
-     * @return
-     */
-    Double zsScore(String key, Object value);
+    Boolean zSetAdd(String key, Object value, double score);
 
-    /**
-     * 从分数低到高正序取出数据
-     *
-     * @param key   键
-     * @param start 开始索引
-     * @param end   结束索引
-     * @return
-     */
-    Set<ZSetOperations.TypedTuple<Object>> zsRangeWithScores(String key, long start, long end);
+    Double zSetIncrementScore(String key, Object value, double score);
 
-    /**
-     * 从分数高到低倒序取出数据
-     *
-     * @param key   键
-     * @param start 开始索引
-     * @param end   结束索引
-     * @return
-     */
-    Set<ZSetOperations.TypedTuple<Object>> zsReverseRangeWithScores(String key, long start, long end);
+    Double zSetDecrementScore(String key, Object value, double score);
 
-    /**
-     * 根据通配符批量获取key
-     *
-     * @param pattern 通配符
-     * @return 所有的键
-     */
-    List<String> scan(String pattern);
+    Long zSetAddAll(String key, Set<ZSetOperations.TypedTuple<Object>> tuples);
 
-    /**
-     * 根据通配符批量删除key
-     *
-     * @param pattern 通配符
-     */
-    void batchDel(String pattern);
+    Long zSetReverseRank(String key, Object value);
 
-    /**
-     * 获取Redis模板对象。
-     * 这个方法用于返回一个配置好的Redis模板，可以在应用程序中直接使用它来操作Redis数据库。
-     *
-     * @return RedisTemplate<String, Object> 返回一个字符串键和对象值的Redis模板。这个模板可以用于执行各种Redis操作，如存取数据、执行命令等。
-     */
+    Double zSetScore(String key, Object value);
+
+    Set<ZSetOperations.TypedTuple<Object>> zSetRangeWithScores(String key, long start, long end);
+
+    Set<ZSetOperations.TypedTuple<Object>> zSetReverseRangeWithScores(String key, long start, long end);
+
+    // ================ 其他 ================
+
+    List<String> scanKeys(String pattern);
+
+    void batchDelete(String pattern);
+
     RedisTemplate<String, Object> redisTemplate();
 }
