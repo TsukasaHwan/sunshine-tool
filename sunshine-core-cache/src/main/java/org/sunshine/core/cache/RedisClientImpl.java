@@ -225,7 +225,7 @@ public record RedisClientImpl(RedisTemplate<String, Object> redisTemplate) imple
     }
 
     @Override
-    public Long listGetSize(String key) {
+    public Long listSize(String key) {
         return redisTemplate.opsForList().size(key);
     }
 
