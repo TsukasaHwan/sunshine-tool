@@ -61,26 +61,35 @@ public class RateLimitAspect {
     }
 
     private Long selectLimitType(ImmutableList<String> keys, RateLimit rateLimit) {
-        Long result = null;
         RateLimit.RateLimitType type = rateLimit.type();
         DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>();
-        TimeUnit unit = rateLimit.unit();
         redisScript.setResultType(Long.class);
+
+        TimeUnit unit = rateLimit.unit();
         RateLimitScriptSingleton scriptSingleton = RateLimitScriptSingleton.INSTANCE;
-        if (type.equals(RateLimit.RateLimitType.FIXED_WINDOW)) {
-            // 固定窗口
-            redisScript.setScriptSource(scriptSingleton.getScriptSource(RateLimit.RateLimitType.FIXED_WINDOW));
-            result = redisTemplate.execute(redisScript, keys, rateLimit.limit(), unit.toSeconds(rateLimit.windowSize()));
-        } else if (type.equals(RateLimit.RateLimitType.SLIDING_WINDOW)) {
-            // 滑动窗口
-            long currentTime = System.currentTimeMillis();
-            long windowStart = currentTime - unit.toMillis(rateLimit.windowSize());
-            redisScript.setScriptSource(scriptSingleton.getScriptSource(RateLimit.RateLimitType.SLIDING_WINDOW));
-            result = redisTemplate.execute(redisScript, keys, currentTime, windowStart, rateLimit.limit());
-        } else {
-            throw new IllegalArgumentException("Invalid rate limit type: " + type);
+        Object[] args;
+        switch (type) {
+            case FIXED_WINDOW -> {
+                // 固定窗口
+                redisScript.setScriptSource(scriptSingleton.getScriptSource(RateLimit.RateLimitType.FIXED_WINDOW));
+                args = new Object[2];
+                args[0] = rateLimit.limit();
+                args[1] = unit.toSeconds(rateLimit.windowSize());
+            }
+            case SLIDING_WINDOW -> {
+                // 滑动窗口
+                redisScript.setScriptSource(scriptSingleton.getScriptSource(RateLimit.RateLimitType.SLIDING_WINDOW));
+                long currentTime = System.currentTimeMillis();
+                long windowStart = currentTime - unit.toMillis(rateLimit.windowSize());
+                args = new Object[3];
+                args[0] = currentTime;
+                args[1] = windowStart;
+                args[2] = rateLimit.limit();
+            }
+            default -> throw new IllegalArgumentException("Invalid rate limit type: " + type);
         }
-        return result;
+
+        return redisTemplate.execute(redisScript, keys, args);
     }
 
     private enum RateLimitScriptSingleton {
