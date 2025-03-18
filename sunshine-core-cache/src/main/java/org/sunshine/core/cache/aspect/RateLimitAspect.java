@@ -1,6 +1,5 @@
 package org.sunshine.core.cache.aspect;
 
-import com.google.common.collect.ImmutableList;
 import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -18,7 +17,9 @@ import org.sunshine.core.tool.util.StringUtils;
 import org.sunshine.core.tool.util.WebUtils;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -43,16 +44,13 @@ public class RateLimitAspect {
         Method signatureMethod = signature.getMethod();
         String key = rateLimit.key();
         if (StringUtils.isBlank(key)) {
-            RateLimit.RateLimitKeyType keyType = rateLimit.keyType();
-            if (keyType.equals(RateLimit.RateLimitKeyType.METHOD)) {
-                // 取方法名为key
-                key = signatureMethod.getName();
-            } else if (keyType.equals(RateLimit.RateLimitKeyType.IP)) {
-                // 取ip为key
-                key = WebUtils.getIP();
+            switch (rateLimit.keyType()) {
+                case METHOD -> key = signatureMethod.getName();
+                case IP -> key = WebUtils.getIP();
+                default -> throw new IllegalArgumentException("Invalid rate limit key type: " + rateLimit.keyType());
             }
         }
-        ImmutableList<String> keys = ImmutableList.of(rateLimit.prefix() + key + StringPool.COLON + request.getRequestURI());
+        List<String> keys = Collections.singletonList(rateLimit.prefix() + key + StringPool.COLON + request.getRequestURI());
         Long result = selectLimitType(keys, rateLimit);
         if (result == null || result.equals(0L)) {
             throw new BusinessException(rateLimit.msg());
@@ -60,7 +58,7 @@ public class RateLimitAspect {
         return joinPoint.proceed();
     }
 
-    private Long selectLimitType(ImmutableList<String> keys, RateLimit rateLimit) {
+    private Long selectLimitType(List<String> keys, RateLimit rateLimit) {
         RateLimit.RateLimitType type = rateLimit.type();
         DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>();
         redisScript.setResultType(Long.class);
