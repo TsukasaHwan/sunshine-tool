@@ -230,7 +230,7 @@ public record RedisClientImpl(RedisTemplate<String, Object> redisTemplate) imple
     }
 
     @Override
-    public Optional<Object> listGetIndex(String key, long index) {
+    public Optional<Object> listIndexGet(String key, long index) {
         return Optional.ofNullable(redisTemplate.opsForList().index(key, index));
     }
 

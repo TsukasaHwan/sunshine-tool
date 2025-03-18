@@ -88,7 +88,7 @@ public interface RedisClient {
 
     Long listSize(String key);
 
-    Optional<Object> listGetIndex(String key, long index);
+    Optional<Object> listIndexGet(String key, long index);
 
     Long listRightPush(String key, Object value);
 
