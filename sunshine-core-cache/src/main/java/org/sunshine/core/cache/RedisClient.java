@@ -70,7 +70,7 @@ public interface RedisClient {
 
     // ================ Set ================
 
-    Set<Object> getSetMembers(String key);
+    Set<Object> setGetAll(String key);
 
     Boolean setHasKey(String key, Object value);
 

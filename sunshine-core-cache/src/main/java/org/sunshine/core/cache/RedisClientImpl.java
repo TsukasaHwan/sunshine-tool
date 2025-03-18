@@ -186,7 +186,7 @@ public record RedisClientImpl(RedisTemplate<String, Object> redisTemplate) imple
     }
 
     @Override
-    public Set<Object> getSetMembers(String key) {
+    public Set<Object> setGetAll(String key) {
         return redisTemplate.opsForSet().members(key);
     }
 
