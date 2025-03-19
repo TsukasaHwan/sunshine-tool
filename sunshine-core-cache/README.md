@@ -7,7 +7,7 @@
 ## *💫*使用说明
 
 1. **@[DistributedLock](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Fcache%2Fannotation%2FDistributedLock.java)
-   分布式锁注解，以及分布式锁[RedissonLockUtils](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Fcache%2Fredisson%2Futil%2FRedissonLockUtils.java)
+   分布式锁注解，以及分布式锁模板类[RedissonLockTemplate](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Fcache%2Fredisson%2FRedissonLockTemplate.java)
    使用**
    
     - SpringRedis开启Redisson(单机模式)
@@ -119,98 +119,69 @@
      ```
 
 5. **Redis5.0 Stream新特性支持，自动处理无效的stream，以及处理死信问题**
+   ```yaml
+      spring:
+        stream:
+          # 批量处理消息的数量。默认为10。
+          batch-size: 10
+          # 死信任务执行cron表达式，默认30秒执行一次扫描
+          dead-letter-task-cron: '30 * * * * ?'
+          thread-pool:
+            # 是否启用线程池（默认true）。
+            enable: true
+            # 核心线程数。默认值为为核心处理器的数量。
+            core-pool-size: 5
+            # 最大线程数。默认值为核心线程数的两倍。
+            max-pool-size: 10
+            # 队列容量。默认：500。
+            queue-capacity: 300
+            # 线程存活时间（单位：秒）。默认60秒。
+            keep-alive-seconds: 60
+            # 是否在关机时等待计划任务完成，不中断正在运行的任务和执行队列中的所有任务。默认true。
+            wait-for-jobs-to-complete-on-shutdown: true
+            # 线程池中任务的等待时间，如果超过这个时候还没有销毁就强制销毁。（单位：秒）。默认120秒。
+            await-termination-seconds: 120
+            # 线程名称的前缀。默认值为：redis-stream-thread-
+            thread-name-prefix: 'redis-stream-thread-'
+            # 拒绝策略。默认值为CallerRunsPolicy。
+            rejected-execution-handler: java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy
+   ```
 
    ```java
-      /**
-       * 继承AbstractRedisStreamConfiguration简化配置
-       * 使用applyListenerContainer()方法配置监听容器
-       */
-      @Configuration(proxyBeanMethods = false)
-      public class RedisStreamConfiguration extends AbstractRedisStreamConfiguration {
-   
-          public RedisStreamConfiguration(RedisConnectionFactory redisConnectionFactory,
-                                          ThreadPoolTaskExecutor threadPoolTaskExecutor,
-                                          RedisClient redisClient) {
-              super(redisConnectionFactory, threadPoolTaskExecutor, redisClient);
-          }
-   
-          /**
-           * 消息1监听容器
-           *
-           * @param test1StreamListener 消息监听器
-           * @return StreamMessageListenerContainer
-           */
-          @Bean(initMethod = "start", destroyMethod = "stop")
-          public StreamMessageListenerContainer<String, ObjectRecord<String, OrderMessage>> orderExpiredConsumerListener(
-                  Test1StreamListener test1StreamListener) {
-              return applyListenerContainer(Stream.TEST1, Duration.ofSeconds(1L), 10, Test1.class, test1StreamListener);
-          }
-      }
-   
-      /**
-       * Stream消息队列
-       * 实现RedisStreamKey接口定义流信息
-       */
-      public enum Stream implements RedisStreamKey {
-   
-          /**
-           * test1消息队列
-           */
-          TEST1("test1", "sunshine", "test1-consumer");
-   
-          private final String stream;
-   
-          private final String group;
-   
-          private final String consumer;
-   
-          Stream(String stream, String group, String consumer) {
-              this.stream = stream;
-              this.group = group;
-              this.consumer = consumer;
-          }
-   
-          @Override
-          public String stream() {
-              return this.stream;
-          }
-   
-          @Override
-          public String group() {
-              return this.group;
-          }
-   
-          @Override
-          public String consumer() {
-              return this.consumer;
-          }
-      }
-   
       @Slf4j
       @Component
       public class Test1StreamListener extends AbstractStreamListener<Test1> {
    
-          protected Test1StreamListener(RedisClient redisClient) {
-              super(Test1.class, redisClient);
+          @Override
+          protected String getStreamKey() {
+              return "test1";
           }
    
           @Override
-          protected RedisStreamKey redisStreamKey() {
-              return Stream.TEST1;
-          }
-   
-          @Override
-          public void onMessage(ObjectRecord<String, Test1> message) {
-              Test1 test1 = message.getValue();
+          public void onMessage(Test1 message) {
               // do something
           }
    
-          /**
-           * 定时清理已消费的stream
-           */
-          @Scheduled(cron = "0 0 0/1 * * ?")
-          public void clearTest1Stream() {
-              this.trim(500);
+          @Override
+          public TrimConfig getTrimConfig() {
+              TrimConfig trimConfig = new TrimConfig();
+              // 流修剪执行cron表达式（默认每10分钟执行一次）
+              trimConfig.setCron("0 */10 * * * ?");
+              // 保留最新的500条（默认500条）
+              trimConfig.setMaxCount(500L);
+              return trimConfig;
+          }
+   
+          @Override
+          public DeadLetterConfig getDeadLetterConfig() {
+              DeadLetterConfig deadLetterConfig = new DeadLetterConfig();
+              // 是否启用专用调度器（默认false。注意只有启用了专用调度器cron参数才生效，否则共用一个调度器）
+              deadLetterConfig.setEnableDedicatedScheduler();
+              // 死信任务执行cron表达式（默认每30秒执行一次）
+              deadLetterConfig.setCron();
+              // 当消息超过多少时间后当作死信处理（默认5分钟。可单独配置）
+              deadLetterConfig.setPendingProcessingTimeout();
+              return deadLetterConfig;
           }
       }
    ```
@@ -257,6 +228,18 @@
        @Override
        public void consume(UserMessage message) throws Exception {
            // 执行消费逻辑
+       }
+   
+       @Override
+       public ThreadPoolExecutor getThreadPoolExecutor() {
+          // 是否为当前延迟队列使用线程池，默认不配置
+          return DelayedQueueListener.super.getThreadPoolExecutor();
+       }
+   
+       @Override
+       public void handleException(Exception e) {
+          // 处理异常逻辑，当出现异常调用此方法，默认不做任何处理
+          DelayedQueueListener.super.handleException(e);
        }
    }
    ```
