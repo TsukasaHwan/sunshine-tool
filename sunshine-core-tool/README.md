@@ -93,15 +93,15 @@
      PASSWORD=
      ```
 
-5. **基于easyexcel的excel导入数据**
+5. **基于fastexcel的excel导入数据**
 
-   - 引入easyexcel依赖
+   - 引入fastexcel依赖
 
      ```xml
      <dependency>
-         <groupId>com.alibaba</groupId>
-         <artifactId>easyexcel</artifactId>
-         <version>3.3.0</version>
+         <groupId>cn.idev.excel</groupId>
+         <artifactId>fastexcel</artifactId>
+         <version>1.1.0</version>
      </dependency>
      ```
 
