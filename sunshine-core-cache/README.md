@@ -36,7 +36,14 @@
         * tryLock是否使用尝试锁默认为false
         * 在指定时间内如果未获取到锁则不执行方法，最长等待时间默认为5秒，锁释放时间默认为10秒
         */
+       @Service
        public class Test {
+
+           private final RedissonLockTemplate redissonLockTemplate;
+      
+           public Test(RedissonLockTemplate redissonLockTemplate) {
+               this.redissonLockTemplate = redissonLockTemplate;
+           }
          
            /**
             * 如果testPojo的id为1，则锁的名称为'lock:1'
@@ -51,9 +58,9 @@
          
            public Result<Void> codeLock() {
                // 普通锁
-               RedissionLockUtils.lock("");
+               redissonLockTemplate.lock("");
                // 尝试锁
-               RedissionLockUtils.tryLock("", (isLocked) -> {
+               RedissionLockUtils.tryLockWithoutResult("", (isLocked) -> {
                    if (isLocked) {
                        // do something
                    }
