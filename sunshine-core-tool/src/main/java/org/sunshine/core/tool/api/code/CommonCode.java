@@ -36,12 +36,12 @@ public enum CommonCode implements ResultCode {
     /**
      * 用户名或密码错误
      */
-    USERNAME_OR_PASSWORD_ERROR(HttpServletResponse.SC_BAD_REQUEST, "用户名或密码错误"),
+    USERNAME_OR_PASSWORD_ERROR(HttpServletResponse.SC_UNAUTHORIZED, "用户名或密码错误"),
 
     /**
      * 权限不足，无权操作
      */
-    UNAUTHORIZED(HttpServletResponse.SC_UNAUTHORIZED, "权限不足，无权操作"),
+    UNAUTHORIZED(HttpServletResponse.SC_FORBIDDEN, "权限不足，无权操作"),
 
     /**
      * 认证失败
@@ -51,7 +51,12 @@ public enum CommonCode implements ResultCode {
     /**
      * token过期
      */
-    TOKEN_EXPIRED(HttpServletResponse.SC_FORBIDDEN, "token过期");
+    TOKEN_EXPIRED(HttpServletResponse.SC_UNAUTHORIZED, "token已过期，请重新登录"),
+
+    /**
+     * 请求频率超过限制，请稍后重试
+     */
+    RATE_LIMIT_EXCEEDED(429, "请求频率超过限制，请稍后重试");
 
     private final int code;
     private final String msg;

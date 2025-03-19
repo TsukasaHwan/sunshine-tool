@@ -81,6 +81,10 @@ public class Result<T> implements Serializable {
         return new Result<>(resultCode, msg);
     }
 
+    public static <T> Result<T> of(ResultCode resultCode, String msg, T data) {
+        return new Result<>(resultCode, msg, data);
+    }
+
     public static boolean isSuccess(Result<?> result) {
         return Optional.ofNullable(result)
                 .map(x -> ObjectUtils.nullSafeEquals(CommonCode.SUCCESS.code(), x.code))

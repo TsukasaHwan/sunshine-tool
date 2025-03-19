@@ -11,7 +11,7 @@ import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.scripting.support.ResourceScriptSource;
 import org.springframework.util.Assert;
 import org.sunshine.core.cache.annotation.RateLimit;
-import org.sunshine.core.tool.exception.BusinessException;
+import org.sunshine.core.cache.exception.RateLimitExceededException;
 import org.sunshine.core.tool.util.StringPool;
 import org.sunshine.core.tool.util.StringUtils;
 import org.sunshine.core.tool.util.WebUtils;
@@ -53,7 +53,7 @@ public class RateLimitAspect {
         List<String> keys = Collections.singletonList(rateLimit.prefix() + key + StringPool.COLON + request.getRequestURI());
         Long result = executeScript(keys, rateLimit);
         if (result == null || result.equals(0L)) {
-            throw new BusinessException(rateLimit.msg());
+            throw new RateLimitExceededException(rateLimit.msg());
         }
         return joinPoint.proceed();
     }

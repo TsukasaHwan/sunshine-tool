@@ -56,7 +56,7 @@ public @interface RateLimit {
      *
      * @return String
      */
-    String msg() default "请勿频繁操作";
+    String msg() default "请求频率超过限制，请稍后重试";
 
     /**
      * 限流类型

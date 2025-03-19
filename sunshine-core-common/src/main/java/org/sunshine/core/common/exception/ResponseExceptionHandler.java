@@ -14,6 +14,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.sunshine.core.cache.exception.RateLimitExceededException;
 import org.sunshine.core.tool.api.code.CommonCode;
 import org.sunshine.core.tool.api.code.ResultCode;
 import org.sunshine.core.tool.api.response.Result;
@@ -61,9 +62,21 @@ public class ResponseExceptionHandler {
             return handleBindException(exception);
         } else if (ex instanceof ConstraintViolationException exception) {
             return handleConstraintViolationException(exception);
+        } else if (ex instanceof RateLimitExceededException exception) {
+            return handleRateLimitExceededException(exception);
         } else {
             return handleUnknownException(ex);
         }
+    }
+
+    /**
+     * 处理限流异常
+     *
+     * @param exception 限流异常
+     * @return {Result}
+     */
+    private Result<?> handleRateLimitExceededException(RateLimitExceededException exception) {
+        return Result.of(CommonCode.RATE_LIMIT_EXCEEDED, exception.getMessage());
     }
 
     /**
