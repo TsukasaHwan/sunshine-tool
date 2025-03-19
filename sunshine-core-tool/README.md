@@ -109,7 +109,7 @@
 
    - 实现接口[ImportExcelHandler](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Ftool%2Fexcel%2FImportExcelHandler.java)中的handle方法，处理对应的导入业务逻辑，在调用方法doConvert即可进行导入，默认为条数到达3000条时执行handle方法，当然你也可以自定义，更多方法请看上述类源码
 
-6. **统一异常处理类[CustomException](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Ftool%2Fexception%2FCustomException.java)，需配合sunshine-core-common模块进行使用**
+6. **业务异常处理类[BusinessException](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fcore%2Ftool%2Fexception%2FBusinessException.java)，需配合sunshine-core-common模块进行使用**
 
 7. **树状结构处理类**
 
