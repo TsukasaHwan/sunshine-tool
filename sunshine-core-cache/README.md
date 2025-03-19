@@ -60,7 +60,7 @@
                // 普通锁
                redissonLockTemplate.lock("");
                // 尝试锁
-               RedissionLockUtils.tryLockWithoutResult("", (isLocked) -> {
+               redissonLockTemplate.tryLockWithoutResult("", (isLocked) -> {
                    if (isLocked) {
                        // do something
                    }
