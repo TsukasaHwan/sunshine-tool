@@ -112,7 +112,7 @@ public class StreamDeadLetterQueueProcessor {
 
                 List<MapRecord<String, Object, Object>> records = streamOperations.range(streamKey, Range.just(recordId.getValue()));
                 if (CollectionUtils.isEmpty(records)) {
-                    listener.handleMissingMessage(recordId);
+                    listener.handleMissingMessage(pendingMessage);
                     return;
                 }
                 // 重新投递

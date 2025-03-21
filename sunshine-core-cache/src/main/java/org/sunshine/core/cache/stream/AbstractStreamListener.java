@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
-import org.springframework.data.redis.connection.stream.RecordId;
+import org.springframework.data.redis.connection.stream.PendingMessage;
 import org.springframework.data.redis.stream.StreamListener;
 import org.sunshine.core.cache.RedisMQTemplate;
 import org.sunshine.core.tool.util.BeanUtils;
@@ -75,22 +75,22 @@ public abstract class AbstractStreamListener<T extends AbstractStreamMessage>
      * <p>功能说明：</p>
      * 1. 记录警告日志："[RECORD_NOT_FOUND] 未找到消息记录{}自动确认，流键：{}"
      * 2. 自动确认 Redis 流消息（通过 acknowledge 接口）
-     * 3. 适用于消息已被消费但数据丢失的异常场景
+     * 3. 适用于消息记录丢失的异常场景（例如：Stream被trim或消息记录丢失）
      *
      * <p>使用场景：</p>
      * 当从 Redis 流中读取消息时，若指定 RecordId 对应的消息记录不存在，将调用此方法进行处理
      *
      * <p>扩展建议：</p>
      * 子类可通过覆盖此方法实现定制化逻辑，例如：
-     * - 发送告警通知
-     * - 记录业务指标
-     * - 执行降级策略
+     * - 发送告警通知（携带 pendingMessage 的详细信息）
+     * - 记录业务指标（如统计丢失消息数量）
+     * - 执行降级策略（如记录失败日志或重试逻辑）
      *
-     * @param recordId 缺失的消息ID
+     * @param pendingMessage 包含缺失消息元数据的PendingMessage对象（包含消息ID、消费者组等信息）
      */
-    protected void handleMissingMessage(RecordId recordId) {
-        logger.warn("[RECORD_NOT_FOUND] 未找到消息记录{}自动确认，流键：{}", recordId, streamKey);
-        redisMQTemplate.redisTemplate().opsForStream().acknowledge(streamKey, group, recordId);
+    protected void handleMissingMessage(PendingMessage pendingMessage) {
+        logger.warn("[RECORD_NOT_FOUND] 未找到消息记录{}自动确认，流键：{}", pendingMessage.getId(), streamKey);
+        redisMQTemplate.redisTemplate().opsForStream().acknowledge(streamKey, group, pendingMessage.getId());
     }
 
     /**
