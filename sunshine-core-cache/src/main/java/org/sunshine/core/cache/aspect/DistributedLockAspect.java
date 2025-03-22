@@ -4,12 +4,11 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.SimpleEvaluationContext;
 import org.sunshine.core.cache.annotation.DistributedLock;
+import org.sunshine.core.cache.exception.DistributedLockAcquisitionException;
 import org.sunshine.core.cache.redisson.RedissonLockTemplate;
 import org.sunshine.core.tool.util.ClassUtils;
 
@@ -22,8 +21,6 @@ import java.lang.reflect.Parameter;
  */
 @Aspect
 public class DistributedLockAspect {
-
-    private static final Logger logger = LoggerFactory.getLogger(DistributedLockAspect.class);
 
     private static final SpelExpressionParser PARSER = new SpelExpressionParser();
 
@@ -122,8 +119,7 @@ public class DistributedLockAspect {
             );
 
             if (!locked) {
-                logger.warn("Failed to acquire lock: {}", lockKey);
-                return null;
+                throw new DistributedLockAcquisitionException("Failed to acquire lock: " + lockKey);
             }
 
             return pjp.proceed();

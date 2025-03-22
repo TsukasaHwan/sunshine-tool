@@ -14,6 +14,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.sunshine.core.cache.exception.DistributedLockAcquisitionException;
 import org.sunshine.core.cache.exception.RateLimitExceededException;
 import org.sunshine.core.tool.api.code.CommonCode;
 import org.sunshine.core.tool.api.code.ResultCode;
@@ -46,6 +47,7 @@ public class ResponseExceptionHandler {
         BUILDER.put(HttpMessageNotReadableException.class, CommonCode.INVALID_PARAM);
         BUILDER.put(HttpRequestMethodNotSupportedException.class, CommonCode.REQUEST_METHOD_NOT_SUPPORTED);
         BUILDER.put(AccessDeniedException.class, CommonCode.UNAUTHORIZED);
+        BUILDER.put(DistributedLockAcquisitionException.class, CommonCode.DISTRIBUTED_LOCK_ACQUISITION_FAILED);
     }
 
     /**
