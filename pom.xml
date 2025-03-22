@@ -130,6 +130,7 @@
                     <target>${java.version}</target>
                     <source>${java.version}</source>
                     <encoding>UTF-8</encoding>
+                    <parameters>true</parameters>
                 </configuration>
             </plugin>
             <plugin>
