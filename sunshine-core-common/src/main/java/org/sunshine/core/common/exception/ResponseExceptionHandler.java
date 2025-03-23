@@ -47,7 +47,7 @@ public class ResponseExceptionHandler {
         BUILDER.put(HttpMessageNotReadableException.class, CommonCode.INVALID_PARAM);
         BUILDER.put(HttpRequestMethodNotSupportedException.class, CommonCode.REQUEST_METHOD_NOT_SUPPORTED);
         BUILDER.put(AccessDeniedException.class, CommonCode.UNAUTHORIZED);
-        BUILDER.put(DistributedLockAcquisitionException.class, CommonCode.DISTRIBUTED_LOCK_ACQUISITION_FAILED);
+        BUILDER.put(DistributedLockAcquisitionException.class, CommonCode.SERVICE_UNAVAILABLE);
     }
 
     /**

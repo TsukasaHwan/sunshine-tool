@@ -59,9 +59,9 @@ public enum CommonCode implements ResultCode {
     RATE_LIMIT_EXCEEDED(429, "请求频率超过限制，请稍后重试"),
 
     /**
-     * 分布式锁获取失败
+     * 系统繁忙，请稍后再试
      */
-    DISTRIBUTED_LOCK_ACQUISITION_FAILED(HttpServletResponse.SC_SERVICE_UNAVAILABLE, "系统繁忙，请稍后再试");
+    SERVICE_UNAVAILABLE(HttpServletResponse.SC_SERVICE_UNAVAILABLE, "系统繁忙，请稍后再试");
 
     private final int code;
     private final String msg;
