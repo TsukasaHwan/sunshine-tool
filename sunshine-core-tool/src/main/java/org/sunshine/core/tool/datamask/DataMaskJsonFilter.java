@@ -66,7 +66,7 @@ public class DataMaskJsonFilter implements ContextValueFilter {
 
                 //没有set()的接口，重新构造一个
                 @SuppressWarnings("unchecked")
-                Collection<String> newValue = (Collection<String>) value.getClass().newInstance();
+                Collection<String> newValue = (Collection<String>) value.getClass().getDeclaredConstructor().newInstance();
                 @SuppressWarnings("unchecked")
                 Collection<String> items = (Collection<String>) value;
                 for (String item : items) {
