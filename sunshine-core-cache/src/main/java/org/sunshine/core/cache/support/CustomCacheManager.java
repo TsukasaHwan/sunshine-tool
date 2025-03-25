@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class CustomCacheManager implements CacheManager {
 
-    private final ConcurrentMap<String, Cache> cacheConcurrentMap = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, Cache> cacheConcurrentMap = new ConcurrentHashMap<>(16);
 
     private final CacheManager localCacheManager;
 
