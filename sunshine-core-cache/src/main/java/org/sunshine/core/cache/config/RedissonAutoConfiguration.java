@@ -21,6 +21,8 @@ import org.sunshine.core.cache.redisson.DistributedTaskExecutor;
 import org.sunshine.core.cache.redisson.RedissonLockTemplate;
 import org.sunshine.core.cache.redisson.queue.DelayedQueueListener;
 import org.sunshine.core.cache.redisson.queue.DelayedQueueListenerConfigurer;
+import org.sunshine.core.cache.redisson.queue.RedissonDelayedMQTemplate;
+import org.sunshine.core.cache.redisson.queue.RedissonDelayedMQTemplateImpl;
 import org.sunshine.core.tool.util.StringUtils;
 
 import java.util.List;
@@ -73,6 +75,11 @@ public class RedissonAutoConfiguration {
     @Bean
     public RedissonLockTemplate redissonLockTemplate(RedissonClient redissonClient) {
         return new RedissonLockTemplate(redissonClient);
+    }
+
+    @Bean
+    public RedissonDelayedMQTemplate redissonDelayedMQTemplate(RedissonClient redissonClient) {
+        return new RedissonDelayedMQTemplateImpl(redissonClient);
     }
 
     @Bean
