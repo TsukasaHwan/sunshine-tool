@@ -16,8 +16,7 @@ public record RedissonDelayedMQTemplateImpl(RedissonClient redissonClient)
 
     @Override
     public <T> void send(String queueName, T message, long delay, TimeUnit timeUnit) {
-        RBlockingDeque<T> blockingDeque = redissonClient.getBlockingDeque(queueName);
-        RDelayedQueue<T> delayedQueue = redissonClient.getDelayedQueue(blockingDeque);
+        RDelayedQueue<T> delayedQueue = getDelayedQueue(queueName);
         try {
             delayedQueue.offer(message, delay, timeUnit);
         } finally {
@@ -27,8 +26,7 @@ public record RedissonDelayedMQTemplateImpl(RedissonClient redissonClient)
 
     @Override
     public <T> boolean remove(String queueName, T message) {
-        RBlockingDeque<T> blockingDeque = redissonClient.getBlockingDeque(queueName);
-        RDelayedQueue<T> delayedQueue = redissonClient.getDelayedQueue(blockingDeque);
+        RDelayedQueue<T> delayedQueue = getDelayedQueue(queueName);
         try {
             return delayedQueue.remove(message);
         } finally {
@@ -38,12 +36,23 @@ public record RedissonDelayedMQTemplateImpl(RedissonClient redissonClient)
 
     @Override
     public <T> boolean removeAll(String queueName, Collection<T> messages) {
-        RBlockingDeque<T> blockingDeque = redissonClient.getBlockingDeque(queueName);
-        RDelayedQueue<T> delayedQueue = redissonClient.getDelayedQueue(blockingDeque);
+        RDelayedQueue<T> delayedQueue = getDelayedQueue(queueName);
         try {
             return delayedQueue.removeAll(messages);
         } finally {
             delayedQueue.destroy();
         }
+    }
+
+    /**
+     * 获取延迟队列
+     *
+     * @param queueName 队列名称
+     * @param <T>       泛型
+     * @return 延迟队列
+     */
+    private <T> RDelayedQueue<T> getDelayedQueue(String queueName) {
+        RBlockingDeque<T> blockingDeque = redissonClient.getBlockingDeque(queueName);
+        return redissonClient.getDelayedQueue(blockingDeque);
     }
 }
