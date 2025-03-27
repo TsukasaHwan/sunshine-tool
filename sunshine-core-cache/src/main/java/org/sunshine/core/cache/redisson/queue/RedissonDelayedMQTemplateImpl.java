@@ -4,6 +4,7 @@ import org.redisson.api.RBlockingDeque;
 import org.redisson.api.RDelayedQueue;
 import org.redisson.api.RedissonClient;
 
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -30,6 +31,17 @@ public record RedissonDelayedMQTemplateImpl(RedissonClient redissonClient)
         RDelayedQueue<T> delayedQueue = redissonClient.getDelayedQueue(blockingDeque);
         try {
             return delayedQueue.remove(message);
+        } finally {
+            delayedQueue.destroy();
+        }
+    }
+
+    @Override
+    public <T> boolean removeAll(String queueName, Collection<T> messages) {
+        RBlockingDeque<T> blockingDeque = redissonClient.getBlockingDeque(queueName);
+        RDelayedQueue<T> delayedQueue = redissonClient.getDelayedQueue(blockingDeque);
+        try {
+            return delayedQueue.removeAll(messages);
         } finally {
             delayedQueue.destroy();
         }

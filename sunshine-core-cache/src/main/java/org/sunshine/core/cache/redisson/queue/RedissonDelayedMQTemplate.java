@@ -2,6 +2,7 @@ package org.sunshine.core.cache.redisson.queue;
 
 import org.redisson.api.RedissonClient;
 
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -32,9 +33,19 @@ public interface RedissonDelayedMQTemplate {
      * 移除消息
      *
      * @param queueName 队列名称
-     * @param message   消息
+     * @param messages  消息
      * @param <T>       消息类型
      * @return 是否移除成功
      */
-    <T> boolean remove(String queueName, T message);
+    <T> boolean remove(String queueName, T messages);
+
+    /**
+     * 移除消息列表
+     *
+     * @param queueName 队列名称
+     * @param messages  消息列表
+     * @param <T>       消息类型
+     * @return 是否移除成功
+     */
+    <T> boolean removeAll(String queueName, Collection<T> messages);
 }
