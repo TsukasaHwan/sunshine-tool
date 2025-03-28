@@ -23,7 +23,7 @@ public class DistributedTaskExecutor {
      * @param template RedissonLockTemplate
      * @return DistributedTaskExecutor
      */
-    public static DistributedTaskExecutor builder(RedissonLockTemplate template) {
+    public static DistributedTaskExecutor create(RedissonLockTemplate template) {
         return new DistributedTaskExecutor(template);
     }
 

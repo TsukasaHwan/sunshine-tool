@@ -95,6 +95,6 @@ public class RedissonAutoConfiguration {
 
     @Bean
     public DistributedTaskExecutor distributedLockedTaskExecutor(RedissonLockTemplate redissonLockTemplate) {
-        return DistributedTaskExecutor.builder(redissonLockTemplate);
+        return DistributedTaskExecutor.create(redissonLockTemplate);
     }
 }
