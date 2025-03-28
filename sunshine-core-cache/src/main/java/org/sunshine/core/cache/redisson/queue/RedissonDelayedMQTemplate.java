@@ -3,7 +3,6 @@ package org.sunshine.core.cache.redisson.queue;
 import org.redisson.api.RedissonClient;
 
 import java.util.Collection;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Teamo
@@ -19,33 +18,30 @@ public interface RedissonDelayedMQTemplate {
     RedissonClient redissonClient();
 
     /**
-     * 发送延时消息
+     * 发送消息
      *
-     * @param queueName 队列名称
-     * @param message   消息
-     * @param delay     延时
-     * @param timeUnit  时间单位
-     * @param <T>       消息类型
+     * @param record 消息
+     * @param <T>    消息类型
      */
-    <T> void send(String queueName, T message, long delay, TimeUnit timeUnit);
+    <T> void send(DelayedRecord<T> record);
 
     /**
      * 移除消息
      *
-     * @param queueName 队列名称
-     * @param messages  消息
-     * @param <T>       消息类型
+     * @param queue 队列
+     * @param value 消息
+     * @param <T>   消息类型
      * @return 是否移除成功
      */
-    <T> boolean remove(String queueName, T messages);
+    <T> boolean remove(String queue, T value);
 
     /**
      * 移除消息列表
      *
-     * @param queueName 队列名称
-     * @param messages  消息列表
-     * @param <T>       消息类型
+     * @param queue  队列名称
+     * @param values 消息列表
+     * @param <T>    消息类型
      * @return 是否移除成功
      */
-    <T> boolean removeAll(String queueName, Collection<T> messages);
+    <T> boolean removeAll(String queue, Collection<T> values);
 }

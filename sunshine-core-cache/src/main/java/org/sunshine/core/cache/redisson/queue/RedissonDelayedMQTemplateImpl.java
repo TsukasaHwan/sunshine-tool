@@ -5,7 +5,6 @@ import org.redisson.api.RDelayedQueue;
 import org.redisson.api.RedissonClient;
 
 import java.util.Collection;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Teamo
@@ -15,30 +14,30 @@ public record RedissonDelayedMQTemplateImpl(RedissonClient redissonClient)
         implements RedissonDelayedMQTemplate {
 
     @Override
-    public <T> void send(String queueName, T message, long delay, TimeUnit timeUnit) {
-        RDelayedQueue<T> delayedQueue = getDelayedQueue(queueName);
+    public <T> void send(DelayedRecord<T> record) {
+        RDelayedQueue<T> delayedQueue = getDelayedQueue(record.getQueue());
         try {
-            delayedQueue.offer(message, delay, timeUnit);
+            delayedQueue.offer(record.getValue(), record.getDelay(), record.getUnit());
         } finally {
             delayedQueue.destroy();
         }
     }
 
     @Override
-    public <T> boolean remove(String queueName, T message) {
-        RDelayedQueue<T> delayedQueue = getDelayedQueue(queueName);
+    public <T> boolean remove(String queue, T value) {
+        RDelayedQueue<T> delayedQueue = getDelayedQueue(queue);
         try {
-            return delayedQueue.remove(message);
+            return delayedQueue.remove(value);
         } finally {
             delayedQueue.destroy();
         }
     }
 
     @Override
-    public <T> boolean removeAll(String queueName, Collection<T> messages) {
-        RDelayedQueue<T> delayedQueue = getDelayedQueue(queueName);
+    public <T> boolean removeAll(String queue, Collection<T> values) {
+        RDelayedQueue<T> delayedQueue = getDelayedQueue(queue);
         try {
-            return delayedQueue.removeAll(messages);
+            return delayedQueue.removeAll(values);
         } finally {
             delayedQueue.destroy();
         }
@@ -47,12 +46,12 @@ public record RedissonDelayedMQTemplateImpl(RedissonClient redissonClient)
     /**
      * 获取延迟队列
      *
-     * @param queueName 队列名称
-     * @param <T>       泛型
+     * @param queue 队列名称
+     * @param <T>   泛型
      * @return 延迟队列
      */
-    private <T> RDelayedQueue<T> getDelayedQueue(String queueName) {
-        RBlockingDeque<T> blockingDeque = redissonClient.getBlockingDeque(queueName);
+    private <T> RDelayedQueue<T> getDelayedQueue(String queue) {
+        RBlockingDeque<T> blockingDeque = redissonClient.getBlockingDeque(queue);
         return redissonClient.getDelayedQueue(blockingDeque);
     }
 }
