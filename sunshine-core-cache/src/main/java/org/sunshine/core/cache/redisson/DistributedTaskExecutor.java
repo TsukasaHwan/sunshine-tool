@@ -13,7 +13,7 @@ public class DistributedTaskExecutor {
      */
     private final RedissonLockTemplate template;
 
-    public DistributedTaskExecutor(RedissonLockTemplate template) {
+    private DistributedTaskExecutor(RedissonLockTemplate template) {
         this.template = template;
     }
 
