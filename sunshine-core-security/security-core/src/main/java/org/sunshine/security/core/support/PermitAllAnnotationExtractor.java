@@ -9,7 +9,7 @@ import org.sunshine.core.tool.util.ClassUtils;
  * @author Teamo
  * @since 2023/3/23
  */
-public class PermitAllAnnotationSupport extends AbstractSecurityAnnotationSupport {
+public class PermitAllAnnotationExtractor extends SecurityAnnotationPathMatcherExtractor {
 
     @Override
     protected boolean hasAnnotation(RequestMappingInfo requestMappingInfo, HandlerMethod handlerMethod) {

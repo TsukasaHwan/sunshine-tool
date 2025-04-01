@@ -60,9 +60,9 @@ public class JwtSecurityProperties {
     );
 
     /**
-     * Logout resource path.
+     * Logout url.
      */
-    private String logoutPath = "/logout";
+    private String logoutUrl;
 
     /**
      * RefreshToken resource path.
@@ -158,12 +158,12 @@ public class JwtSecurityProperties {
         this.permitAllPaths = permitAllPaths;
     }
 
-    public String getLogoutPath() {
-        return logoutPath;
+    public String getLogoutUrl() {
+        return logoutUrl;
     }
 
-    public void setLogoutPath(String logoutPath) {
-        this.logoutPath = logoutPath;
+    public void setLogoutUrl(String logoutUrl) {
+        this.logoutUrl = logoutUrl;
     }
 
     public String getRefreshTokenPath() {

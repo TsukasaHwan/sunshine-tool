@@ -7,7 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.sunshine.security.core.context.TransmittableThreadLocalSecurityContextHolderStrategy;
-import org.sunshine.security.core.support.PermitAllAnnotationSupport;
+import org.sunshine.security.core.support.PermitAllAnnotationExtractor;
 
 /**
  * @author Teamo
@@ -22,8 +22,8 @@ public class SecurityComponentConfiguration {
     }
 
     @Bean
-    public PermitAllAnnotationSupport permitAllAnnotationSupport() {
-        return new PermitAllAnnotationSupport();
+    public PermitAllAnnotationExtractor permitAllAnnotationExtractor() {
+        return new PermitAllAnnotationExtractor();
     }
 
     @Bean

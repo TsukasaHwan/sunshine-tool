@@ -7,8 +7,6 @@ import io.swagger.v3.oas.models.parameters.Parameter;
 import jakarta.annotation.security.PermitAll;
 import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +17,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -27,19 +26,20 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationEntryPointFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.util.Assert;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.sunshine.security.core.DefaultSecurityConfiguration;
 import org.sunshine.security.core.handler.CommonAccessDeniedHandler;
-import org.sunshine.security.core.support.AbstractSecurityAnnotationSupport;
+import org.sunshine.security.core.support.PermitAllAnnotationExtractor;
+import org.sunshine.security.core.support.SecurityAnnotationPathMatcherExtractor;
 import org.sunshine.security.jwt.filter.JwtAuthenticationFilter;
 import org.sunshine.security.jwt.handler.JwtAuthenticationEntryPoint;
-import org.sunshine.security.jwt.handler.JwtLogoutSuccessHandler;
 import org.sunshine.security.jwt.properties.JwtSecurityProperties;
-import org.sunshine.security.jwt.userdetails.JwtUserDetailsService;
 import org.sunshine.security.jwt.util.JwtClaimsUtils;
 
 import java.util.ArrayList;
@@ -59,80 +59,46 @@ public class JwtSecurityConfiguration {
 
     private final JwtSecurityProperties jwtSecurityProperties;
 
-    public JwtSecurityConfiguration(JwtSecurityProperties jwtSecurityProperties) {
+    private final UserDetailsService userDetailsService;
+
+    private final CorsConfigurationSource corsConfigurationSource;
+
+    private final List<SecurityAnnotationPathMatcherExtractor> securityAnnotationPathMatcherExtractors;
+
+    private LogoutHandler logoutHandler;
+
+    private LogoutSuccessHandler logoutSuccessHandler;
+
+    public JwtSecurityConfiguration(JwtSecurityProperties jwtSecurityProperties,
+                                    UserDetailsService userDetailsService,
+                                    CorsConfigurationSource corsConfigurationSource,
+                                    List<SecurityAnnotationPathMatcherExtractor> securityAnnotationPathMatcherExtractors) {
         this.jwtSecurityProperties = jwtSecurityProperties;
+        this.userDetailsService = userDetailsService;
+        this.corsConfigurationSource = corsConfigurationSource;
+        this.securityAnnotationPathMatcherExtractors = securityAnnotationPathMatcherExtractors;
+    }
+
+    @Autowired(required = false)
+    public void setLogoutHandler(LogoutHandler logoutHandler) {
+        this.logoutHandler = logoutHandler;
+    }
+
+    @Autowired(required = false)
+    public void setLogoutSuccessHandler(LogoutSuccessHandler logoutSuccessHandler) {
+        this.logoutSuccessHandler = logoutSuccessHandler;
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                   UserDetailsService userDetailsService,
-                                                   CorsConfigurationSource corsConfigurationSource,
-                                                   List<AbstractSecurityAnnotationSupport> securityAnnotationSupportList,
-                                                   @Autowired(required = false) LogoutSuccessHandler logoutSuccessHandler) throws Exception {
-        http.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
-        List<AntPathRequestMatcher> antPathRequestMatchers = new ArrayList<>(16);
-
-        List<String> permitAllPaths = jwtSecurityProperties.getPermitAllPaths().stream().distinct().toList();
-        http.authorizeHttpRequests(authorize -> {
-            if (!permitAllPaths.isEmpty()) {
-                authorize.requestMatchers(permitAllPaths.toArray(new String[0])).permitAll();
-                antPathRequestMatchers.addAll(permitAllPaths.stream().map(AntPathRequestMatcher::antMatcher).toList());
-            }
-            securityAnnotationSupportList.forEach(annotationSupport -> {
-                List<AntPathRequestMatcher> antPatterns = annotationSupport.getAntPatterns();
-                antPatterns.removeIf(matcher -> permitAllPaths.contains(matcher.getPattern()));
-                if (!antPatterns.isEmpty()) {
-                    authorize.requestMatchers(antPatterns.toArray(new AntPathRequestMatcher[0])).permitAll();
-                    antPathRequestMatchers.addAll(antPatterns);
-                }
-            });
-            authorize.anyRequest().authenticated();
-        });
-
-        AuthenticationEntryPoint authenticationEntryPoint = new JwtAuthenticationEntryPoint();
-        AuthenticationFailureHandler authenticationFailureHandler = new AuthenticationEntryPointFailureHandler(authenticationEntryPoint);
-
-        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(userDetailsService, authenticationFailureHandler, jwtSecurityProperties);
-        jwtAuthenticationFilter.setAntPathRequestMatchers(antPathRequestMatchers);
-
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
-        http.userDetailsService(userDetailsService);
-
-        if (logoutSuccessHandler != null) {
-            http.logout(logoutConfigurer -> logoutConfigurer
-                    .logoutUrl(jwtSecurityProperties.getLogoutPath())
-                    .logoutSuccessHandler(logoutSuccessHandler));
-        }
-
-        http.exceptionHandling((exceptions) -> exceptions
-                .authenticationEntryPoint(authenticationEntryPoint)
-                .accessDeniedHandler(new CommonAccessDeniedHandler())
-        );
-
-        http.csrf(AbstractHttpConfigurer::disable);
-
-        http.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
-
-        UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = (UrlBasedCorsConfigurationSource) corsConfigurationSource;
-        urlBasedCorsConfigurationSource.getCorsConfigurations().forEach((s, configuration) -> {
-            List<String> allowedHeaders = configuration.getAllowedHeaders();
-            if (allowedHeaders != null && !allowedHeaders.contains(jwtSecurityProperties.getHeader())) {
-                allowedHeaders.add(jwtSecurityProperties.getHeader());
-            }
-        });
-
-        http.cors(cors -> cors.configurationSource(urlBasedCorsConfigurationSource));
-
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .csrf(AbstractHttpConfigurer::disable)
+                .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
+        List<AntPathRequestMatcher> permitAllMatchers = this.applyPermitPathsIfAvailable(http);
+        this.applyJwtSecurity(http, permitAllMatchers);
+        this.applyLogoutIfAvailable(http);
+        this.applyCorsConfiguration(http);
         return http.build();
-    }
-
-    @Bean
-    @ConditionalOnBean(JwtUserDetailsService.class)
-    @ConditionalOnMissingBean(LogoutSuccessHandler.class)
-    public LogoutSuccessHandler logoutSuccessHandler(JwtUserDetailsService jwtUserDetailsService) {
-        return new JwtLogoutSuccessHandler(jwtUserDetailsService);
     }
 
     @Bean
@@ -164,5 +130,94 @@ public class JwtSecurityConfiguration {
             }
             return operation;
         };
+    }
+
+    private List<AntPathRequestMatcher> applyPermitPathsIfAvailable(HttpSecurity http) throws Exception {
+        List<AntPathRequestMatcher> permitAllMatchers = new ArrayList<>(16);
+        List<String> permitAllPaths = this.jwtSecurityProperties.getPermitAllPaths().stream().distinct().toList();
+        http.authorizeHttpRequests(authorize -> {
+            if (!permitAllPaths.isEmpty()) {
+                List<AntPathRequestMatcher> requestMatchers = permitAllPaths.stream()
+                        .map(AntPathRequestMatcher::antMatcher)
+                        .toList();
+                authorize.requestMatchers(requestMatchers.toArray(AntPathRequestMatcher[]::new))
+                        .permitAll();
+                permitAllMatchers.addAll(requestMatchers);
+            }
+            securityAnnotationPathMatcherExtractors.forEach(extractor -> {
+                if (extractor instanceof PermitAllAnnotationExtractor permitAllAnnotationExtractor) {
+                    List<AntPathRequestMatcher> permitAllAnnotationMatchers = handlePermitAllAnnotationExtractor(authorize, permitAllAnnotationExtractor, permitAllPaths);
+                    permitAllMatchers.addAll(permitAllAnnotationMatchers);
+                }
+            });
+            authorize.anyRequest().authenticated();
+        });
+        return permitAllMatchers;
+    }
+
+    private List<AntPathRequestMatcher> handlePermitAllAnnotationExtractor(
+            AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authorize,
+            PermitAllAnnotationExtractor permitAllAnnotationExtractor,
+            List<String> permitAllPaths) {
+        AntPathMatcher antPathMatcher = new AntPathMatcher();
+        List<AntPathRequestMatcher> antPatterns = permitAllAnnotationExtractor.getAntPatterns();
+        antPatterns.removeIf(matcher -> {
+            String pattern = matcher.getPattern();
+            return permitAllPaths.stream().anyMatch(p -> antPathMatcher.match(p, pattern));
+        });
+        if (!antPatterns.isEmpty()) {
+            authorize.requestMatchers(antPatterns.toArray(AntPathRequestMatcher[]::new))
+                    .permitAll();
+        }
+        return antPatterns;
+    }
+
+    private void applyJwtSecurity(HttpSecurity http, List<AntPathRequestMatcher> permitAllMatchers) throws Exception {
+        AuthenticationEntryPoint authenticationEntryPoint = new JwtAuthenticationEntryPoint();
+        AuthenticationFailureHandler authenticationFailureHandler = new AuthenticationEntryPointFailureHandler(authenticationEntryPoint);
+        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(
+                this.userDetailsService, authenticationFailureHandler, this.jwtSecurityProperties);
+        jwtAuthenticationFilter.setPermitAllMatchers(permitAllMatchers);
+        // @formatter:off
+        http
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .userDetailsService(this.userDetailsService)
+            .exceptionHandling((exceptions) -> exceptions
+                    .authenticationEntryPoint(authenticationEntryPoint)
+                    .accessDeniedHandler(new CommonAccessDeniedHandler())
+            );
+        // @formatter:on
+    }
+
+    private void applyLogoutIfAvailable(HttpSecurity http) throws Exception {
+        http.logout(logoutConfigurer -> {
+            String logoutUrl = this.jwtSecurityProperties.getLogoutUrl();
+            if (logoutUrl != null && !logoutUrl.isBlank()) {
+                logoutConfigurer.logoutUrl(logoutUrl);
+            }
+            if (this.logoutHandler != null) {
+                logoutConfigurer.addLogoutHandler(this.logoutHandler);
+            }
+            if (this.logoutSuccessHandler != null) {
+                logoutConfigurer.logoutSuccessHandler(this.logoutSuccessHandler);
+            }
+        });
+    }
+
+    private void applyCorsConfiguration(HttpSecurity http) throws Exception {
+        UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = (UrlBasedCorsConfigurationSource) this.corsConfigurationSource;
+        String header = this.jwtSecurityProperties.getHeader();
+        urlBasedCorsConfigurationSource.getCorsConfigurations().forEach((s, configuration) -> {
+            List<String> allowedHeaders = configuration.getAllowedHeaders();
+            if (allowedHeaders == null) {
+                allowedHeaders = new ArrayList<>(1);
+            }
+            if (!allowedHeaders.contains(header)) {
+                allowedHeaders.add(header);
+            }
+            configuration.setAllowedHeaders(allowedHeaders);
+        });
+
+        http.cors(cors -> cors.configurationSource(urlBasedCorsConfigurationSource));
     }
 }

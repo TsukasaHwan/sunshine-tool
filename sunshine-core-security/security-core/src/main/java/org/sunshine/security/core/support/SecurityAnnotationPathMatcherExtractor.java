@@ -20,7 +20,7 @@ import java.util.Set;
  * @author Teamo
  * @since 2023/3/23
  */
-public abstract class AbstractSecurityAnnotationSupport implements InitializingBean, ApplicationContextAware {
+public abstract class SecurityAnnotationPathMatcherExtractor implements InitializingBean, ApplicationContextAware {
 
     protected ApplicationContext context;
 
@@ -79,9 +79,5 @@ public abstract class AbstractSecurityAnnotationSupport implements InitializingB
 
     public List<AntPathRequestMatcher> getAntPatterns() {
         return antPatterns;
-    }
-
-    public void setAntPatterns(List<AntPathRequestMatcher> antPatterns) {
-        this.antPatterns = antPatterns;
     }
 }

@@ -18,7 +18,7 @@ import java.util.List;
  */
 public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter {
 
-    private List<AntPathRequestMatcher> antPathRequestMatchers;
+    private List<AntPathRequestMatcher> permitAllMatchers;
 
     @Override
     @SuppressWarnings("NullableProblems")
@@ -50,17 +50,17 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
      */
     private boolean isPermitAll(HttpServletRequest request) {
         boolean isPermitAll = false;
-        if (antPathRequestMatchers != null && !antPathRequestMatchers.isEmpty()) {
-            isPermitAll = antPathRequestMatchers.stream().anyMatch(antPathRequestMatcher -> antPathRequestMatcher.matches(request));
+        if (permitAllMatchers != null && !permitAllMatchers.isEmpty()) {
+            isPermitAll = permitAllMatchers.stream().anyMatch(antPathRequestMatcher -> antPathRequestMatcher.matches(request));
         }
         return isPermitAll;
     }
 
-    public List<AntPathRequestMatcher> getAntPathRequestMatchers() {
-        return antPathRequestMatchers;
+    public List<AntPathRequestMatcher> getPermitAllMatchers() {
+        return permitAllMatchers;
     }
 
-    public void setAntPathRequestMatchers(List<AntPathRequestMatcher> antPathRequestMatchers) {
-        this.antPathRequestMatchers = antPathRequestMatchers;
+    public void setPermitAllMatchers(List<AntPathRequestMatcher> permitAllMatchers) {
+        this.permitAllMatchers = permitAllMatchers;
     }
 }
