@@ -32,7 +32,7 @@
                # 认证服务jwks路径
                jwk-set-uri: http://localhost:8081/oauth2/jwks
      ```
-     当然，默认开启了方法级别的注解权限控制，如需使用动态的接口放行可使用注解@PermitAll进行控制。也可自定义注解，只需继承[AbstractSecurityAnnotationSupport](..%2Fsecurity-core%2Fsrc%2Fmain%2Fjava%2Forg%2Fsunshine%2Fsecurity%2Fcore%2Fsupport%2FAbstractSecurityAnnotationSupport.java)类实现hasAnnotation方法并注册Bean到Spring容器即可。
+     当然，默认开启了类和方法级别的注解权限控制，如需使用动态的接口放行可使用注解@PermitAll进行控制。
 
 2. **在启动类上面增加注解@[EnableOAuth2ResourceServer](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Foauth2%2Fresource%2Fserver%2FEnableOAuth2ResourceServer.java)即可开启OAUTH2资源服务**
 

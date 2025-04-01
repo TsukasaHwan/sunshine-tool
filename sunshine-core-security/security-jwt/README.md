@@ -47,30 +47,20 @@ Spring-Security集成JWT
            public-key: classpath:app.pub
            private-key: classpath:app.key
          # 登出路径
-         logout-path: /logout
+         logout-url: /logout
      ```
-     当然，默认开启了方法级别的注解权限控制，如需使用动态的接口放行可使用注解@PermitAll进行控制。也可自定义注解，只需继承[AbstractSecurityAnnotationSupport](..%2Fsecurity-core%2Fsrc%2Fmain%2Fjava%2Forg%2Fsunshine%2Fsecurity%2Fcore%2Fsupport%2FAbstractSecurityAnnotationSupport.java)类实现hasAnnotation方法并注册Bean到Spring容器即可。
+     当然，默认开启了类和方法级别的注解权限控制，如需使用动态的接口放行可使用注解@PermitAll进行控制。
 
-3. **实现[JwtUserDetailsService](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fsecurity%2Fjwt%2Fuserdetails%2FJwtUserDetailsService.java)接口，编写用户查询逻辑，用户实体类可继承[JwtUserDetails](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fsecurity%2Fjwt%2Fuserdetails%2FJwtUserDetails.java)也可实现UserDetails接口**
+3. **实现UserDetailsService接口，编写用户查询逻辑，用户实体类可继承[JwtUserDetails](src%2Fmain%2Fjava%2Forg%2Fsunshine%2Fsecurity%2Fjwt%2Fuserdetails%2FJwtUserDetails.java)也可实现UserDetails接口**
 
    - ```java
      @Service
-     public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
+     public class JwtUserDetailsServiceImpl implements UserDetailsService {
      
          @Override
          public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
              LoginUser loginUser = new LoginUser();
              return loginUser;
-         }
-     
-         /**
-          * 注销成功调用逻辑,username有可能为null,当token错误或过期时username为null
-          *
-          * @param username 用户名(有可能为null)
-          */
-         @Override
-         public void onLogoutSuccess(String username) {
-             JwtUserDetailsService.super.onLogoutSuccess(username);
          }
      }
      
