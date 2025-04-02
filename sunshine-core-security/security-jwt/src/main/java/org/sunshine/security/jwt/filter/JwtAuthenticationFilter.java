@@ -62,16 +62,10 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
             Claims claims = JwtClaimsUtils.parseToken(authToken);
             String refreshTokenClaim = claims.get(JwtClaimsUtils.REFRESH_TOKEN_CLAIM_KEY, String.class);
 
-            String servletPath = request.getServletPath();
             // Check if the request is for the refresh token endpoint and handle accordingly
-            if (refreshTokenClaim == null) {
-                if (ANT_PATH_MATCHER.match(servletPath, properties.getRefreshTokenPath())) {
-                    filterChain.doFilter(request, response);
-                    return;
-                }
-            } else if (refreshTokenClaim.equals(properties.getRefreshTokenClaim())) {
-                boolean isRefreshPath = ANT_PATH_MATCHER.match(servletPath, properties.getRefreshTokenPath());
-                if (isRefreshPath) {
+            String servletPath = request.getServletPath();
+            if (refreshTokenClaim != null) {
+                if (refreshTokenClaim.equals(properties.getRefreshTokenClaim()) && isRefreshPath(servletPath)) {
                     doAuthenticate(request, authToken, claims);
                 }
                 filterChain.doFilter(request, response);
@@ -132,5 +126,9 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
             log.error(e.getMessage(), e);
             return new JwtAuthenticationException(e.getMessage());
         }
+    }
+
+    private boolean isRefreshPath(String path) {
+        return properties.getRefreshTokenPath() != null && ANT_PATH_MATCHER.match(properties.getRefreshTokenPath(), path);
     }
 }
