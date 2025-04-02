@@ -6,11 +6,13 @@ import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
 import org.sunshine.security.jwt.Jwt;
 import org.sunshine.security.jwt.properties.JwtSecurityProperties;
+import org.sunshine.security.jwt.support.FastJson2Deserializer;
+import org.sunshine.security.jwt.support.FastJson2Serializer;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -36,8 +38,18 @@ public class JwtClaimsUtils {
      * @return JWT
      */
     public static String accessToken(String subject) {
-        Duration expiresIn = properties.getExpiresIn();
-        return sign(subject, expiresIn, null);
+        return accessToken(subject, null);
+    }
+
+    /**
+     * 访问令牌
+     *
+     * @param subject 主题(用户名)
+     * @param claims  声称要设置为 JWT 主体
+     * @return JWT
+     */
+    public static String accessToken(String subject, Map<String, ?> claims) {
+        return sign(subject, properties.getExpiresIn(), claims);
     }
 
     /**
@@ -48,8 +60,7 @@ public class JwtClaimsUtils {
      */
     public static String refreshToken(String subject) {
         Duration refreshTokenExpiresIn = properties.getRefreshTokenExpiresIn();
-        Map<String, Object> claims = new HashMap<>(1);
-        claims.put(REFRESH_TOKEN_CLAIM_KEY, properties.getRefreshTokenClaim());
+        Map<String, String> claims = Collections.singletonMap(REFRESH_TOKEN_CLAIM_KEY, properties.getRefreshTokenClaim());
         return sign(subject, refreshTokenExpiresIn, claims);
     }
 
@@ -61,9 +72,10 @@ public class JwtClaimsUtils {
      * @param claims    声称要设置为 JWT 主体
      * @return JWT
      */
-    public static String sign(String subject, Duration expiresIn, Map<String, Object> claims) {
+    public static String sign(String subject, Duration expiresIn, Map<String, ?> claims) {
         Instant now = Instant.now();
         JwtBuilder jwtBuilder = Jwts.builder()
+                .json(new FastJson2Serializer<>())
                 .issuedAt(Date.from(now))
                 // 主题信息，可存储用户json
                 .subject(subject)
@@ -87,9 +99,25 @@ public class JwtClaimsUtils {
      * @return Claims
      */
     public static Claims parseToken(String token) {
-        // 默认情况下 JJWT 只能解析 String, Date, Long, Integer, Short and Byte 类型，如果需要解析其他类型则需要配置 JacksonDeserializer
-        // .deserializeJsonWith(new JacksonDeserializer(Maps.of(USER_INFO_KEY, UserInfo.class).build()))
+        return parseToken(token, null);
+    }
+
+    /**
+     * 解析JWT
+     *
+     * @param token        token
+     * @param claimTypeMap 声明类型
+     * @return Claims
+     */
+    public static Claims parseToken(String token, Map<String, Class<?>> claimTypeMap) {
+        FastJson2Deserializer<Map<String, ?>> deserializer;
+        if (claimTypeMap == null) {
+            deserializer = new FastJson2Deserializer<>();
+        } else {
+            deserializer = new FastJson2Deserializer<>(claimTypeMap);
+        }
         return Jwts.parser()
+                .json(deserializer)
                 .verifyWith(properties.getSecret().getPublicKey())
                 .clockSkewSeconds(properties.getAllowedClockSkew().getSeconds())
                 .build()
@@ -104,7 +132,18 @@ public class JwtClaimsUtils {
      * @return {@link Jwt}
      */
     public static Jwt getJwt(String subject) {
-        String accessToken = accessToken(subject);
+        return getJwt(subject, null);
+    }
+
+    /**
+     * 获取JWT对象
+     *
+     * @param subject subject
+     * @param claims  声明要设置为 JWT 主体
+     * @return {@link Jwt}
+     */
+    public static Jwt getJwt(String subject, Map<String, ?> claims) {
+        String accessToken = accessToken(subject, claims);
         String refreshToken = refreshToken(subject);
         long time = parseToken(accessToken).getExpiration().getTime();
         return Jwt.builder()
