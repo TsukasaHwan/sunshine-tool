@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.util.AntPathMatcher;
 import org.sunshine.security.core.filter.AbstractAuthenticationFilter;
 import org.sunshine.security.core.util.SecurityUtils;
 import org.sunshine.security.jwt.exception.ExpiredJwtAuthenticationException;
@@ -33,6 +34,8 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
 
     private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+
+    private static final AntPathMatcher ANT_PATH_MATCHER = new AntPathMatcher();
 
     private final UserDetailsService userDetailsService;
 
@@ -57,15 +60,18 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
 
         try {
             Claims claims = JwtClaimsUtils.parseToken(authToken);
-
             String refreshTokenClaim = claims.get(JwtClaimsUtils.REFRESH_TOKEN_CLAIM_KEY, String.class);
-            if (refreshTokenClaim == null && request.getServletPath().contains(properties.getRefreshTokenPath())) {
-                filterChain.doFilter(request, response);
-                return;
-            }
 
-            if (refreshTokenClaim != null && refreshTokenClaim.equals(properties.getRefreshTokenClaim())) {
-                if (request.getServletPath().equals(properties.getRefreshTokenPath())) {
+            String servletPath = request.getServletPath();
+            // Check if the request is for the refresh token endpoint and handle accordingly
+            if (refreshTokenClaim == null) {
+                if (ANT_PATH_MATCHER.match(servletPath, properties.getRefreshTokenPath())) {
+                    filterChain.doFilter(request, response);
+                    return;
+                }
+            } else if (refreshTokenClaim.equals(properties.getRefreshTokenClaim())) {
+                boolean isRefreshPath = ANT_PATH_MATCHER.match(servletPath, properties.getRefreshTokenPath());
+                if (isRefreshPath) {
                     doAuthenticate(request, authToken, claims);
                 }
                 filterChain.doFilter(request, response);
@@ -102,27 +108,26 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
 
     private void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, Exception e) throws ServletException, IOException {
         SecurityUtils.clearContext();
-        AuthenticationException exception;
-        if (e instanceof JwtException) {
-            exception = handleJwtException((JwtException) e);
-        } else if (e instanceof AuthenticationException) {
-            exception = (AuthenticationException) e;
-        } else {
-            log.error(e.getMessage(), e);
-            exception = new JwtAuthenticationException(e.getMessage());
-        }
+        AuthenticationException exception = convertException(e);
         authenticationFailureHandler.onAuthenticationFailure(request, response, exception);
     }
 
     /**
-     * 将JwtException包装为AuthenticationException
+     * 转换为AuthenticationException
      *
-     * @param e {@link JwtException}
+     * @param e 异常
      * @return {@link AuthenticationException}
      */
-    private AuthenticationException handleJwtException(JwtException e) {
-        if (e instanceof ExpiredJwtException) {
-            return new ExpiredJwtAuthenticationException(e.getMessage());
+    private AuthenticationException convertException(Exception e) {
+        if (e instanceof JwtException) {
+            if (e instanceof ExpiredJwtException) {
+                return new ExpiredJwtAuthenticationException(e.getMessage());
+            } else {
+                log.error(e.getMessage(), e);
+                return new JwtAuthenticationException(e.getMessage());
+            }
+        } else if (e instanceof AuthenticationException authenticationException) {
+            return authenticationException;
         } else {
             log.error(e.getMessage(), e);
             return new JwtAuthenticationException(e.getMessage());
