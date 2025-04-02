@@ -72,6 +72,11 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
                 return;
             }
 
+            if (isRefreshPath(servletPath)) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
             doAuthenticate(request, authToken, claims);
         } catch (Exception e) {
             unsuccessfulAuthentication(request, response, e);
