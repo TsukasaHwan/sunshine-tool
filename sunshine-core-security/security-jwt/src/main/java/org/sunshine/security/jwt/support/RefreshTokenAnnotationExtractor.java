@@ -1,0 +1,50 @@
+package org.sunshine.security.jwt.support;
+
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.util.Assert;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
+import org.sunshine.core.tool.util.ClassUtils;
+import org.sunshine.security.core.support.SecurityAnnotationPathMatcherExtractor;
+import org.sunshine.security.jwt.annotation.RefreshTokenApi;
+import org.sunshine.security.jwt.util.JwtClaimsUtils;
+
+/**
+ * @author Teamo
+ * @since 2025/4/3
+ */
+public class RefreshTokenAnnotationExtractor extends SecurityAnnotationPathMatcherExtractor {
+
+    /**
+     * 统计@RefreshTokenApi注解的数量，保证只能使用一次
+     */
+    private int refreshTokenApiCount = 0;
+
+    private RefreshTokenApi refreshTokenApi;
+
+    @Override
+    protected boolean hasAnnotation(RequestMappingInfo requestMappingInfo, HandlerMethod handlerMethod) {
+        RefreshTokenApi annotation = ClassUtils.getAnnotation(handlerMethod, RefreshTokenApi.class);
+        if (annotation == null) {
+            return false;
+        }
+        this.refreshTokenApi = annotation;
+        this.refreshTokenApiCount++;
+        Assert.state(this.refreshTokenApiCount < 2,
+                String.format("The @RefreshTokenApi annotation can only be used once on method: %s", handlerMethod)
+        );
+        return true;
+    }
+
+    @Override
+    public boolean shouldSkipAuthentication(HttpServletRequest request) {
+        String refreshToken = JwtClaimsUtils.getToken(request);
+        if (refreshToken == null) {
+            return true;
+        }
+        Claims claims = JwtClaimsUtils.parseToken(refreshToken);
+        String refreshTokenClaim = claims.get(JwtClaimsUtils.REFRESH_TOKEN_CLAIM_KEY, String.class);
+        return refreshTokenClaim == null || !refreshTokenClaim.equals(this.refreshTokenApi.value());
+    }
+}

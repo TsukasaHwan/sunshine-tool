@@ -4,8 +4,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.sunshine.security.core.support.SecurityAnnotationPathMatcherExtractor;
 
 import java.io.IOException;
 import java.util.List;
@@ -18,14 +18,18 @@ import java.util.List;
  */
 public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter {
 
-    private List<AntPathRequestMatcher> permitAllMatchers;
+    private List<SecurityAnnotationPathMatcherExtractor> extractors;
 
     @Override
     @SuppressWarnings("NullableProblems")
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (isPermitAll(request)) {
-            filterChain.doFilter(request, response);
-            return;
+        if (this.extractors != null) {
+            for (SecurityAnnotationPathMatcherExtractor extractor : this.extractors) {
+                if (extractor.shouldSkipAuthentication(request)) {
+                    filterChain.doFilter(request, response);
+                    return;
+                }
+            }
         }
 
         authenticate(request, response, filterChain);
@@ -42,25 +46,11 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
      */
     protected abstract void authenticate(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException;
 
-    /**
-     * 判断请求路径是否包含@PermitAll注解
-     *
-     * @param request HttpServletRequest
-     * @return 是否需要token认证
-     */
-    private boolean isPermitAll(HttpServletRequest request) {
-        boolean isPermitAll = false;
-        if (permitAllMatchers != null && !permitAllMatchers.isEmpty()) {
-            isPermitAll = permitAllMatchers.stream().anyMatch(antPathRequestMatcher -> antPathRequestMatcher.matches(request));
-        }
-        return isPermitAll;
+    public List<SecurityAnnotationPathMatcherExtractor> getExtractors() {
+        return extractors;
     }
 
-    public List<AntPathRequestMatcher> getPermitAllMatchers() {
-        return permitAllMatchers;
-    }
-
-    public void setPermitAllMatchers(List<AntPathRequestMatcher> permitAllMatchers) {
-        this.permitAllMatchers = permitAllMatchers;
+    public void setExtractors(List<SecurityAnnotationPathMatcherExtractor> extractors) {
+        this.extractors = extractors;
     }
 }

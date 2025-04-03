@@ -54,7 +54,7 @@ import java.util.Optional;
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(JwtSecurityProperties.class)
 @EnableMethodSecurity(securedEnabled = true)
-@Import(DefaultSecurityConfiguration.class)
+@Import({DefaultSecurityConfiguration.class, JwtSecurityComponent.class})
 public class JwtSecurityConfiguration {
 
     private final JwtSecurityProperties jwtSecurityProperties;
@@ -63,7 +63,7 @@ public class JwtSecurityConfiguration {
 
     private final CorsConfigurationSource corsConfigurationSource;
 
-    private final List<SecurityAnnotationPathMatcherExtractor> securityAnnotationPathMatcherExtractors;
+    private List<SecurityAnnotationPathMatcherExtractor> securityAnnotationPathMatcherExtractors;
 
     private LogoutHandler logoutHandler;
 
@@ -71,11 +71,14 @@ public class JwtSecurityConfiguration {
 
     public JwtSecurityConfiguration(JwtSecurityProperties jwtSecurityProperties,
                                     UserDetailsService userDetailsService,
-                                    CorsConfigurationSource corsConfigurationSource,
-                                    List<SecurityAnnotationPathMatcherExtractor> securityAnnotationPathMatcherExtractors) {
+                                    CorsConfigurationSource corsConfigurationSource) {
         this.jwtSecurityProperties = jwtSecurityProperties;
         this.userDetailsService = userDetailsService;
         this.corsConfigurationSource = corsConfigurationSource;
+    }
+
+    @Autowired(required = false)
+    public void setSecurityAnnotationPathMatcherExtractors(List<SecurityAnnotationPathMatcherExtractor> securityAnnotationPathMatcherExtractors) {
         this.securityAnnotationPathMatcherExtractors = securityAnnotationPathMatcherExtractors;
     }
 
@@ -94,8 +97,8 @@ public class JwtSecurityConfiguration {
         http.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
-        List<AntPathRequestMatcher> permitAllMatchers = this.applyPermitPathsIfAvailable(http);
-        this.applyJwtSecurity(http, permitAllMatchers);
+        this.applyPermitPathsIfAvailable(http);
+        this.applyJwtSecurity(http);
         this.applyLogoutIfAvailable(http);
         this.applyCorsConfiguration(http);
         return http.build();
@@ -132,52 +135,50 @@ public class JwtSecurityConfiguration {
         };
     }
 
-    private List<AntPathRequestMatcher> applyPermitPathsIfAvailable(HttpSecurity http) throws Exception {
-        List<AntPathRequestMatcher> permitAllMatchers = new ArrayList<>(16);
-        List<String> permitAllPaths = this.jwtSecurityProperties.getPermitAllPaths().stream().distinct().toList();
-        http.authorizeHttpRequests(authorize -> {
-            if (!permitAllPaths.isEmpty()) {
-                List<AntPathRequestMatcher> requestMatchers = permitAllPaths.stream()
+    private void applyPermitPathsIfAvailable(HttpSecurity http) throws Exception {
+        List<AntPathRequestMatcher> requestMatchers =
+                this.jwtSecurityProperties.getPermitAllPaths().stream()
+                        .distinct()
                         .map(AntPathRequestMatcher::antMatcher)
                         .toList();
+        http.authorizeHttpRequests(authorize -> {
+            if (!requestMatchers.isEmpty()) {
                 authorize.requestMatchers(requestMatchers.toArray(AntPathRequestMatcher[]::new))
                         .permitAll();
-                permitAllMatchers.addAll(requestMatchers);
             }
             securityAnnotationPathMatcherExtractors.forEach(extractor -> {
                 if (extractor instanceof PermitAllAnnotationExtractor permitAllAnnotationExtractor) {
-                    List<AntPathRequestMatcher> permitAllAnnotationMatchers = handlePermitAllAnnotationExtractor(authorize, permitAllAnnotationExtractor, permitAllPaths);
-                    permitAllMatchers.addAll(permitAllAnnotationMatchers);
+                    handlePermitAllAnnotationExtractor(authorize, permitAllAnnotationExtractor, requestMatchers);
                 }
             });
+
             authorize.anyRequest().authenticated();
         });
-        return permitAllMatchers;
     }
 
-    private List<AntPathRequestMatcher> handlePermitAllAnnotationExtractor(
+    private void handlePermitAllAnnotationExtractor(
             AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authorize,
             PermitAllAnnotationExtractor permitAllAnnotationExtractor,
-            List<String> permitAllPaths) {
+            List<AntPathRequestMatcher> requestMatchers) {
         AntPathMatcher antPathMatcher = new AntPathMatcher();
         List<AntPathRequestMatcher> antPatterns = permitAllAnnotationExtractor.getAntPatterns();
         antPatterns.removeIf(matcher -> {
             String pattern = matcher.getPattern();
-            return permitAllPaths.stream().anyMatch(p -> antPathMatcher.match(p, pattern));
+            return requestMatchers.stream().anyMatch(p -> antPathMatcher.match(p.getPattern(), pattern));
         });
         if (!antPatterns.isEmpty()) {
             authorize.requestMatchers(antPatterns.toArray(AntPathRequestMatcher[]::new))
                     .permitAll();
         }
-        return antPatterns;
+        antPatterns.addAll(requestMatchers);
     }
 
-    private void applyJwtSecurity(HttpSecurity http, List<AntPathRequestMatcher> permitAllMatchers) throws Exception {
+    private void applyJwtSecurity(HttpSecurity http) throws Exception {
         AuthenticationEntryPoint authenticationEntryPoint = new JwtAuthenticationEntryPoint();
         AuthenticationFailureHandler authenticationFailureHandler = new AuthenticationEntryPointFailureHandler(authenticationEntryPoint);
         JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(
                 this.userDetailsService, authenticationFailureHandler, this.jwtSecurityProperties);
-        jwtAuthenticationFilter.setPermitAllMatchers(permitAllMatchers);
+        jwtAuthenticationFilter.setExtractors(this.securityAnnotationPathMatcherExtractors);
         // @formatter:off
         http
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

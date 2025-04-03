@@ -2,6 +2,7 @@ package org.sunshine.security.jwt.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.http.HttpHeaders;
+import org.sunshine.security.jwt.annotation.RefreshTokenApi;
 
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
@@ -27,14 +28,15 @@ public class JwtSecurityProperties {
     private String tokenPrefix;
 
     /**
-     * Refresh token claim
-     */
-    private String refreshTokenClaim = "refresh_token";
-
-    /**
      * Token expiration time (default 30 minutes).
      */
     private Duration expiresIn = Duration.ofMinutes(30L);
+
+    /**
+     * If the clock of the machine generating the token has a reasonable drift from the machine parsing it, the expiration check may fail.
+     * In this case you can use this field to allow some wiggle room on the difference between the clocks (1 to 2 minutes should be more than enough, Default is 0)
+     */
+    private Duration allowedClockSkew = Duration.ofSeconds(0L);
 
     /**
      * RefreshToken expiration time (default 1 hours).
@@ -42,10 +44,23 @@ public class JwtSecurityProperties {
     private Duration refreshTokenExpiresIn = Duration.ofHours(1L);
 
     /**
-     * If the clock of the machine generating the token has a reasonable drift from the machine parsing it, the expiration check may fail.
-     * In this case you can use this field to allow some wiggle room on the difference between the clocks (1 to 2 minutes should be more than enough, Default is 0)
+     * RefreshToken resource path.
      */
-    private Duration allowedClockSkew = Duration.ofSeconds(0L);
+    private String refreshTokenPath;
+
+    /**
+     * Refresh token claim
+     */
+    private String refreshTokenClaim = "refresh_token";
+
+    /**
+     * Whether to enable {@link RefreshTokenApi} annotation-based configuration. When enabled:
+     * 1. The {@code refreshTokenPath} is dynamically determined by the {@code @RefreshTokenApi} annotation's mapped endpoint path.
+     * 2. The {@code refreshTokenClaim} value is overridden by the annotation's configuration instead of the property's value.
+     *
+     * <p>Both properties are ignored when annotations are enabled, and the refresh token logic relies entirely on annotation metadata.
+     */
+    private Boolean enabledRefreshTokenApiAnnotation;
 
     /**
      * Accessible resource path.
@@ -63,11 +78,6 @@ public class JwtSecurityProperties {
      * Logout url.
      */
     private String logoutUrl;
-
-    /**
-     * RefreshToken resource path.
-     */
-    private String refreshTokenPath;
 
     /**
      * secret
@@ -118,20 +128,20 @@ public class JwtSecurityProperties {
         this.tokenPrefix = tokenPrefix;
     }
 
-    public String getRefreshTokenClaim() {
-        return refreshTokenClaim;
-    }
-
-    public void setRefreshTokenClaim(String refreshTokenClaim) {
-        this.refreshTokenClaim = refreshTokenClaim;
-    }
-
     public Duration getExpiresIn() {
         return expiresIn;
     }
 
     public void setExpiresIn(Duration expiresIn) {
         this.expiresIn = expiresIn;
+    }
+
+    public Duration getAllowedClockSkew() {
+        return allowedClockSkew;
+    }
+
+    public void setAllowedClockSkew(Duration allowedClockSkew) {
+        this.allowedClockSkew = allowedClockSkew;
     }
 
     public Duration getRefreshTokenExpiresIn() {
@@ -142,12 +152,28 @@ public class JwtSecurityProperties {
         this.refreshTokenExpiresIn = refreshTokenExpiresIn;
     }
 
-    public Duration getAllowedClockSkew() {
-        return allowedClockSkew;
+    public String getRefreshTokenPath() {
+        return refreshTokenPath;
     }
 
-    public void setAllowedClockSkew(Duration allowedClockSkew) {
-        this.allowedClockSkew = allowedClockSkew;
+    public void setRefreshTokenPath(String refreshTokenPath) {
+        this.refreshTokenPath = refreshTokenPath;
+    }
+
+    public String getRefreshTokenClaim() {
+        return refreshTokenClaim;
+    }
+
+    public void setRefreshTokenClaim(String refreshTokenClaim) {
+        this.refreshTokenClaim = refreshTokenClaim;
+    }
+
+    public Boolean getEnabledRefreshTokenApiAnnotation() {
+        return enabledRefreshTokenApiAnnotation;
+    }
+
+    public void setEnabledRefreshTokenApiAnnotation(Boolean enabledRefreshTokenApiAnnotation) {
+        this.enabledRefreshTokenApiAnnotation = enabledRefreshTokenApiAnnotation;
     }
 
     public List<String> getPermitAllPaths() {
@@ -164,14 +190,6 @@ public class JwtSecurityProperties {
 
     public void setLogoutUrl(String logoutUrl) {
         this.logoutUrl = logoutUrl;
-    }
-
-    public String getRefreshTokenPath() {
-        return refreshTokenPath;
-    }
-
-    public void setRefreshTokenPath(String refreshTokenPath) {
-        this.refreshTokenPath = refreshTokenPath;
     }
 
     public Secret getSecret() {

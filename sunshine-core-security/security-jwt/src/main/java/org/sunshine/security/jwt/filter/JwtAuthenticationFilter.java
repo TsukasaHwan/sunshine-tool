@@ -60,21 +60,24 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
 
         try {
             Claims claims = JwtClaimsUtils.parseToken(authToken);
-            String refreshTokenClaim = claims.get(JwtClaimsUtils.REFRESH_TOKEN_CLAIM_KEY, String.class);
 
-            // Check if the request is for the refresh token endpoint and handle accordingly
-            String servletPath = request.getServletPath();
-            if (refreshTokenClaim != null) {
-                if (refreshTokenClaim.equals(properties.getRefreshTokenClaim()) && isRefreshPath(servletPath)) {
-                    doAuthenticate(request, authToken, claims);
+            if (properties.getEnabledRefreshTokenApiAnnotation() == null ||
+                !properties.getEnabledRefreshTokenApiAnnotation()) {
+                // Check if the request is for the refresh token endpoint and handle accordingly
+                String refreshTokenClaim = claims.get(JwtClaimsUtils.REFRESH_TOKEN_CLAIM_KEY, String.class);
+                String servletPath = request.getServletPath();
+                if (refreshTokenClaim != null) {
+                    if (refreshTokenClaim.equals(properties.getRefreshTokenClaim()) && isRefreshPath(servletPath)) {
+                        doAuthenticate(request, authToken, claims);
+                    }
+                    filterChain.doFilter(request, response);
+                    return;
                 }
-                filterChain.doFilter(request, response);
-                return;
-            }
 
-            if (isRefreshPath(servletPath)) {
-                filterChain.doFilter(request, response);
-                return;
+                if (isRefreshPath(servletPath)) {
+                    filterChain.doFilter(request, response);
+                    return;
+                }
             }
 
             doAuthenticate(request, authToken, claims);

@@ -1,5 +1,6 @@
 package org.sunshine.security.core.support;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -24,7 +25,7 @@ public abstract class SecurityAnnotationPathMatcherExtractor implements Initiali
 
     protected ApplicationContext context;
 
-    protected List<AntPathRequestMatcher> antPatterns = new ArrayList<>();
+    protected List<AntPathRequestMatcher> antPatterns = new ArrayList<>(16);
 
     /**
      * Is there any annotation
@@ -34,6 +35,16 @@ public abstract class SecurityAnnotationPathMatcherExtractor implements Initiali
      * @return boolean
      */
     protected abstract boolean hasAnnotation(RequestMappingInfo requestMappingInfo, HandlerMethod handlerMethod);
+
+    /**
+     * Should skip authentication
+     *
+     * @param request {@link HttpServletRequest}
+     * @return boolean
+     */
+    public boolean shouldSkipAuthentication(HttpServletRequest request) {
+        return request != null && antPatterns.stream().anyMatch(matcher -> matcher.matches(request));
+    }
 
     @Override
     public void afterPropertiesSet() throws Exception {
