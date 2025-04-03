@@ -54,11 +54,8 @@ public class JwtSecurityProperties {
     private String refreshTokenClaim = "refresh_token";
 
     /**
-     * Whether to enable {@link RefreshTokenApi} annotation-based configuration. When enabled:
-     * 1. The {@code refreshTokenPath} is dynamically determined by the {@code @RefreshTokenApi} annotation's mapped endpoint path.
-     * 2. The {@code refreshTokenClaim} value is overridden by the annotation's configuration instead of the property's value.
-     *
-     * <p>Both properties are ignored when annotations are enabled, and the refresh token logic relies entirely on annotation metadata.
+     * Whether to enable {@link RefreshTokenApi} annotation-based configuration. When enabled, the {@code refreshTokenPath} configuration is ignored,
+     * and the refresh token endpoint path is dynamically determined by the {@code @RefreshTokenApi} annotation's mapped endpoint path instead.
      */
     private Boolean enabledRefreshTokenApiAnnotation;
 

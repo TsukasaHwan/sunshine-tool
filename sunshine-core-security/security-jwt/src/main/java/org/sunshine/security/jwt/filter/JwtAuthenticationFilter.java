@@ -89,6 +89,13 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
         filterChain.doFilter(request, response);
     }
 
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, Exception e) throws ServletException, IOException {
+        SecurityUtils.clearContext();
+        AuthenticationException exception = convertException(e);
+        authenticationFailureHandler.onAuthenticationFailure(request, response, exception);
+    }
+
     /**
      * 认证
      *
@@ -106,12 +113,6 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
                 SecurityUtils.setAuthentication(authentication);
             }
         }
-    }
-
-    private void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, Exception e) throws ServletException, IOException {
-        SecurityUtils.clearContext();
-        AuthenticationException exception = convertException(e);
-        authenticationFailureHandler.onAuthenticationFailure(request, response, exception);
     }
 
     /**

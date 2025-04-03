@@ -2,6 +2,7 @@ package org.sunshine.security.jwt.support;
 
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.util.Assert;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
@@ -9,6 +10,8 @@ import org.sunshine.core.tool.util.ClassUtils;
 import org.sunshine.security.core.support.SecurityAnnotationPathMatcherExtractor;
 import org.sunshine.security.jwt.annotation.RefreshTokenApi;
 import org.sunshine.security.jwt.util.JwtClaimsUtils;
+
+import java.util.Optional;
 
 /**
  * @author Teamo
@@ -21,7 +24,11 @@ public class RefreshTokenAnnotationExtractor extends SecurityAnnotationPathMatch
      */
     private int refreshTokenApiCount = 0;
 
-    private RefreshTokenApi refreshTokenApi;
+    private final String refreshTokenClaim;
+
+    public RefreshTokenAnnotationExtractor(String refreshTokenClaim) {
+        this.refreshTokenClaim = refreshTokenClaim;
+    }
 
     @Override
     protected boolean hasAnnotation(RequestMappingInfo requestMappingInfo, HandlerMethod handlerMethod) {
@@ -29,7 +36,6 @@ public class RefreshTokenAnnotationExtractor extends SecurityAnnotationPathMatch
         if (annotation == null) {
             return false;
         }
-        this.refreshTokenApi = annotation;
         this.refreshTokenApiCount++;
         Assert.state(this.refreshTokenApiCount < 2,
                 String.format("The @RefreshTokenApi annotation can only be used once on method: %s", handlerMethod)
@@ -39,12 +45,18 @@ public class RefreshTokenAnnotationExtractor extends SecurityAnnotationPathMatch
 
     @Override
     public boolean shouldSkipAuthentication(HttpServletRequest request) {
-        String refreshToken = JwtClaimsUtils.getToken(request);
-        if (refreshToken == null) {
-            return true;
+        Optional<AntPathRequestMatcher> matcherOpt = this.antPatterns.stream().findFirst();
+        if (matcherOpt.isEmpty()) {
+            return false;
         }
-        Claims claims = JwtClaimsUtils.parseToken(refreshToken);
-        String refreshTokenClaim = claims.get(JwtClaimsUtils.REFRESH_TOKEN_CLAIM_KEY, String.class);
-        return refreshTokenClaim == null || !refreshTokenClaim.equals(this.refreshTokenApi.value());
+        return matcherOpt.map(matcher -> {
+            String token = JwtClaimsUtils.getToken(request);
+            if (token == null) {
+                return false;
+            }
+            Claims claims = JwtClaimsUtils.parseToken(token);
+            String refreshTokenClaim = claims.get(JwtClaimsUtils.REFRESH_TOKEN_CLAIM_KEY, String.class);
+            return refreshTokenClaim == null ? matcher.matches(request) : !refreshTokenClaim.equals(this.refreshTokenClaim) || !matcher.matches(request);
+        }).orElse(Boolean.FALSE);
     }
 }

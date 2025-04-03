@@ -24,11 +24,16 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
     @SuppressWarnings("NullableProblems")
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         if (this.extractors != null) {
-            for (SecurityAnnotationPathMatcherExtractor extractor : this.extractors) {
-                if (extractor.shouldSkipAuthentication(request)) {
-                    filterChain.doFilter(request, response);
-                    return;
+            try {
+                for (SecurityAnnotationPathMatcherExtractor extractor : this.extractors) {
+                    if (extractor.shouldSkipAuthentication(request)) {
+                        filterChain.doFilter(request, response);
+                        return;
+                    }
                 }
+            } catch (Exception e) {
+                unsuccessfulAuthentication(request, response, e);
+                return;
             }
         }
 
@@ -45,6 +50,17 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
      * @throws IOException      IOException
      */
     protected abstract void authenticate(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException;
+
+    /**
+     * 认证失败
+     *
+     * @param request  HttpServletRequest
+     * @param response HttpServletResponse
+     * @param e        Exception
+     * @throws ServletException ServletException
+     * @throws IOException      IOException
+     */
+    protected abstract void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, Exception e) throws ServletException, IOException;
 
     public List<SecurityAnnotationPathMatcherExtractor> getExtractors() {
         return extractors;
