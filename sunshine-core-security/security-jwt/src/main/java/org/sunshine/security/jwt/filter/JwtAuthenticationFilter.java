@@ -15,7 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.util.AntPathMatcher;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.sunshine.security.core.filter.AbstractAuthenticationFilter;
 import org.sunshine.security.core.util.SecurityUtils;
 import org.sunshine.security.jwt.exception.ExpiredJwtAuthenticationException;
@@ -35,7 +35,7 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
 
     private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
-    private static final AntPathMatcher ANT_PATH_MATCHER = new AntPathMatcher();
+    private static AntPathRequestMatcher antPathRequestMatcher;
 
     private final UserDetailsService userDetailsService;
 
@@ -47,6 +47,9 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
         this.userDetailsService = userDetailsService;
         this.authenticationFailureHandler = authenticationFailureHandler;
         this.properties = properties;
+        if (properties.getRefreshTokenPath() != null) {
+            antPathRequestMatcher = AntPathRequestMatcher.antMatcher(properties.getRefreshTokenPath());
+        }
     }
 
     @Override
@@ -65,16 +68,15 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
                 !properties.getEnabledRefreshTokenApiAnnotation()) {
                 // Check if the request is for the refresh token endpoint and handle accordingly
                 String refreshTokenClaim = claims.get(JwtClaimsUtils.REFRESH_TOKEN_CLAIM_KEY, String.class);
-                String servletPath = request.getServletPath();
                 if (refreshTokenClaim != null) {
-                    if (refreshTokenClaim.equals(properties.getRefreshTokenClaim()) && isRefreshPath(servletPath)) {
+                    if (refreshTokenClaim.equals(properties.getRefreshTokenClaim()) && isRefreshPath(request)) {
                         doAuthenticate(request, authToken, claims);
                     }
                     filterChain.doFilter(request, response);
                     return;
                 }
 
-                if (isRefreshPath(servletPath)) {
+                if (isRefreshPath(request)) {
                     filterChain.doFilter(request, response);
                     return;
                 }
@@ -137,7 +139,7 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
         }
     }
 
-    private boolean isRefreshPath(String path) {
-        return properties.getRefreshTokenPath() != null && ANT_PATH_MATCHER.match(properties.getRefreshTokenPath(), path);
+    private boolean isRefreshPath(HttpServletRequest request) {
+        return antPathRequestMatcher != null && antPathRequestMatcher.matches(request);
     }
 }
