@@ -3,6 +3,7 @@ package org.sunshine.security.jwt;
 import org.sunshine.security.jwt.util.JwtUtils;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -34,11 +35,11 @@ public class Jwt implements Serializable {
     public static Jwt of(String subject, Map<String, ?> claims) {
         String accessToken = JwtUtils.accessToken(subject, claims);
         String refreshToken = JwtUtils.refreshToken(subject);
-        long time = JwtUtils.parseToken(accessToken).getExpiration().getTime();
+        Date expiration = JwtUtils.parseToken(accessToken).getExpiration();
         return builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
-                .expiresIn(time)
+                .expiresIn(expiration == null ? null : expiration.getTime())
                 .build();
     }
 
