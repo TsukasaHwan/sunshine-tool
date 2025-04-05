@@ -39,7 +39,7 @@ public class OAuth2ClientConfiguration {
         List<String> forbiddenPaths = properties.getForbiddenPaths();
         http.authorizeExchange(authorize -> {
             if (CollectionUtils.isNotEmpty(forbiddenPaths)) {
-                authorize.pathMatchers(forbiddenPaths.toArray(new String[0])).denyAll();
+                authorize.pathMatchers(forbiddenPaths.toArray(String[]::new)).denyAll();
             }
             // 放行交由资源服务器进行认证鉴权
             authorize.anyExchange().permitAll();

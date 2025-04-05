@@ -28,13 +28,12 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.util.AntPathMatcher;
 import org.springframework.util.Assert;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.sunshine.security.core.DefaultSecurityConfiguration;
 import org.sunshine.security.core.handler.CommonAccessDeniedHandler;
+import org.sunshine.security.core.support.PathPatternRequestMatcher;
 import org.sunshine.security.core.support.PermitAllAnnotationExtractor;
 import org.sunshine.security.core.support.SecurityAnnotationPathMatcherExtractor;
 import org.sunshine.security.jwt.filter.JwtAuthenticationFilter;
@@ -136,14 +135,14 @@ public class JwtSecurityConfiguration {
     }
 
     private void applyPermitPathsIfAvailable(HttpSecurity http) throws Exception {
-        List<AntPathRequestMatcher> requestMatchers =
+        List<PathPatternRequestMatcher> requestMatchers =
                 this.jwtSecurityProperties.getPermitAllPaths().stream()
                         .distinct()
-                        .map(AntPathRequestMatcher::antMatcher)
+                        .map(path -> PathPatternRequestMatcher.withDefaults().matcher(path))
                         .toList();
         http.authorizeHttpRequests(authorize -> {
             if (!requestMatchers.isEmpty()) {
-                authorize.requestMatchers(requestMatchers.toArray(AntPathRequestMatcher[]::new))
+                authorize.requestMatchers(requestMatchers.toArray(PathPatternRequestMatcher[]::new))
                         .permitAll();
             }
             securityAnnotationPathMatcherExtractors.forEach(extractor -> {
@@ -159,18 +158,14 @@ public class JwtSecurityConfiguration {
     private void handlePermitAllAnnotationExtractor(
             AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authorize,
             PermitAllAnnotationExtractor permitAllAnnotationExtractor,
-            List<AntPathRequestMatcher> requestMatchers) {
-        AntPathMatcher antPathMatcher = new AntPathMatcher();
-        List<AntPathRequestMatcher> antPatterns = permitAllAnnotationExtractor.getAntPatterns();
-        antPatterns.removeIf(matcher -> {
-            String pattern = matcher.getPattern();
-            return requestMatchers.stream().anyMatch(p -> antPathMatcher.match(p.getPattern(), pattern));
-        });
-        if (!antPatterns.isEmpty()) {
-            authorize.requestMatchers(antPatterns.toArray(AntPathRequestMatcher[]::new))
+            List<PathPatternRequestMatcher> requestMatchers) {
+        List<PathPatternRequestMatcher> matchers = permitAllAnnotationExtractor.getPathPatternRequestMatchers();
+        matchers.removeIf(matcher -> requestMatchers.stream().anyMatch(p -> p.equals(matcher)));
+        if (!matchers.isEmpty()) {
+            authorize.requestMatchers(matchers.toArray(PathPatternRequestMatcher[]::new))
                     .permitAll();
         }
-        antPatterns.addAll(requestMatchers);
+        matchers.addAll(requestMatchers);
     }
 
     private void applyJwtSecurity(HttpSecurity http) throws Exception {

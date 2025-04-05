@@ -5,7 +5,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.condition.PathPatternsRequestCondition;
 import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
@@ -25,7 +24,7 @@ public abstract class SecurityAnnotationPathMatcherExtractor implements Initiali
 
     protected ApplicationContext context;
 
-    protected List<AntPathRequestMatcher> antPatterns = new ArrayList<>(16);
+    protected List<PathPatternRequestMatcher> pathPatternRequestMatchers = new ArrayList<>(16);
 
     /**
      * Is there any annotation
@@ -43,7 +42,7 @@ public abstract class SecurityAnnotationPathMatcherExtractor implements Initiali
      * @return boolean
      */
     public boolean shouldSkipAuthentication(HttpServletRequest request) {
-        return request != null && antPatterns.stream().anyMatch(matcher -> matcher.matches(request));
+        return request != null && pathPatternRequestMatchers.stream().anyMatch(matcher -> matcher.matches(request));
     }
 
     @Override
@@ -84,11 +83,11 @@ public abstract class SecurityAnnotationPathMatcherExtractor implements Initiali
         requestMappingInfo.getMethodsCondition().getMethods().forEach(requestMethod -> {
             HttpMethod httpMethod = HttpMethod.valueOf(requestMethod.name());
 
-            patterns.forEach(pattern -> antPatterns.add(AntPathRequestMatcher.antMatcher(httpMethod, pattern)));
+            patterns.forEach(pattern -> pathPatternRequestMatchers.add(PathPatternRequestMatcher.withDefaults().matcher(httpMethod, pattern)));
         });
     }
 
-    public List<AntPathRequestMatcher> getAntPatterns() {
-        return antPatterns;
+    public List<PathPatternRequestMatcher> getPathPatternRequestMatchers() {
+        return pathPatternRequestMatchers;
     }
 }

@@ -2,11 +2,11 @@ package org.sunshine.security.jwt.support;
 
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.util.Assert;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.sunshine.core.tool.util.ClassUtils;
+import org.sunshine.security.core.support.PathPatternRequestMatcher;
 import org.sunshine.security.core.support.SecurityAnnotationPathMatcherExtractor;
 import org.sunshine.security.jwt.annotation.RefreshTokenApi;
 import org.sunshine.security.jwt.util.JwtClaimsUtils;
@@ -45,7 +45,7 @@ public class RefreshTokenAnnotationExtractor extends SecurityAnnotationPathMatch
 
     @Override
     public boolean shouldSkipAuthentication(HttpServletRequest request) {
-        Optional<AntPathRequestMatcher> matcherOpt = this.antPatterns.stream().findFirst();
+        Optional<PathPatternRequestMatcher> matcherOpt = this.pathPatternRequestMatchers.stream().findFirst();
         return matcherOpt.map(matcher -> {
             String token = JwtClaimsUtils.getToken(request);
             if (token == null) {

@@ -15,8 +15,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.sunshine.security.core.filter.AbstractAuthenticationFilter;
+import org.sunshine.security.core.support.PathPatternRequestMatcher;
 import org.sunshine.security.core.util.SecurityUtils;
 import org.sunshine.security.jwt.exception.ExpiredJwtAuthenticationException;
 import org.sunshine.security.jwt.exception.JwtAuthenticationException;
@@ -35,7 +35,7 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
 
     private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
-    private static AntPathRequestMatcher antPathRequestMatcher;
+    private static PathPatternRequestMatcher pathPatternRequestMatcher;
 
     private final UserDetailsService userDetailsService;
 
@@ -48,7 +48,7 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
         this.authenticationFailureHandler = authenticationFailureHandler;
         this.properties = properties;
         if (properties.getRefreshTokenPath() != null) {
-            antPathRequestMatcher = AntPathRequestMatcher.antMatcher(properties.getRefreshTokenPath());
+            pathPatternRequestMatcher = PathPatternRequestMatcher.withDefaults().matcher(properties.getRefreshTokenPath());
         }
     }
 
@@ -140,6 +140,6 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
     }
 
     private boolean isRefreshPath(HttpServletRequest request) {
-        return antPathRequestMatcher != null && antPathRequestMatcher.matches(request);
+        return pathPatternRequestMatcher != null && pathPatternRequestMatcher.matches(request);
     }
 }
