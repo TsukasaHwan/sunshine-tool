@@ -39,7 +39,7 @@ import org.sunshine.security.core.support.SecurityAnnotationPathMatcherExtractor
 import org.sunshine.security.jwt.filter.JwtAuthenticationFilter;
 import org.sunshine.security.jwt.handler.JwtAuthenticationEntryPoint;
 import org.sunshine.security.jwt.properties.JwtSecurityProperties;
-import org.sunshine.security.jwt.util.JwtClaimsUtils;
+import org.sunshine.security.jwt.util.JwtUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,13 +105,13 @@ public class JwtSecurityConfiguration {
 
     @Bean
     @SuppressWarnings("InstantiationOfUtilityClass")
-    public JwtClaimsUtils jwtClaimsUtils() {
+    public JwtUtils jwtUtils() {
         // Need to use JwtSecurityProperties, so register a bean
         JwtSecurityProperties.Secret secret = jwtSecurityProperties.getSecret();
         Assert.notNull(secret.getPublicKey(), "RSAPublicKey must not be null!");
         Assert.notNull(secret.getPrivateKey(), "RSAPrivateKey must not be null!");
 
-        return new JwtClaimsUtils(jwtSecurityProperties);
+        return new JwtUtils(jwtSecurityProperties);
     }
 
     @Bean
@@ -123,8 +123,8 @@ public class JwtSecurityConfiguration {
                 return Optional.ofNullable(AnnotatedElementUtils.findMergedAnnotation(beanType, PermitAll.class));
             }).isEmpty();
             if (empty) {
-                String header = JwtClaimsUtils.getTokenRequestHeader();
-                String tokenPrefix = JwtClaimsUtils.getTokenPrefix();
+                String header = JwtUtils.getTokenHeader();
+                String tokenPrefix = JwtUtils.getTokenPrefix();
                 @SuppressWarnings("rawtypes")
                 Schema stringSchema = new StringSchema()._default(tokenPrefix).name(header).description("请求接口凭证");
                 Parameter headerParameter = new HeaderParameter().name(header).description("请求接口凭证").schema(stringSchema);

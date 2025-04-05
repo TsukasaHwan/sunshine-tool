@@ -21,7 +21,7 @@ import org.sunshine.security.core.util.SecurityUtils;
 import org.sunshine.security.jwt.exception.ExpiredJwtAuthenticationException;
 import org.sunshine.security.jwt.exception.JwtAuthenticationException;
 import org.sunshine.security.jwt.properties.JwtSecurityProperties;
-import org.sunshine.security.jwt.util.JwtClaimsUtils;
+import org.sunshine.security.jwt.util.JwtUtils;
 
 import java.io.IOException;
 
@@ -53,7 +53,7 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
 
     @Override
     protected void authenticate(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String authToken = JwtClaimsUtils.getToken(request);
+        String authToken = JwtUtils.getToken(request);
 
         if (authToken == null) {
             filterChain.doFilter(request, response);
@@ -61,11 +61,11 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
         }
 
         try {
-            Claims claims = JwtClaimsUtils.parseToken(authToken);
+            Claims claims = JwtUtils.getClaims(request, authToken);
             boolean enableRefreshTokenApiAnnotation = Boolean.TRUE.equals(properties.getEnabledRefreshTokenApiAnnotation());
 
             if (!enableRefreshTokenApiAnnotation) {
-                String refreshTokenClaim = claims.get(JwtClaimsUtils.REFRESH_TOKEN_CLAIM_KEY, String.class);
+                String refreshTokenClaim = JwtUtils.getRefreshTokenClaim(claims);
                 if (refreshTokenClaim != null) {
                     if (refreshTokenClaim.equals(properties.getRefreshTokenClaim()) && isRefreshPath(request)) {
                         doAuthenticate(request, authToken, claims);
@@ -105,7 +105,7 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
         String username = claims.getSubject();
         if (username != null && SecurityUtils.getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            if (JwtClaimsUtils.validateToken(authToken, userDetails.getUsername())) {
+            if (JwtUtils.validateToken(authToken, userDetails.getUsername())) {
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, authToken, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityUtils.setAuthentication(authentication);

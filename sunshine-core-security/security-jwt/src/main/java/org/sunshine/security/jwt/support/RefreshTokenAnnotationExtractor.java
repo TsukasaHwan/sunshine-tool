@@ -9,7 +9,7 @@ import org.sunshine.core.tool.util.ClassUtils;
 import org.sunshine.security.core.support.PathPatternRequestMatcher;
 import org.sunshine.security.core.support.SecurityAnnotationPathMatcherExtractor;
 import org.sunshine.security.jwt.annotation.RefreshTokenApi;
-import org.sunshine.security.jwt.util.JwtClaimsUtils;
+import org.sunshine.security.jwt.util.JwtUtils;
 
 import java.util.Optional;
 
@@ -47,12 +47,12 @@ public class RefreshTokenAnnotationExtractor extends SecurityAnnotationPathMatch
     public boolean shouldSkipAuthentication(HttpServletRequest request) throws Exception {
         Optional<PathPatternRequestMatcher> matcherOpt = this.pathPatternRequestMatchers.stream().findFirst();
         return matcherOpt.map(matcher -> {
-            String token = JwtClaimsUtils.getToken(request);
+            String token = JwtUtils.getToken(request);
             if (token == null) {
                 return false;
             }
-            Claims claims = JwtClaimsUtils.parseToken(token);
-            String refreshTokenClaim = claims.get(JwtClaimsUtils.REFRESH_TOKEN_CLAIM_KEY, String.class);
+            Claims claims = JwtUtils.getClaims(request, token);
+            String refreshTokenClaim = JwtUtils.getRefreshTokenClaim(claims);
             boolean isMatched = matcher.matches(request);
             return refreshTokenClaim == null ? isMatched : !refreshTokenClaim.equals(this.refreshTokenClaim) || !isMatched;
         }).orElse(Boolean.FALSE);

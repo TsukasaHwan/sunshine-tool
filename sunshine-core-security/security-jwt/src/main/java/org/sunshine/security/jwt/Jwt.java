@@ -1,6 +1,9 @@
 package org.sunshine.security.jwt;
 
+import org.sunshine.security.jwt.util.JwtUtils;
+
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * @author Teamo
@@ -22,6 +25,21 @@ public class Jwt implements Serializable {
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    public static Jwt of(String subject) {
+        return of(subject, null);
+    }
+
+    public static Jwt of(String subject, Map<String, ?> claims) {
+        String accessToken = JwtUtils.accessToken(subject, claims);
+        String refreshToken = JwtUtils.refreshToken(subject);
+        long time = JwtUtils.parseToken(accessToken).getExpiration().getTime();
+        return builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .expiresIn(time)
+                .build();
     }
 
     public String getAccessToken() {
