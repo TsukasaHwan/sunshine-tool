@@ -35,7 +35,7 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
 
     private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
-    private static PathPatternRequestMatcher pathPatternRequestMatcher;
+    private final PathPatternRequestMatcher pathPatternRequestMatcher;
 
     private final UserDetailsService userDetailsService;
 
@@ -47,9 +47,8 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
         this.userDetailsService = userDetailsService;
         this.authenticationFailureHandler = authenticationFailureHandler;
         this.properties = properties;
-        if (properties.getRefreshTokenPath() != null) {
-            pathPatternRequestMatcher = PathPatternRequestMatcher.withDefaults().matcher(properties.getRefreshTokenPath());
-        }
+        this.pathPatternRequestMatcher = properties.getRefreshTokenPath() == null ?
+                null : PathPatternRequestMatcher.withDefaults().matcher(properties.getRefreshTokenPath());
     }
 
     @Override
@@ -63,10 +62,9 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
 
         try {
             Claims claims = JwtClaimsUtils.parseToken(authToken);
+            boolean enableRefreshTokenApiAnnotation = Boolean.TRUE.equals(properties.getEnabledRefreshTokenApiAnnotation());
 
-            if (properties.getEnabledRefreshTokenApiAnnotation() == null ||
-                !properties.getEnabledRefreshTokenApiAnnotation()) {
-                // Check if the request is for the refresh token endpoint and handle accordingly
+            if (!enableRefreshTokenApiAnnotation) {
                 String refreshTokenClaim = claims.get(JwtClaimsUtils.REFRESH_TOKEN_CLAIM_KEY, String.class);
                 if (refreshTokenClaim != null) {
                     if (refreshTokenClaim.equals(properties.getRefreshTokenClaim()) && isRefreshPath(request)) {
@@ -83,12 +81,10 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
             }
 
             doAuthenticate(request, authToken, claims);
+            filterChain.doFilter(request, response);
         } catch (Exception e) {
             unsuccessfulAuthentication(request, response, e);
-            return;
         }
-
-        filterChain.doFilter(request, response);
     }
 
     @Override
@@ -124,22 +120,19 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
      * @return {@link AuthenticationException}
      */
     private AuthenticationException convertException(Exception e) {
-        if (e instanceof JwtException) {
-            if (e instanceof ExpiredJwtException) {
-                return new ExpiredJwtAuthenticationException(e.getMessage());
-            } else {
-                log.error(e.getMessage(), e);
-                return new JwtAuthenticationException(e.getMessage());
-            }
-        } else if (e instanceof AuthenticationException authenticationException) {
-            return authenticationException;
+        if (e instanceof ExpiredJwtException) {
+            return new ExpiredJwtAuthenticationException(e.getMessage(), e);
+        } else if (e instanceof JwtException) {
+            return new JwtAuthenticationException(e.getMessage(), e);
+        } else if (e instanceof AuthenticationException) {
+            return (AuthenticationException) e;
         } else {
-            log.error(e.getMessage(), e);
-            return new JwtAuthenticationException(e.getMessage());
+            log.error("Unexpected authentication error", e);
+            return new JwtAuthenticationException("Authentication failed", e);
         }
     }
 
     private boolean isRefreshPath(HttpServletRequest request) {
-        return pathPatternRequestMatcher != null && pathPatternRequestMatcher.matches(request);
+        return this.pathPatternRequestMatcher != null && this.pathPatternRequestMatcher.matches(request);
     }
 }
