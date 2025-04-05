@@ -53,7 +53,8 @@ public class RefreshTokenAnnotationExtractor extends SecurityAnnotationPathMatch
             }
             Claims claims = JwtClaimsUtils.parseToken(token);
             String refreshTokenClaim = claims.get(JwtClaimsUtils.REFRESH_TOKEN_CLAIM_KEY, String.class);
-            return refreshTokenClaim == null ? matcher.matches(request) : !refreshTokenClaim.equals(this.refreshTokenClaim) || !matcher.matches(request);
+            boolean isMatched = matcher.matches(request);
+            return refreshTokenClaim == null ? isMatched : !refreshTokenClaim.equals(this.refreshTokenClaim) || !isMatched;
         }).orElse(Boolean.FALSE);
     }
 }
