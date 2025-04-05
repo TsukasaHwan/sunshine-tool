@@ -44,7 +44,7 @@ public class RefreshTokenAnnotationExtractor extends SecurityAnnotationPathMatch
     }
 
     @Override
-    public boolean shouldSkipAuthentication(HttpServletRequest request) {
+    public boolean shouldSkipAuthentication(HttpServletRequest request) throws Exception {
         Optional<PathPatternRequestMatcher> matcherOpt = this.pathPatternRequestMatchers.stream().findFirst();
         return matcherOpt.map(matcher -> {
             String token = JwtClaimsUtils.getToken(request);

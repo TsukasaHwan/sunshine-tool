@@ -40,8 +40,9 @@ public abstract class SecurityAnnotationPathMatcherExtractor implements Initiali
      *
      * @param request {@link HttpServletRequest}
      * @return boolean
+     * @throws Exception Exception
      */
-    public boolean shouldSkipAuthentication(HttpServletRequest request) {
+    public boolean shouldSkipAuthentication(HttpServletRequest request) throws Exception {
         return request != null && pathPatternRequestMatchers.stream().anyMatch(matcher -> matcher.matches(request));
     }
 
