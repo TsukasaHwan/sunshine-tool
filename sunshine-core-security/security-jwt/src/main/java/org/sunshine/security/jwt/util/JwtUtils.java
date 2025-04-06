@@ -7,15 +7,15 @@ import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.util.Assert;
 import org.sunshine.core.tool.util.WebUtils;
+import org.sunshine.security.jwt.JwtToken;
+import org.sunshine.security.jwt.JwtTokenClaims;
 import org.sunshine.security.jwt.properties.JwtSecurityProperties;
 import org.sunshine.security.jwt.support.FastJson2Deserializer;
 import org.sunshine.security.jwt.support.FastJson2Serializer;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.Date;
-import java.util.Map;
 
 /**
  * @author Teamo
@@ -24,8 +24,6 @@ import java.util.Map;
 public class JwtUtils {
 
     private static final String JWT_CLAIMS_REQUEST_ATTRIBUTE = "JWT_CLAIMS";
-
-    private static final String REFRESH_TOKEN_CLAIM_NAME = "refresh";
 
     private static final char TOKEN_CONNECTOR_CHAT = ' ';
 
@@ -42,18 +40,23 @@ public class JwtUtils {
      * @return 访问令牌
      */
     public static String accessToken(String subject) {
-        return accessToken(subject, null);
+        Assert.hasText(subject, "'subject' must not be empty");
+        JwtTokenClaims.AccessTokenBuilder accessBuilder = JwtTokenClaims.builder()
+                .subject(subject)
+                .accessToken();
+        return accessToken(accessBuilder);
     }
 
     /**
      * 访问令牌
      *
-     * @param subject 主题（用户名）
-     * @param claims  声称要设置为 JWT 主体
+     * @param accessBuilder 声明
      * @return 访问令牌
      */
-    public static String accessToken(String subject, Map<String, ?> claims) {
-        return token(subject, properties.getExpiresIn(), claims);
+    public static String accessToken(JwtTokenClaims.AccessTokenBuilder accessBuilder) {
+        Assert.notNull(accessBuilder, "'accessBuilder' must not be null");
+        JwtTokenClaims claims = accessBuilder.build();
+        return token(claims, properties.getExpiresIn());
     }
 
     /**
@@ -63,34 +66,43 @@ public class JwtUtils {
      * @return 刷新令牌
      */
     public static String refreshToken(String subject) {
-        Duration refreshTokenExpiresIn = properties.getRefreshTokenExpiresIn();
-        Map<String, String> claims = Collections.singletonMap(REFRESH_TOKEN_CLAIM_NAME, properties.getRefreshTokenClaim());
-        return token(subject, refreshTokenExpiresIn, claims);
+        Assert.hasText(subject, "'subject' must not be empty");
+        JwtTokenClaims.RefreshTokenBuilder refreshBuilder = JwtTokenClaims.builder()
+                .subject(subject)
+                .refreshToken();
+        return refreshToken(refreshBuilder);
+    }
+
+    /**
+     * 刷新令牌
+     *
+     * @param refreshBuilder 声明
+     * @return 刷新令牌
+     */
+    public static String refreshToken(JwtTokenClaims.RefreshTokenBuilder refreshBuilder) {
+        Assert.notNull(refreshBuilder, "'refreshBuilder' must not be null");
+        JwtTokenClaims claims = refreshBuilder.build();
+        return token(claims, properties.getRefreshTokenExpiresIn());
     }
 
     /**
      * 令牌
      *
-     * @param subject   主题（用户名）
-     * @param expiresIn 过期时间
      * @param claims    声称要设置为 JWT 主体
+     * @param expiresIn 过期时间
      * @return 令牌
      */
-    public static String token(String subject, Duration expiresIn, Map<String, ?> claims) {
-        Assert.hasText(subject, "'subject' must not be empty");
+    private static String token(JwtTokenClaims claims, Duration expiresIn) {
+        Assert.notNull(claims, "'claims' must not be null");
         Instant now = Instant.now();
         JwtBuilder jwtBuilder = Jwts.builder()
                 .json(new FastJson2Serializer<>())
+                .claims(claims.getClaims())
                 .issuedAt(Date.from(now))
-                .subject(subject)
                 .signWith(properties.getSecret().getPrivateKey());
 
         if (expiresIn != null) {
             jwtBuilder.expiration(Date.from(now.plus(expiresIn)));
-        }
-
-        if (claims != null) {
-            jwtBuilder.claims(claims);
         }
 
         return jwtBuilder.compact();
@@ -100,34 +112,21 @@ public class JwtUtils {
      * 解析令牌
      *
      * @param token 令牌
-     * @return Claims
+     * @return JwtToken
      */
-    public static Claims parseToken(String token) {
-        return parseToken(token, null);
-    }
-
-    /**
-     * 解析令牌
-     *
-     * @param token        令牌
-     * @param claimTypeMap 声明类型
-     * @return Claims
-     */
-    public static Claims parseToken(String token, Map<String, Class<?>> claimTypeMap) {
+    public static JwtToken parseToken(String token) {
         Assert.hasText(token, "'token' must not be empty");
-        FastJson2Deserializer<Map<String, ?>> deserializer;
-        if (claimTypeMap == null) {
-            deserializer = new FastJson2Deserializer<>();
-        } else {
-            deserializer = new FastJson2Deserializer<>(claimTypeMap);
-        }
-        return Jwts.parser()
-                .json(deserializer)
+        Claims claims = Jwts.parser()
+                .json(new FastJson2Deserializer<>())
                 .verifyWith(properties.getSecret().getPublicKey())
                 .clockSkewSeconds(properties.getAllowedClockSkew().getSeconds())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+
+        return JwtToken.withTokenValue(token)
+                .claims(claims)
+                .build();
     }
 
     /**
@@ -178,25 +177,25 @@ public class JwtUtils {
      *
      * @param request HttpServletRequest
      * @param token   令牌
-     * @return 声明
+     * @return JwtToken
      */
-    public static Claims getClaims(HttpServletRequest request, String token) {
+    public static JwtToken getJwtToken(HttpServletRequest request, String token) {
         Assert.notNull(request, "HttpServletRequest must not be null");
-        Claims claims = (Claims) request.getAttribute(JWT_CLAIMS_REQUEST_ATTRIBUTE);
-        if (claims == null) {
-            claims = parseToken(token);
-            request.setAttribute(JWT_CLAIMS_REQUEST_ATTRIBUTE, claims);
+        JwtToken jwtToken = (JwtToken) request.getAttribute(JWT_CLAIMS_REQUEST_ATTRIBUTE);
+        if (jwtToken == null) {
+            jwtToken = parseToken(token);
+            request.setAttribute(JWT_CLAIMS_REQUEST_ATTRIBUTE, jwtToken);
         }
-        return claims;
+        return jwtToken;
     }
 
     /**
-     * 获取当前请求的声明
+     * 获取当前请求的凭证
      *
-     * @return 声明
+     * @return JwtToken
      */
-    public static Claims getCurrentClaims() {
-        return getClaims(WebUtils.getRequest(), getCurrentToken());
+    public static JwtToken getCurrentJwtToken() {
+        return getJwtToken(WebUtils.getRequest(), getCurrentToken());
     }
 
     /**
@@ -210,18 +209,8 @@ public class JwtUtils {
     public static <T> T getCurrentClaimValue(String name, Class<T> claimType) {
         Assert.notNull(name, "Name must not be null");
         Assert.notNull(claimType, "Claim type must not be null");
-        Claims currentClaims = getCurrentClaims();
+        Claims currentClaims = getCurrentJwtToken().getClaims();
         return JSON.to(claimType, currentClaims.get(name));
-    }
-
-    /**
-     * 获取刷新令牌声明
-     *
-     * @param claims 声明
-     * @return 刷新令牌声明
-     */
-    public static String getRefreshTokenClaim(Claims claims) {
-        return claims == null ? null : claims.get(REFRESH_TOKEN_CLAIM_NAME, String.class);
     }
 
     /**
@@ -232,7 +221,7 @@ public class JwtUtils {
      * @return boolean
      */
     public static boolean validateToken(String token, String subject) {
-        final String tokenSubject = parseToken(token).getSubject();
+        final String tokenSubject = parseToken(token).getClaims().getSubject();
         return (tokenSubject != null && tokenSubject.equals(subject));
     }
 

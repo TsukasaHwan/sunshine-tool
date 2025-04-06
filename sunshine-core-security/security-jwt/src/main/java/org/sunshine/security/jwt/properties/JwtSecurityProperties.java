@@ -49,11 +49,6 @@ public class JwtSecurityProperties {
     private String refreshTokenPath;
 
     /**
-     * Refresh token claim
-     */
-    private String refreshTokenClaim = "refresh_token";
-
-    /**
      * Whether to enable {@link RefreshTokenApi} annotation-based configuration. When enabled, the {@code refreshTokenPath} configuration is ignored,
      * and the refresh token endpoint path is dynamically determined by the {@code @RefreshTokenApi} annotation's mapped endpoint path instead.
      */
@@ -155,14 +150,6 @@ public class JwtSecurityProperties {
 
     public void setRefreshTokenPath(String refreshTokenPath) {
         this.refreshTokenPath = refreshTokenPath;
-    }
-
-    public String getRefreshTokenClaim() {
-        return refreshTokenClaim;
-    }
-
-    public void setRefreshTokenClaim(String refreshTokenClaim) {
-        this.refreshTokenClaim = refreshTokenClaim;
     }
 
     public Boolean getEnabledRefreshTokenApiAnnotation() {

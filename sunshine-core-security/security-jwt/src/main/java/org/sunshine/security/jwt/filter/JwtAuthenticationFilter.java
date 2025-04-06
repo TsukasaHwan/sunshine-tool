@@ -1,6 +1,5 @@
 package org.sunshine.security.jwt.filter;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -18,6 +17,8 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.sunshine.security.core.filter.AbstractAuthenticationFilter;
 import org.sunshine.security.core.support.PathPatternRequestMatcher;
 import org.sunshine.security.core.util.SecurityUtils;
+import org.sunshine.security.jwt.JwtToken;
+import org.sunshine.security.jwt.JwtTokenType;
 import org.sunshine.security.jwt.exception.ExpiredJwtAuthenticationException;
 import org.sunshine.security.jwt.exception.JwtAuthenticationException;
 import org.sunshine.security.jwt.properties.JwtSecurityProperties;
@@ -61,14 +62,19 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
         }
 
         try {
-            Claims claims = JwtUtils.getClaims(request, authToken);
-            boolean enableRefreshTokenApiAnnotation = Boolean.TRUE.equals(properties.getEnabledRefreshTokenApiAnnotation());
+            JwtToken jwtToken = JwtUtils.getJwtToken(request, authToken);
+            JwtTokenType tokenType = jwtToken.getTokenType();
 
-            if (!enableRefreshTokenApiAnnotation) {
-                String refreshTokenClaim = JwtUtils.getRefreshTokenClaim(claims);
-                if (refreshTokenClaim != null) {
-                    if (refreshTokenClaim.equals(properties.getRefreshTokenClaim()) && isRefreshPath(request)) {
-                        doAuthenticate(request, authToken, claims);
+            if (tokenType == null) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            boolean enabledAnnotation = Boolean.TRUE.equals(properties.getEnabledRefreshTokenApiAnnotation());
+            if (!enabledAnnotation) {
+                if (tokenType.equals(JwtTokenType.REFRESH_TOKEN)) {
+                    if (isRefreshPath(request)) {
+                        doAuthenticate(request, jwtToken);
                     }
                     filterChain.doFilter(request, response);
                     return;
@@ -80,7 +86,7 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
                 }
             }
 
-            doAuthenticate(request, authToken, claims);
+            doAuthenticate(request, jwtToken);
             filterChain.doFilter(request, response);
         } catch (Exception e) {
             unsuccessfulAuthentication(request, response, e);
@@ -97,12 +103,12 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
     /**
      * 认证
      *
-     * @param request   HttpServletRequest
-     * @param authToken JWT
-     * @param claims    Claims
+     * @param request  HttpServletRequest
+     * @param jwtToken JwtToken
      */
-    private void doAuthenticate(HttpServletRequest request, String authToken, Claims claims) {
-        String username = claims.getSubject();
+    private void doAuthenticate(HttpServletRequest request, JwtToken jwtToken) {
+        String authToken = jwtToken.getTokenValue();
+        String username = jwtToken.getClaims().getSubject();
         if (username != null && SecurityUtils.getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
             if (JwtUtils.validateToken(authToken, userDetails.getUsername())) {

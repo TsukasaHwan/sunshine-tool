@@ -4,7 +4,6 @@ import org.sunshine.security.jwt.util.JwtUtils;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Map;
 
 /**
  * @author Teamo
@@ -29,13 +28,16 @@ public class Jwt implements Serializable {
     }
 
     public static Jwt of(String subject) {
-        return of(subject, null);
+        return of(JwtUtils.accessToken(subject), JwtUtils.refreshToken(subject));
     }
 
-    public static Jwt of(String subject, Map<String, ?> claims) {
-        String accessToken = JwtUtils.accessToken(subject, claims);
-        String refreshToken = JwtUtils.refreshToken(subject);
-        Date expiration = JwtUtils.parseToken(accessToken).getExpiration();
+    public static Jwt of(JwtTokenClaims.AccessTokenBuilder accessBuilder,
+                         JwtTokenClaims.RefreshTokenBuilder refreshBuilder) {
+        return of(JwtUtils.accessToken(accessBuilder), JwtUtils.refreshToken(refreshBuilder));
+    }
+
+    public static Jwt of(String accessToken, String refreshToken) {
+        Date expiration = JwtUtils.parseToken(accessToken).getClaims().getExpiration();
         return builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
