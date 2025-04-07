@@ -15,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationEntryPointFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -24,13 +25,11 @@ import org.springframework.util.Assert;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.sunshine.security.core.DefaultSecurityConfiguration;
-import org.sunshine.security.core.handler.CommonAccessDeniedHandler;
 import org.sunshine.security.core.support.PathPatternRequestMatcher;
 import org.sunshine.security.core.support.PermitAllAnnotationExtractor;
 import org.sunshine.security.core.support.SecurityAnnotationPathMatcherExtractor;
 import org.sunshine.security.jwt.authenticator.TokenAuthenticatorRegistry;
 import org.sunshine.security.jwt.filter.JwtAuthenticationFilter;
-import org.sunshine.security.jwt.handler.JwtAuthenticationEntryPoint;
 import org.sunshine.security.jwt.properties.JwtSecurityProperties;
 import org.sunshine.security.jwt.util.JwtUtils;
 
@@ -58,6 +57,10 @@ public class JwtSecurityConfiguration {
 
     private List<SecurityAnnotationPathMatcherExtractor> securityAnnotationPathMatcherExtractors;
 
+    private AuthenticationEntryPoint authenticationEntryPoint;
+
+    private AccessDeniedHandler accessDeniedHandler;
+
     private LogoutHandler logoutHandler;
 
     private LogoutSuccessHandler logoutSuccessHandler;
@@ -75,6 +78,16 @@ public class JwtSecurityConfiguration {
     @Autowired(required = false)
     public void setSecurityAnnotationPathMatcherExtractors(List<SecurityAnnotationPathMatcherExtractor> securityAnnotationPathMatcherExtractors) {
         this.securityAnnotationPathMatcherExtractors = securityAnnotationPathMatcherExtractors;
+    }
+
+    @Autowired(required = false)
+    public void setAuthenticationEntryPoint(AuthenticationEntryPoint authenticationEntryPoint) {
+        this.authenticationEntryPoint = authenticationEntryPoint;
+    }
+
+    @Autowired(required = false)
+    public void setAccessDeniedHandler(AccessDeniedHandler accessDeniedHandler) {
+        this.accessDeniedHandler = accessDeniedHandler;
     }
 
     @Autowired(required = false)
@@ -145,17 +158,16 @@ public class JwtSecurityConfiguration {
     }
 
     private void applyJwtSecurity(HttpSecurity http) throws Exception {
-        AuthenticationEntryPoint authenticationEntryPoint = new JwtAuthenticationEntryPoint();
-        AuthenticationFailureHandler authenticationFailureHandler = new AuthenticationEntryPointFailureHandler(authenticationEntryPoint);
-        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(tokenAuthenticatorRegistry, authenticationFailureHandler);
+        AuthenticationFailureHandler authenticationFailureHandler = new AuthenticationEntryPointFailureHandler(this.authenticationEntryPoint);
+        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(this.tokenAuthenticatorRegistry, authenticationFailureHandler);
         jwtAuthenticationFilter.setExtractors(this.securityAnnotationPathMatcherExtractors);
         // @formatter:off
         http
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .userDetailsService(this.userDetailsService)
             .exceptionHandling((exceptions) -> exceptions
-                    .authenticationEntryPoint(authenticationEntryPoint)
-                    .accessDeniedHandler(new CommonAccessDeniedHandler())
+                    .authenticationEntryPoint(this.authenticationEntryPoint)
+                    .accessDeniedHandler(this.accessDeniedHandler)
             );
         // @formatter:on
     }

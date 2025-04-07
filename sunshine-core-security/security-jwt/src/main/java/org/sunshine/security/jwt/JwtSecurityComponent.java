@@ -11,9 +11,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.sunshine.security.core.handler.CommonAccessDeniedHandler;
 import org.sunshine.security.jwt.authenticator.AccessTokenAuthenticator;
 import org.sunshine.security.jwt.authenticator.RefreshTokenAuthenticator;
 import org.sunshine.security.jwt.authenticator.TokenAuthenticatorRegistry;
+import org.sunshine.security.jwt.handler.JwtAuthenticationEntryPoint;
 import org.sunshine.security.jwt.util.JwtUtils;
 
 import java.util.Optional;
@@ -42,6 +46,18 @@ public class JwtSecurityComponent {
             }
             return operation;
         };
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public AuthenticationEntryPoint jwtAuthenticationEntryPoint() {
+        return new JwtAuthenticationEntryPoint();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public AccessDeniedHandler commnonAccessDeniedHandler() {
+        return new CommonAccessDeniedHandler();
     }
 
     @Bean
