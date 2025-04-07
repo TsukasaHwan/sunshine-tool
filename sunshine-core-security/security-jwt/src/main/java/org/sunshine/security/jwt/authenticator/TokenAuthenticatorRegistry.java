@@ -60,8 +60,8 @@ public class TokenAuthenticatorRegistry implements InitializingBean, Application
             throw new IllegalArgumentException("获取认证器时tokenType参数不能为null");
         }
 
-        AbstractTokenAuthenticator processor = authenticatorMap.get(tokenType);
-        if (processor == null) {
+        AbstractTokenAuthenticator authenticator = authenticatorMap.get(tokenType);
+        if (authenticator == null) {
             throw new UnsupportedOperationException(
                     String.format("不支持处理该类型的令牌: %s，已注册类型: %s",
                             tokenType.getValue(),
