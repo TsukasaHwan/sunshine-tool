@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Teamo
@@ -41,9 +42,11 @@ public abstract class AbstractTokenAuthenticator implements InitializingBean, Ap
 
     protected final UserDetailsService userDetailsService;
 
-    private static PathPatternRequestMatcher sharedRefreshTokenMatcher;
+    private static volatile PathPatternRequestMatcher sharedRefreshTokenMatcher;
 
-    private static boolean init = false;
+    private static final AtomicBoolean INIT_FLAG = new AtomicBoolean(false);
+
+    private static final Object INIT_LOCK = new Object();
 
     protected AbstractTokenAuthenticator(UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
@@ -55,41 +58,43 @@ public abstract class AbstractTokenAuthenticator implements InitializingBean, Ap
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        if (init) {
+        if (INIT_FLAG.get()) {
             return;
         }
 
-        JwtSecurityProperties properties = context.getBean(JwtSecurityProperties.class);
+        synchronized (INIT_LOCK) {
+            if (INIT_FLAG.compareAndSet(false, true)) {
+                JwtSecurityProperties properties = context.getBean(JwtSecurityProperties.class);
 
-        if (properties.getEnabledRefreshTokenApiAnnotation()) {
-            if (sharedRefreshTokenMatcher != null) {
-                return;
+                if (properties.getEnabledRefreshTokenApiAnnotation()) {
+                    if (sharedRefreshTokenMatcher != null) {
+                        return;
+                    }
+                    RequestMappingHandlerMapping handlerMapping = context.getBean(RequestMappingHandlerMapping.class);
+                    List<RequestMappingInfo> refreshTokenApiMapping = handlerMapping.getHandlerMethods().entrySet()
+                            .stream()
+                            .filter(entry -> Objects.nonNull(ClassUtils.getAnnotation(entry.getValue(), RefreshTokenApi.class)))
+                            .map(Map.Entry::getKey)
+                            .toList();
+
+                    Assert.state(refreshTokenApiMapping.size() < 2, "The @RefreshTokenApi annotation can only be used once on method");
+
+                    if (refreshTokenApiMapping.isEmpty()) {
+                        return;
+                    }
+                    RequestMappingInfo requestMappingInfo = refreshTokenApiMapping.get(0);
+                    String path = extractPathFromRequestMapping(requestMappingInfo);
+                    RequestMethodsRequestCondition methodsCondition = requestMappingInfo.getMethodsCondition();
+                    Optional<RequestMethod> requestMethodOpt = methodsCondition.getMethods().stream().findFirst();
+                    requestMethodOpt.ifPresentOrElse(
+                            requestMethod -> sharedRefreshTokenMatcher = createPathMatcher(requestMethod.asHttpMethod(), path),
+                            () -> sharedRefreshTokenMatcher = createPathMatcher(null, path)
+                    );
+                } else {
+                    sharedRefreshTokenMatcher = createPathMatcher(null, properties.getRefreshTokenPath());
+                }
             }
-            RequestMappingHandlerMapping handlerMapping = context.getBean(RequestMappingHandlerMapping.class);
-            List<RequestMappingInfo> refreshTokenApiMapping = handlerMapping.getHandlerMethods().entrySet()
-                    .stream()
-                    .filter(entry -> Objects.nonNull(ClassUtils.getAnnotation(entry.getValue(), RefreshTokenApi.class)))
-                    .map(Map.Entry::getKey)
-                    .toList();
-
-            Assert.state(refreshTokenApiMapping.size() < 2, "The @RefreshTokenApi annotation can only be used once on method");
-
-            if (refreshTokenApiMapping.isEmpty()) {
-                return;
-            }
-            RequestMappingInfo requestMappingInfo = refreshTokenApiMapping.get(0);
-            String path = extractPathFromRequestMapping(requestMappingInfo);
-            RequestMethodsRequestCondition methodsCondition = requestMappingInfo.getMethodsCondition();
-            Optional<RequestMethod> requestMethodOpt = methodsCondition.getMethods().stream().findFirst();
-            requestMethodOpt.ifPresentOrElse(
-                    requestMethod -> sharedRefreshTokenMatcher = createPathMatcher(requestMethod.asHttpMethod(), path),
-                    () -> sharedRefreshTokenMatcher = createPathMatcher(null, path)
-            );
-        } else {
-            sharedRefreshTokenMatcher = createPathMatcher(null, properties.getRefreshTokenPath());
         }
-
-        init = true;
     }
 
     @Override
