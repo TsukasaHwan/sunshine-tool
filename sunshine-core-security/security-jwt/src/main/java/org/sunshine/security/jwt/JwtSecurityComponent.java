@@ -6,6 +6,7 @@ import io.swagger.v3.oas.models.parameters.HeaderParameter;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import jakarta.annotation.security.PermitAll;
 import org.springdoc.core.customizers.OperationCustomizer;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
@@ -30,6 +31,7 @@ public class JwtSecurityComponent {
 
     @Bean
     @Primary
+    @ConditionalOnClass(OperationCustomizer.class)
     public OperationCustomizer operationCustomizer() {
         return (operation, handlerMethod) -> {
             boolean empty = Optional.ofNullable(handlerMethod.getMethodAnnotation(PermitAll.class)).or(() -> {
