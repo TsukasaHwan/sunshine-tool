@@ -26,12 +26,12 @@ public class TokenAuthenticatorRegistry implements InitializingBean, Application
             throw new IllegalStateException("未找到任何Token认证器实现，请确认是否已正确配置AbstractTokenAuthenticator的子类");
         }
         this.authenticatorMap = new HashMap<>(16);
-        beansOfType.values().forEach(processor -> {
-            JwtTokenType type = processor.getTokenType();
+        beansOfType.values().forEach(authenticator -> {
+            JwtTokenType type = authenticator.getTokenType();
             if (type == null) {
                 throw new IllegalStateException(
                         String.format("认证器%s未正确实现getTokenType()方法，必须返回非空的JwtTokenType",
-                                processor.getClass().getSimpleName())
+                                authenticator.getClass().getSimpleName())
                 );
             }
             if (this.authenticatorMap.containsKey(type)) {
@@ -39,10 +39,10 @@ public class TokenAuthenticatorRegistry implements InitializingBean, Application
                         String.format("发现重复的令牌类型认证器: [%s]，已存在认证器: %s，冲突认证器: %s",
                                 type.getValue(),
                                 authenticatorMap.get(type).getClass().getSimpleName(),
-                                processor.getClass().getSimpleName())
+                                authenticator.getClass().getSimpleName())
                 );
             }
-            this.authenticatorMap.put(type, processor);
+            this.authenticatorMap.put(type, authenticator);
         });
     }
 
