@@ -120,9 +120,10 @@ public class RSAUtils {
      * @return 密文
      * @throws Exception 加密过程中的异常信息
      */
-    public static String encrypt(String str, String publicKey) throws Exception {
+    public static String encrypt(String str, final String publicKey) throws Exception {
+        String cleanedKey = cleanKeyString(publicKey, PUBLIC_KEY_PREFIX, PUBLIC_KEY_SUFFIX);
         //base64编码的公钥
-        byte[] decoded = Base64.getDecoder().decode(publicKey);
+        byte[] decoded = Base64.getDecoder().decode(cleanedKey);
         RSAPublicKey pubKey = (RSAPublicKey) KeyFactory.getInstance(ALGORITHM).generatePublic(new X509EncodedKeySpec(decoded));
         //RSA加密
         Cipher cipher = Cipher.getInstance(ALGORITHM);
@@ -138,11 +139,12 @@ public class RSAUtils {
      * @return 明文
      * @throws Exception 解密过程中的异常信息
      */
-    public static String decrypt(String str, String privateKey) throws Exception {
+    public static String decrypt(String str, final String privateKey) throws Exception {
+        String cleanedKey = cleanKeyString(privateKey, PRIVATE_KEY_PREFIX, PRIVATE_KEY_SUFFIX);
         //64位解码加密后的字符串
         byte[] inputByte = Base64.getDecoder().decode(str);
         //base64编码的私钥
-        byte[] decoded = Base64.getDecoder().decode(privateKey);
+        byte[] decoded = Base64.getDecoder().decode(cleanedKey);
         RSAPrivateKey priKey = (RSAPrivateKey) KeyFactory.getInstance(ALGORITHM).generatePrivate(new PKCS8EncodedKeySpec(decoded));
         //RSA解密
         Cipher cipher = Cipher.getInstance(ALGORITHM);
@@ -150,10 +152,39 @@ public class RSAUtils {
         return new String(cipher.doFinal(inputByte));
     }
 
+    /**
+     * 格式化PEM格式密钥字符串
+     *
+     * @param key    原始密钥字符串
+     * @param prefix 预期前缀
+     * @param suffix 预期后缀
+     * @return 格式化后的密钥字符串
+     */
     private String formatKeyString(String key, String prefix, String suffix) {
         String formatted = key.replaceAll("(.{64})", "$1\n");
         // 确保末尾没有多余换行
         formatted = formatted.replaceAll("\n$", "");
         return prefix + formatted + suffix;
+    }
+
+    /**
+     * 清理PEM格式密钥的前后缀及换行符
+     *
+     * @param key    原始密钥字符串
+     * @param prefix 预期前缀
+     * @param suffix 预期后缀
+     * @return 纯Base64编码的密钥
+     */
+    private static String cleanKeyString(String key, String prefix, String suffix) {
+        // 统一换行符处理
+        String normalized = key.replaceAll("\\r\\n|\\r", "\n");
+        // 移除前后缀及首尾空白
+        if (normalized.contains(prefix)) {
+            normalized = normalized.replace(prefix, "")
+                    .replace(suffix, "")
+                    .replaceAll("^\\s+|\\s+$", "");
+        }
+        // 移除所有换行和空格
+        return normalized.replaceAll("\\s", "");
     }
 }
