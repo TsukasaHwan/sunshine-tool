@@ -14,7 +14,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.sunshine.security.jwt.authenticator.AccessTokenAuthenticator;
 import org.sunshine.security.jwt.authenticator.RefreshTokenAuthenticator;
 import org.sunshine.security.jwt.authenticator.TokenAuthenticatorRegistry;
-import org.sunshine.security.jwt.properties.JwtSecurityProperties;
 import org.sunshine.security.jwt.util.JwtUtils;
 
 import java.util.Optional;
@@ -47,16 +46,14 @@ public class JwtSecurityComponent {
 
     @Bean
     @ConditionalOnMissingBean
-    public AccessTokenAuthenticator accessTokenAuthenticator(JwtSecurityProperties jwtSecurityProperties,
-                                                             UserDetailsService userDetailsService) {
-        return new AccessTokenAuthenticator(jwtSecurityProperties, userDetailsService);
+    public AccessTokenAuthenticator accessTokenAuthenticator(UserDetailsService userDetailsService) {
+        return new AccessTokenAuthenticator(userDetailsService);
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public RefreshTokenAuthenticator refreshTokenAuthenticator(JwtSecurityProperties jwtSecurityProperties,
-                                                               UserDetailsService userDetailsService) {
-        return new RefreshTokenAuthenticator(jwtSecurityProperties, userDetailsService);
+    public RefreshTokenAuthenticator refreshTokenAuthenticator(UserDetailsService userDetailsService) {
+        return new RefreshTokenAuthenticator(userDetailsService);
     }
 
     @Bean

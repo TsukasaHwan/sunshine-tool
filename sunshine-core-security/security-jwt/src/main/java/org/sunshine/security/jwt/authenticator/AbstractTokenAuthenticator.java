@@ -39,16 +39,13 @@ public abstract class AbstractTokenAuthenticator implements InitializingBean, Ap
 
     protected ApplicationContext context;
 
-    protected final JwtSecurityProperties jwtSecurityProperties;
-
     protected final UserDetailsService userDetailsService;
 
     private static PathPatternRequestMatcher sharedRefreshTokenMatcher;
 
     private static boolean init = false;
 
-    protected AbstractTokenAuthenticator(JwtSecurityProperties jwtSecurityProperties, UserDetailsService userDetailsService) {
-        this.jwtSecurityProperties = jwtSecurityProperties;
+    protected AbstractTokenAuthenticator(UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
 
@@ -62,7 +59,9 @@ public abstract class AbstractTokenAuthenticator implements InitializingBean, Ap
             return;
         }
 
-        if (jwtSecurityProperties.getEnabledRefreshTokenApiAnnotation()) {
+        JwtSecurityProperties properties = context.getBean(JwtSecurityProperties.class);
+
+        if (properties.getEnabledRefreshTokenApiAnnotation()) {
             if (sharedRefreshTokenMatcher != null) {
                 return;
             }
@@ -87,7 +86,7 @@ public abstract class AbstractTokenAuthenticator implements InitializingBean, Ap
                     () -> sharedRefreshTokenMatcher = createPathMatcher(null, path)
             );
         } else {
-            sharedRefreshTokenMatcher = createPathMatcher(null, jwtSecurityProperties.getRefreshTokenPath());
+            sharedRefreshTokenMatcher = createPathMatcher(null, properties.getRefreshTokenPath());
         }
 
         init = true;

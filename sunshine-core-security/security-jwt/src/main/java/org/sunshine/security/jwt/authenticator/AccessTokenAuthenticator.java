@@ -4,7 +4,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.sunshine.security.jwt.JwtToken;
 import org.sunshine.security.jwt.JwtTokenType;
-import org.sunshine.security.jwt.properties.JwtSecurityProperties;
 
 /**
  * @author Teamo
@@ -12,8 +11,8 @@ import org.sunshine.security.jwt.properties.JwtSecurityProperties;
  */
 public class AccessTokenAuthenticator extends AbstractTokenAuthenticator {
 
-    public AccessTokenAuthenticator(JwtSecurityProperties jwtSecurityProperties, UserDetailsService userDetailsService) {
-        super(jwtSecurityProperties, userDetailsService);
+    public AccessTokenAuthenticator(UserDetailsService userDetailsService) {
+        super(userDetailsService);
     }
 
     @Override
