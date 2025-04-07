@@ -17,7 +17,7 @@ public class AccessTokenAuthenticator extends AbstractTokenAuthenticator {
     }
 
     @Override
-    public JwtTokenType getTokenType() {
+    JwtTokenType getTokenType() {
         return JwtTokenType.ACCESS_TOKEN;
     }
 

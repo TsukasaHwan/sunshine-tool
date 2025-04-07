@@ -32,7 +32,7 @@ public abstract class AbstractTokenAuthenticator {
         this.pathPatternRequestMatcher = createPathMatcher(jwtSecurityProperties);
     }
 
-    public abstract JwtTokenType getTokenType();
+    abstract JwtTokenType getTokenType();
 
     public abstract void authenticate(HttpServletRequest request, JwtToken token) throws Exception;
 

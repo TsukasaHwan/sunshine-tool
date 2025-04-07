@@ -17,7 +17,7 @@ public class RefreshTokenAuthenticator extends AbstractTokenAuthenticator {
     }
 
     @Override
-    public JwtTokenType getTokenType() {
+    JwtTokenType getTokenType() {
         return JwtTokenType.REFRESH_TOKEN;
     }
 
