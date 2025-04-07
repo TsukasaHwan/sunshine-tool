@@ -1,18 +1,10 @@
 package org.sunshine.security.jwt;
 
-import io.swagger.v3.oas.models.media.Schema;
-import io.swagger.v3.oas.models.media.StringSchema;
-import io.swagger.v3.oas.models.parameters.HeaderParameter;
-import io.swagger.v3.oas.models.parameters.Parameter;
-import jakarta.annotation.security.PermitAll;
-import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Primary;
-import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -36,6 +28,7 @@ import org.sunshine.security.core.handler.CommonAccessDeniedHandler;
 import org.sunshine.security.core.support.PathPatternRequestMatcher;
 import org.sunshine.security.core.support.PermitAllAnnotationExtractor;
 import org.sunshine.security.core.support.SecurityAnnotationPathMatcherExtractor;
+import org.sunshine.security.jwt.authenticator.TokenAuthenticatorRegistry;
 import org.sunshine.security.jwt.filter.JwtAuthenticationFilter;
 import org.sunshine.security.jwt.handler.JwtAuthenticationEntryPoint;
 import org.sunshine.security.jwt.properties.JwtSecurityProperties;
@@ -43,7 +36,6 @@ import org.sunshine.security.jwt.util.JwtUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Teamo
@@ -62,6 +54,8 @@ public class JwtSecurityConfiguration {
 
     private final CorsConfigurationSource corsConfigurationSource;
 
+    private final TokenAuthenticatorRegistry tokenAuthenticatorRegistry;
+
     private List<SecurityAnnotationPathMatcherExtractor> securityAnnotationPathMatcherExtractors;
 
     private LogoutHandler logoutHandler;
@@ -70,10 +64,12 @@ public class JwtSecurityConfiguration {
 
     public JwtSecurityConfiguration(JwtSecurityProperties jwtSecurityProperties,
                                     UserDetailsService userDetailsService,
-                                    CorsConfigurationSource corsConfigurationSource) {
+                                    CorsConfigurationSource corsConfigurationSource,
+                                    TokenAuthenticatorRegistry tokenAuthenticatorRegistry) {
         this.jwtSecurityProperties = jwtSecurityProperties;
         this.userDetailsService = userDetailsService;
         this.corsConfigurationSource = corsConfigurationSource;
+        this.tokenAuthenticatorRegistry = tokenAuthenticatorRegistry;
     }
 
     @Autowired(required = false)
@@ -114,26 +110,6 @@ public class JwtSecurityConfiguration {
         return new JwtUtils(jwtSecurityProperties);
     }
 
-    @Bean
-    @Primary
-    public OperationCustomizer operationCustomizer() {
-        return (operation, handlerMethod) -> {
-            boolean empty = Optional.ofNullable(handlerMethod.getMethodAnnotation(PermitAll.class)).or(() -> {
-                Class<?> beanType = handlerMethod.getBeanType();
-                return Optional.ofNullable(AnnotatedElementUtils.findMergedAnnotation(beanType, PermitAll.class));
-            }).isEmpty();
-            if (empty) {
-                String header = JwtUtils.getTokenHeader();
-                String tokenPrefix = JwtUtils.getTokenPrefix();
-                @SuppressWarnings("rawtypes")
-                Schema stringSchema = new StringSchema()._default(tokenPrefix).name(header).description("请求接口凭证");
-                Parameter headerParameter = new HeaderParameter().name(header).description("请求接口凭证").schema(stringSchema);
-                operation.addParametersItem(headerParameter);
-            }
-            return operation;
-        };
-    }
-
     private void applyPermitPathsIfAvailable(HttpSecurity http) throws Exception {
         List<PathPatternRequestMatcher> requestMatchers =
                 this.jwtSecurityProperties.getPermitAllPaths().stream()
@@ -171,8 +147,7 @@ public class JwtSecurityConfiguration {
     private void applyJwtSecurity(HttpSecurity http) throws Exception {
         AuthenticationEntryPoint authenticationEntryPoint = new JwtAuthenticationEntryPoint();
         AuthenticationFailureHandler authenticationFailureHandler = new AuthenticationEntryPointFailureHandler(authenticationEntryPoint);
-        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(
-                this.userDetailsService, authenticationFailureHandler, this.jwtSecurityProperties);
+        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(tokenAuthenticatorRegistry, authenticationFailureHandler);
         jwtAuthenticationFilter.setExtractors(this.securityAnnotationPathMatcherExtractors);
         // @formatter:off
         http
