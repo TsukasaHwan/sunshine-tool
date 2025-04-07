@@ -1,44 +1,98 @@
 package org.sunshine.security.jwt.authenticator;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.mvc.condition.PathPatternsRequestCondition;
+import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
+import org.springframework.web.servlet.mvc.condition.RequestMethodsRequestCondition;
+import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.sunshine.core.tool.util.ClassUtils;
 import org.sunshine.security.core.support.PathPatternRequestMatcher;
 import org.sunshine.security.core.util.SecurityUtils;
 import org.sunshine.security.jwt.JwtToken;
 import org.sunshine.security.jwt.JwtTokenType;
+import org.sunshine.security.jwt.annotation.RefreshTokenApi;
 import org.sunshine.security.jwt.properties.JwtSecurityProperties;
 import org.sunshine.security.jwt.util.JwtUtils;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
  * @author Teamo
  * @since 2025/4/7
  */
-public abstract class AbstractTokenAuthenticator {
+public abstract class AbstractTokenAuthenticator implements InitializingBean, ApplicationContextAware {
+
+    protected ApplicationContext context;
 
     protected final JwtSecurityProperties jwtSecurityProperties;
 
     protected final UserDetailsService userDetailsService;
 
-    private final PathPatternRequestMatcher pathPatternRequestMatcher;
+    private static PathPatternRequestMatcher sharedRefreshTokenMatcher;
 
     protected AbstractTokenAuthenticator(JwtSecurityProperties jwtSecurityProperties, UserDetailsService userDetailsService) {
         this.jwtSecurityProperties = jwtSecurityProperties;
         this.userDetailsService = userDetailsService;
-        this.pathPatternRequestMatcher = createPathMatcher(jwtSecurityProperties);
     }
 
     abstract JwtTokenType getTokenType();
 
     public abstract void authenticate(HttpServletRequest request, JwtToken token) throws Exception;
 
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        if (jwtSecurityProperties.getEnabledRefreshTokenApiAnnotation()) {
+            if (sharedRefreshTokenMatcher == null) {
+                RequestMappingHandlerMapping handlerMapping = context.getBean(RequestMappingHandlerMapping.class);
+                List<RequestMappingInfo> refreshTokenApiMapping = handlerMapping.getHandlerMethods().entrySet()
+                        .stream()
+                        .filter(entry -> Objects.nonNull(ClassUtils.getAnnotation(entry.getValue(), RefreshTokenApi.class)))
+                        .map(Map.Entry::getKey)
+                        .toList();
+
+                Assert.state(refreshTokenApiMapping.size() < 2, "The @RefreshTokenApi annotation can only be used once on method");
+
+                if (refreshTokenApiMapping.isEmpty()) {
+                    return;
+                }
+                RequestMappingInfo requestMappingInfo = refreshTokenApiMapping.get(0);
+                String path = extractPathFromRequestMapping(requestMappingInfo);
+                RequestMethodsRequestCondition methodsCondition = requestMappingInfo.getMethodsCondition();
+                Optional<RequestMethod> requestMethodOpt = methodsCondition.getMethods().stream().findFirst();
+                requestMethodOpt.ifPresentOrElse(
+                        requestMethod -> sharedRefreshTokenMatcher = createPathMatcher(requestMethod.asHttpMethod(), path),
+                        () -> sharedRefreshTokenMatcher = createPathMatcher(null, path)
+                );
+            }
+        } else {
+            sharedRefreshTokenMatcher = createPathMatcher(null, jwtSecurityProperties.getRefreshTokenPath());
+        }
+
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.context = applicationContext;
+    }
+
     protected boolean isRefreshPath(HttpServletRequest request) {
-        return this.pathPatternRequestMatcher != null &&
-               this.pathPatternRequestMatcher.matches(request);
+        return sharedRefreshTokenMatcher != null &&
+               sharedRefreshTokenMatcher.matches(request);
     }
 
     protected void doAuthenticate(HttpServletRequest request, JwtToken jwtToken) {
@@ -54,9 +108,22 @@ public abstract class AbstractTokenAuthenticator {
         }
     }
 
-    private PathPatternRequestMatcher createPathMatcher(JwtSecurityProperties jwtSecurityProperties) {
-        return Optional.ofNullable(jwtSecurityProperties.getRefreshTokenPath())
-                .map(path -> PathPatternRequestMatcher.withDefaults().matcher(path))
+    private PathPatternRequestMatcher createPathMatcher(HttpMethod httpMethod, String refreshTokenPath) {
+        return Optional.ofNullable(refreshTokenPath)
+                .map(path -> PathPatternRequestMatcher.withDefaults().matcher(httpMethod, path))
                 .orElse(null);
+    }
+
+    private String extractPathFromRequestMapping(RequestMappingInfo requestMappingInfo) {
+        PathPatternsRequestCondition pathPatternsCondition = requestMappingInfo.getPathPatternsCondition();
+        if (pathPatternsCondition == null) {
+            PatternsRequestCondition patternsRequestCondition = requestMappingInfo.getPatternsCondition();
+            if (patternsRequestCondition == null) {
+                return null;
+            }
+            return patternsRequestCondition.getPatterns().stream().findFirst().orElse(null);
+        } else {
+            return pathPatternsCondition.getFirstPattern().getPatternString();
+        }
     }
 }

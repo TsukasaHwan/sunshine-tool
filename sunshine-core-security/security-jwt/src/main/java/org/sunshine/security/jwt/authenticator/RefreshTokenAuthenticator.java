@@ -23,8 +23,7 @@ public class RefreshTokenAuthenticator extends AbstractTokenAuthenticator {
 
     @Override
     public void authenticate(HttpServletRequest request, JwtToken token) throws Exception {
-        boolean shouldAuth = jwtSecurityProperties.getEnabledRefreshTokenApiAnnotation() || isRefreshPath(request);
-        if (!shouldAuth) {
+        if (!isRefreshPath(request)) {
             return;
         }
         doAuthenticate(request, token);

@@ -7,7 +7,6 @@ import io.swagger.v3.oas.models.parameters.Parameter;
 import jakarta.annotation.security.PermitAll;
 import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -16,7 +15,6 @@ import org.sunshine.security.jwt.authenticator.AccessTokenAuthenticator;
 import org.sunshine.security.jwt.authenticator.RefreshTokenAuthenticator;
 import org.sunshine.security.jwt.authenticator.TokenAuthenticatorRegistry;
 import org.sunshine.security.jwt.properties.JwtSecurityProperties;
-import org.sunshine.security.jwt.support.RefreshTokenAnnotationExtractor;
 import org.sunshine.security.jwt.util.JwtUtils;
 
 import java.util.Optional;
@@ -45,12 +43,6 @@ public class JwtSecurityComponent {
             }
             return operation;
         };
-    }
-
-    @Bean
-    @ConditionalOnProperty(name = "jwt.security.enabled-refresh-token-api-annotation", havingValue = "true")
-    public RefreshTokenAnnotationExtractor refreshTokenAnnotationExtractor() {
-        return new RefreshTokenAnnotationExtractor();
     }
 
     @Bean
