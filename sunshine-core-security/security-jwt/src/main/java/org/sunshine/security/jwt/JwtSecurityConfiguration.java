@@ -1,40 +1,50 @@
 package org.sunshine.security.jwt;
 
+import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationEntryPointFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
 import org.springframework.util.Assert;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.sunshine.security.core.DefaultSecurityConfiguration;
+import org.springframework.web.servlet.mvc.condition.PathPatternsRequestCondition;
+import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.sunshine.core.tool.util.ClassUtils;
+import org.sunshine.security.core.context.TransmittableThreadLocalSecurityContextHolderStrategy;
 import org.sunshine.security.core.support.PathPatternRequestMatcher;
-import org.sunshine.security.core.support.PermitAllAnnotationExtractor;
-import org.sunshine.security.core.support.SecurityAnnotationPathMatcherExtractor;
 import org.sunshine.security.jwt.authenticator.TokenAuthenticatorRegistry;
 import org.sunshine.security.jwt.filter.JwtAuthenticationFilter;
 import org.sunshine.security.jwt.properties.JwtSecurityProperties;
 import org.sunshine.security.jwt.util.JwtUtils;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Teamo
@@ -44,18 +54,18 @@ import java.util.List;
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(JwtSecurityProperties.class)
 @EnableMethodSecurity(securedEnabled = true)
-@Import({DefaultSecurityConfiguration.class, JwtSecurityComponent.class})
+@Import(JwtSecurityComponent.class)
 public class JwtSecurityConfiguration {
 
     private final JwtSecurityProperties jwtSecurityProperties;
 
     private final UserDetailsService userDetailsService;
 
-    private final CorsConfigurationSource corsConfigurationSource;
-
     private final TokenAuthenticatorRegistry tokenAuthenticatorRegistry;
 
-    private List<SecurityAnnotationPathMatcherExtractor> securityAnnotationPathMatcherExtractors;
+    private CorsConfigurationSource corsConfigurationSource;
+
+    private AuthenticationSuccessHandler authenticationSuccessHandler;
 
     private AuthenticationEntryPoint authenticationEntryPoint;
 
@@ -65,22 +75,27 @@ public class JwtSecurityConfiguration {
 
     private LogoutSuccessHandler logoutSuccessHandler;
 
+    private ApplicationContext context;
+
     public JwtSecurityConfiguration(JwtSecurityProperties jwtSecurityProperties,
                                     UserDetailsService userDetailsService,
-                                    CorsConfigurationSource corsConfigurationSource,
                                     TokenAuthenticatorRegistry tokenAuthenticatorRegistry) {
         this.jwtSecurityProperties = jwtSecurityProperties;
         this.userDetailsService = userDetailsService;
-        this.corsConfigurationSource = corsConfigurationSource;
         this.tokenAuthenticatorRegistry = tokenAuthenticatorRegistry;
     }
 
     @Autowired(required = false)
-    public void setSecurityAnnotationPathMatcherExtractors(List<SecurityAnnotationPathMatcherExtractor> securityAnnotationPathMatcherExtractors) {
-        this.securityAnnotationPathMatcherExtractors = securityAnnotationPathMatcherExtractors;
+    public void setCorsConfigurationSource(UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource) {
+        this.corsConfigurationSource = urlBasedCorsConfigurationSource;
     }
 
-    @Autowired(required = false)
+    @Autowired
+    public void setAuthenticationSuccessHandler(AuthenticationSuccessHandler authenticationSuccessHandler) {
+        this.authenticationSuccessHandler = authenticationSuccessHandler;
+    }
+
+    @Autowired
     public void setAuthenticationEntryPoint(AuthenticationEntryPoint authenticationEntryPoint) {
         this.authenticationEntryPoint = authenticationEntryPoint;
     }
@@ -100,6 +115,11 @@ public class JwtSecurityConfiguration {
         this.logoutSuccessHandler = logoutSuccessHandler;
     }
 
+    @Autowired
+    public void setApplicationContext(ApplicationContext context) {
+        this.context = context;
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -108,7 +128,7 @@ public class JwtSecurityConfiguration {
         this.applyPermitPathsIfAvailable(http);
         this.applyJwtSecurity(http);
         this.applyLogoutIfAvailable(http);
-        this.applyCorsConfiguration(http);
+        this.applyCorsIfAvailable(http);
         return http.build();
     }
 
@@ -134,33 +154,21 @@ public class JwtSecurityConfiguration {
                 authorize.requestMatchers(requestMatchers.toArray(PathPatternRequestMatcher[]::new))
                         .permitAll();
             }
-            securityAnnotationPathMatcherExtractors.forEach(extractor -> {
-                if (extractor instanceof PermitAllAnnotationExtractor permitAllAnnotationExtractor) {
-                    handlePermitAllAnnotationExtractor(authorize, permitAllAnnotationExtractor, requestMatchers);
-                }
-            });
-
+            List<PathPatternRequestMatcher> permitAllMatcher = extractPermitAllAnnotationPath();
+            permitAllMatcher.removeIf(matcher -> requestMatchers.stream().anyMatch(p -> p.equals(matcher)));
+            if (!permitAllMatcher.isEmpty()) {
+                authorize.requestMatchers(permitAllMatcher.toArray(PathPatternRequestMatcher[]::new))
+                        .permitAll();
+            }
             authorize.anyRequest().authenticated();
         });
     }
 
-    private void handlePermitAllAnnotationExtractor(
-            AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authorize,
-            PermitAllAnnotationExtractor permitAllAnnotationExtractor,
-            List<PathPatternRequestMatcher> requestMatchers) {
-        List<PathPatternRequestMatcher> matchers = permitAllAnnotationExtractor.getPathPatternRequestMatchers();
-        matchers.removeIf(matcher -> requestMatchers.stream().anyMatch(p -> p.equals(matcher)));
-        if (!matchers.isEmpty()) {
-            authorize.requestMatchers(matchers.toArray(PathPatternRequestMatcher[]::new))
-                    .permitAll();
-        }
-        matchers.addAll(requestMatchers);
-    }
-
     private void applyJwtSecurity(HttpSecurity http) throws Exception {
         AuthenticationFailureHandler authenticationFailureHandler = new AuthenticationEntryPointFailureHandler(this.authenticationEntryPoint);
-        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(this.tokenAuthenticatorRegistry, authenticationFailureHandler);
-        jwtAuthenticationFilter.setExtractors(this.securityAnnotationPathMatcherExtractors);
+        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(
+                this.tokenAuthenticatorRegistry, authenticationSuccessHandler,
+                authenticationFailureHandler);
         // @formatter:off
         http
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
@@ -168,7 +176,14 @@ public class JwtSecurityConfiguration {
             .exceptionHandling((exceptions) -> exceptions
                     .authenticationEntryPoint(this.authenticationEntryPoint)
                     .accessDeniedHandler(this.accessDeniedHandler)
-            );
+            )
+            .securityContext((securityContextConfigurer) -> {
+                SecurityContextHolder.setStrategyName(TransmittableThreadLocalSecurityContextHolderStrategy.class.getName());
+                SecurityContextHolderStrategy securityContextHolderStrategy = new TransmittableThreadLocalSecurityContextHolderStrategy();
+                RequestAttributeSecurityContextRepository securityContextRepository = new RequestAttributeSecurityContextRepository();
+                securityContextRepository.setSecurityContextHolderStrategy(securityContextHolderStrategy);
+                securityContextConfigurer.securityContextRepository(securityContextRepository);
+            });
         // @formatter:on
     }
 
@@ -187,8 +202,11 @@ public class JwtSecurityConfiguration {
         });
     }
 
-    private void applyCorsConfiguration(HttpSecurity http) throws Exception {
+    private void applyCorsIfAvailable(HttpSecurity http) throws Exception {
         UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = (UrlBasedCorsConfigurationSource) this.corsConfigurationSource;
+        if (urlBasedCorsConfigurationSource == null) {
+            return;
+        }
         String header = this.jwtSecurityProperties.getHeader();
         urlBasedCorsConfigurationSource.getCorsConfigurations().forEach((s, configuration) -> {
             List<String> allowedHeaders = configuration.getAllowedHeaders();
@@ -202,5 +220,36 @@ public class JwtSecurityConfiguration {
         });
 
         http.cors(cors -> cors.configurationSource(urlBasedCorsConfigurationSource));
+    }
+
+    private List<PathPatternRequestMatcher> extractPermitAllAnnotationPath() {
+        List<PathPatternRequestMatcher> matchers = new ArrayList<>(16);
+        RequestMappingHandlerMapping mapping = this.context.getBean(RequestMappingHandlerMapping.class);
+        mapping.getHandlerMethods().forEach((requestMappingInfo, handlerMethod) -> {
+            if (requestMappingInfo == null ||
+                ClassUtils.getAnnotation(handlerMethod, PermitAll.class) == null) {
+                return;
+            }
+
+            // Handle different path matching strategies
+            Set<String> patterns = new LinkedHashSet<>(16);
+            PathPatternsRequestCondition pathPatternsCondition = requestMappingInfo.getPathPatternsCondition();
+            if (pathPatternsCondition == null) {
+                PatternsRequestCondition patternsRequestCondition = requestMappingInfo.getPatternsCondition();
+                if (patternsRequestCondition == null) {
+                    return;
+                }
+                patterns.addAll(patternsRequestCondition.getPatterns());
+            } else {
+                patterns.addAll(pathPatternsCondition.getPatternValues());
+            }
+
+            requestMappingInfo.getMethodsCondition().getMethods().forEach(requestMethod -> {
+                HttpMethod httpMethod = HttpMethod.valueOf(requestMethod.name());
+
+                patterns.forEach(pattern -> matchers.add(PathPatternRequestMatcher.withDefaults().matcher(httpMethod, pattern)));
+            });
+        });
+        return matchers;
     }
 }

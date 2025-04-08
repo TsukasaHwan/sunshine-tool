@@ -1,7 +1,8 @@
-package org.sunshine.security.jwt;
+package org.sunshine.security.jwt.core;
 
 import com.alibaba.fastjson2.JSON;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import org.springframework.util.Assert;
 
 /**
@@ -12,14 +13,14 @@ public class JwtToken {
 
     private final String tokenValue;
 
-    private final Claims claims;
+    private final Jws<Claims> jws;
 
     private final JwtTokenType tokenType;
 
-    public JwtToken(String tokenValue, Claims claims, JwtTokenType tokenType) {
+    public JwtToken(String tokenValue, Jws<Claims> jws, JwtTokenType tokenType) {
         Assert.hasText(tokenValue, "tokenValue cannot be empty");
         this.tokenValue = tokenValue;
-        this.claims = claims;
+        this.jws = jws;
         this.tokenType = tokenType;
     }
 
@@ -31,8 +32,8 @@ public class JwtToken {
         return tokenValue;
     }
 
-    public Claims getClaims() {
-        return claims;
+    public Jws<Claims> getJws() {
+        return jws;
     }
 
     public JwtTokenType getTokenType() {
@@ -43,7 +44,7 @@ public class JwtToken {
 
         private String tokenValue;
 
-        private Claims claims;
+        private Jws<Claims> jws;
 
         private JwtTokenType tokenType;
 
@@ -56,8 +57,8 @@ public class JwtToken {
             return this;
         }
 
-        public Builder claims(Claims claims) {
-            this.claims = claims;
+        public Builder jws(Jws<Claims> jws) {
+            this.jws = jws;
             return this;
         }
 
@@ -67,10 +68,10 @@ public class JwtToken {
         }
 
         public JwtToken build() {
-            if (claims != null) {
-                tokenType = getTokenType(claims.get(JwtClaimsNames.GRANT_TYPE));
+            if (jws != null) {
+                tokenType = getTokenType(jws.getPayload().get(JwtClaimsNames.GRANT_TYPE));
             }
-            return new JwtToken(tokenValue, claims, tokenType);
+            return new JwtToken(tokenValue, jws, tokenType);
         }
 
         private JwtTokenType getTokenType(Object jwtTokenType) {

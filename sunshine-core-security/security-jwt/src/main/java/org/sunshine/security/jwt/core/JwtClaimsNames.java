@@ -1,4 +1,4 @@
-package org.sunshine.security.jwt;
+package org.sunshine.security.jwt.core;
 
 /**
  * @author Teamo

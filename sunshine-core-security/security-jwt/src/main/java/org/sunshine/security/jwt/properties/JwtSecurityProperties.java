@@ -39,9 +39,9 @@ public class JwtSecurityProperties {
     private Duration allowedClockSkew = Duration.ofSeconds(0L);
 
     /**
-     * RefreshToken expiration time (default 1 hours).
+     * RefreshToken expiration time (default 15 days).
      */
-    private Duration refreshTokenExpiresIn = Duration.ofHours(1L);
+    private Duration refreshTokenExpiresIn = Duration.ofDays(15L);
 
     /**
      * RefreshToken resource path.

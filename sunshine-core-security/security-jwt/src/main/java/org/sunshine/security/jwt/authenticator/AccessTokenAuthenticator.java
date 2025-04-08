@@ -1,9 +1,10 @@
 package org.sunshine.security.jwt.authenticator;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.sunshine.security.jwt.JwtToken;
-import org.sunshine.security.jwt.JwtTokenType;
+import org.sunshine.security.jwt.core.JwtToken;
+import org.sunshine.security.jwt.core.JwtTokenType;
 
 /**
  * @author Teamo
@@ -21,10 +22,10 @@ public class AccessTokenAuthenticator extends AbstractTokenAuthenticator {
     }
 
     @Override
-    public void authenticate(HttpServletRequest request, JwtToken token) throws Exception {
+    public Authentication authenticate(HttpServletRequest request, JwtToken token) {
         if (isRefreshPath(request)) {
-            return;
+            return null;
         }
-        doAuthenticate(request, token);
+        return doAuthenticate(request, token);
     }
 }

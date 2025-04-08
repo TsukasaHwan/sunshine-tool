@@ -4,11 +4,13 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.sunshine.security.core.support.SecurityAnnotationPathMatcherExtractor;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * 抽象认证
@@ -18,55 +20,74 @@ import java.util.List;
  */
 public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter {
 
-    private List<SecurityAnnotationPathMatcherExtractor> extractors;
+    protected final AuthenticationSuccessHandler successHandler;
+
+    protected final AuthenticationFailureHandler failureHandler;
+
+    protected AbstractAuthenticationFilter(AuthenticationSuccessHandler successHandler, AuthenticationFailureHandler failureHandler) {
+        this.successHandler = successHandler;
+        this.failureHandler = failureHandler;
+    }
 
     @Override
     @SuppressWarnings("NullableProblems")
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (this.extractors != null) {
-            try {
-                for (SecurityAnnotationPathMatcherExtractor extractor : this.extractors) {
-                    if (extractor.shouldSkipAuthentication(request)) {
-                        filterChain.doFilter(request, response);
-                        return;
-                    }
-                }
-            } catch (Exception e) {
-                unsuccessfulAuthentication(request, response, e);
+        try {
+            beforeAuthentication(request);
+            Authentication authentication = attemptAuthentication(request, response);
+            if (authentication == null) {
+                filterChain.doFilter(request, response);
                 return;
             }
+            successfulAuthentication(request, response, filterChain, authentication);
+        } catch (Exception e) {
+            unsuccessfulAuthentication(request, response, e);
         }
-
-        authenticate(request, response, filterChain);
     }
 
     /**
-     * 抽象认证
+     * 认证前处理
      *
-     * @param request     HttpServletRequest
-     * @param response    HttpServletResponse
-     * @param filterChain FilterChain
-     * @throws ServletException ServletException
-     * @throws IOException      IOException
+     * @param request 请求
      */
-    protected abstract void authenticate(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException;
+    protected void beforeAuthentication(HttpServletRequest request) {
+        // do nothing
+    }
 
     /**
-     * 认证失败
+     * 尝试认证
      *
-     * @param request  HttpServletRequest
-     * @param response HttpServletResponse
-     * @param e        Exception
-     * @throws ServletException ServletException
-     * @throws IOException      IOException
+     * @param request  请求
+     * @param response 响应
+     * @return 认证结果
      */
-    protected abstract void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, Exception e) throws ServletException, IOException;
+    protected abstract Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response);
 
-    public List<SecurityAnnotationPathMatcherExtractor> getExtractors() {
-        return extractors;
+    /**
+     * 认证成功处理
+     *
+     * @param request        请求
+     * @param response       响应
+     * @param chain          过滤器链
+     * @param authentication 认证结果
+     * @throws IOException      IO异常
+     * @throws ServletException Servlet异常
+     */
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
+                                            Authentication authentication) throws IOException, ServletException {
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        this.successHandler.onAuthenticationSuccess(request, response, chain, authentication);
     }
 
-    public void setExtractors(List<SecurityAnnotationPathMatcherExtractor> extractors) {
-        this.extractors = extractors;
-    }
+    /**
+     * 认证失败处理
+     *
+     * @param request  请求
+     * @param response 响应
+     * @param e        异常
+     * @throws ServletException Servlet异常
+     * @throws IOException      IO异常
+     */
+    protected abstract void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, Exception e)
+            throws ServletException, IOException;
 }

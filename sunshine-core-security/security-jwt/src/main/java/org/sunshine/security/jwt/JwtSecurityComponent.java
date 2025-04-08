@@ -14,7 +14,9 @@ import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.sunshine.security.core.handler.CommonAccessDeniedHandler;
+import org.sunshine.security.jwt.authentication.NoOpAuthenticationSuccessHandler;
 import org.sunshine.security.jwt.authenticator.AccessTokenAuthenticator;
 import org.sunshine.security.jwt.authenticator.RefreshTokenAuthenticator;
 import org.sunshine.security.jwt.authenticator.TokenAuthenticatorRegistry;
@@ -48,6 +50,12 @@ public class JwtSecurityComponent {
             }
             return operation;
         };
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public AuthenticationSuccessHandler noOpAuthenticationSuccessHandler() {
+        return new NoOpAuthenticationSuccessHandler();
     }
 
     @Bean

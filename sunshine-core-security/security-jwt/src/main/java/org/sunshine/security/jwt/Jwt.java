@@ -1,5 +1,7 @@
 package org.sunshine.security.jwt;
 
+import org.sunshine.security.jwt.core.AccessToken;
+import org.sunshine.security.jwt.core.RefreshToken;
 import org.sunshine.security.jwt.util.JwtUtils;
 
 import java.io.Serializable;
@@ -31,13 +33,15 @@ public class Jwt implements Serializable {
         return of(JwtUtils.accessToken(subject), JwtUtils.refreshToken(subject));
     }
 
-    public static Jwt of(JwtTokenClaims.AccessTokenBuilder accessBuilder,
-                         JwtTokenClaims.RefreshTokenBuilder refreshBuilder) {
-        return of(JwtUtils.accessToken(accessBuilder), JwtUtils.refreshToken(refreshBuilder));
+    public static Jwt of(AccessToken accessToken, RefreshToken refreshToken) {
+        return of(JwtUtils.accessToken(accessToken), JwtUtils.refreshToken(refreshToken));
     }
 
-    public static Jwt of(String accessToken, String refreshToken) {
-        Date expiration = JwtUtils.parseToken(accessToken).getClaims().getExpiration();
+    private static Jwt of(String accessToken, String refreshToken) {
+        Date expiration = JwtUtils.parseToken(accessToken)
+                .getJws()
+                .getPayload()
+                .getExpiration();
         return builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)

@@ -7,6 +7,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -19,10 +22,9 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.sunshine.core.tool.util.ClassUtils;
 import org.sunshine.security.core.support.PathPatternRequestMatcher;
-import org.sunshine.security.core.util.SecurityUtils;
-import org.sunshine.security.jwt.JwtToken;
-import org.sunshine.security.jwt.JwtTokenType;
 import org.sunshine.security.jwt.annotation.RefreshTokenApi;
+import org.sunshine.security.jwt.core.JwtToken;
+import org.sunshine.security.jwt.core.JwtTokenType;
 import org.sunshine.security.jwt.properties.JwtSecurityProperties;
 import org.sunshine.security.jwt.util.JwtUtils;
 
@@ -52,7 +54,7 @@ public abstract class AbstractTokenAuthenticator implements InitializingBean, Ap
 
     abstract JwtTokenType getTokenType();
 
-    public abstract void authenticate(HttpServletRequest request, JwtToken token) throws Exception;
+    public abstract Authentication authenticate(HttpServletRequest request, JwtToken token);
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -99,17 +101,19 @@ public abstract class AbstractTokenAuthenticator implements InitializingBean, Ap
                sharedRefreshTokenMatcher.matches(request);
     }
 
-    protected void doAuthenticate(HttpServletRequest request, JwtToken jwtToken) {
+    protected Authentication doAuthenticate(HttpServletRequest request, JwtToken jwtToken) {
         String authToken = jwtToken.getTokenValue();
-        String username = jwtToken.getClaims().getSubject();
-        if (username != null && SecurityUtils.getAuthentication() == null) {
+        String username = jwtToken.getJws().getPayload().getSubject();
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        if (username != null && securityContext.getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
             if (JwtUtils.validateToken(authToken, userDetails.getUsername())) {
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, authToken, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityUtils.setAuthentication(authentication);
+                return authentication;
             }
         }
+        return null;
     }
 
     private PathPatternRequestMatcher createPathMatcher(HttpMethod httpMethod, String refreshTokenPath) {
