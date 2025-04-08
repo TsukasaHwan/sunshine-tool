@@ -46,8 +46,8 @@ import org.sunshine.oauth2.authorization.server.entity.OAuth2Auth;
 import org.sunshine.oauth2.authorization.server.entity.OAuth2AuthConsent;
 import org.sunshine.oauth2.authorization.server.entity.OAuth2AuthedClient;
 import org.sunshine.oauth2.authorization.server.properties.OAuth2AuthorizationServerProperties;
+import org.sunshine.security.core.authentication.CommonAuthenticationEntryPoint;
 import org.sunshine.security.core.enums.RoleEnum;
-import org.sunshine.security.core.handler.CommonAuthenticationEntryPoint;
 import org.sunshine.security.core.oauth2.TokenConstant;
 
 import java.util.Arrays;

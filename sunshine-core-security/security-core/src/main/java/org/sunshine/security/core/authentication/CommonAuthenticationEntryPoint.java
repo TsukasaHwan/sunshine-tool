@@ -1,4 +1,4 @@
-package org.sunshine.security.core.handler;
+package org.sunshine.security.core.authentication;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,11 +1,11 @@
-package org.sunshine.security.jwt.handler;
+package org.sunshine.security.jwt.authentication;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.AuthenticationException;
 import org.sunshine.core.tool.api.code.CommonCode;
 import org.sunshine.core.tool.api.response.Result;
 import org.sunshine.core.tool.util.WebUtils;
-import org.sunshine.security.core.handler.CommonAuthenticationEntryPoint;
+import org.sunshine.security.core.authentication.CommonAuthenticationEntryPoint;
 import org.sunshine.security.jwt.exception.ExpiredJwtAuthenticationException;
 
 /**

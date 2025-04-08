@@ -25,8 +25,8 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import org.sunshine.core.tool.util.ClassUtils;
 import org.sunshine.oauth2.authorization.server.properties.OAuth2AuthorizationServerProperties;
 import org.sunshine.security.core.DefaultSecurityConfiguration;
-import org.sunshine.security.core.handler.CommonAccessDeniedHandler;
-import org.sunshine.security.core.handler.CommonAuthenticationEntryPoint;
+import org.sunshine.security.core.access.CommonAccessDeniedHandler;
+import org.sunshine.security.core.authentication.CommonAuthenticationEntryPoint;
 import org.sunshine.security.core.support.PathPatternRequestMatcher;
 
 import java.util.ArrayList;
