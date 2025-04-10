@@ -236,6 +236,9 @@ public class JwtUtils {
      * @return boolean
      */
     public static boolean validateToken(String token, String subject) {
+        if (token == null || subject == null) {
+            return false;
+        }
         final String tokenSubject = parseToken(token).getJws().getPayload().getSubject();
         return (tokenSubject != null && tokenSubject.equals(subject));
     }
