@@ -122,9 +122,9 @@ public interface RedisClient {
 
     // ================ 其他 ================
 
-    List<String> scanKeys(String pattern);
+    Set<String> scanKeys(String pattern);
 
-    List<String> scanKeys(String pattern, Long count);
+    Set<String> scanKeys(String pattern, Long count);
 
     void batchDelete(String pattern);
 

@@ -319,16 +319,16 @@ public record RedisClientImpl(RedisTemplate<String, Object> redisTemplate) imple
     }
 
     @Override
-    public List<String> scanKeys(String pattern) {
+    public Set<String> scanKeys(String pattern) {
         return scanKeys(pattern, null);
     }
 
     @Override
-    public List<String> scanKeys(String pattern, Long count) {
+    public Set<String> scanKeys(String pattern, Long count) {
         if (pattern == null || pattern.isEmpty()) {
-            return Collections.emptyList();
+            return Collections.emptySet();
         }
-        List<String> keys = new ArrayList<>(16);
+        Set<String> keys = new HashSet<>(16);
         ScanOptions.ScanOptionsBuilder scanOptionsBuilder = ScanOptions.scanOptions()
                 .match(pattern);
         if (count != null && count > 0) {
@@ -345,7 +345,7 @@ public record RedisClientImpl(RedisTemplate<String, Object> redisTemplate) imple
 
     @Override
     public void batchDelete(String pattern) {
-        List<String> keys = scanKeys(pattern);
+        Set<String> keys = scanKeys(pattern);
         redisTemplate.delete(keys);
     }
 
