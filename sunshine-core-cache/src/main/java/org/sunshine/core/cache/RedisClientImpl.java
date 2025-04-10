@@ -320,11 +320,21 @@ public record RedisClientImpl(RedisTemplate<String, Object> redisTemplate) imple
 
     @Override
     public List<String> scanKeys(String pattern) {
+        return scanKeys(pattern, null);
+    }
+
+    @Override
+    public List<String> scanKeys(String pattern, Long count) {
         if (pattern == null || pattern.isEmpty()) {
             return Collections.emptyList();
         }
-        List<String> keys = new ArrayList<>();
-        ScanOptions scanOptions = ScanOptions.scanOptions().match(pattern).build();
+        List<String> keys = new ArrayList<>(16);
+        ScanOptions.ScanOptionsBuilder scanOptionsBuilder = ScanOptions.scanOptions()
+                .match(pattern);
+        if (count != null && count > 0) {
+            scanOptionsBuilder.count(count);
+        }
+        ScanOptions scanOptions = scanOptionsBuilder.build();
         try (Cursor<String> cursor = redisTemplate.scan(scanOptions)) {
             while (cursor.hasNext()) {
                 keys.add(cursor.next());

@@ -124,6 +124,8 @@ public interface RedisClient {
 
     List<String> scanKeys(String pattern);
 
+    List<String> scanKeys(String pattern, Long count);
+
     void batchDelete(String pattern);
 
     RedisTemplate<String, Object> redisTemplate();
