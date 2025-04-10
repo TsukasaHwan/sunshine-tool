@@ -15,9 +15,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.sunshine.security.core.access.CommonAccessDeniedHandler;
 import org.sunshine.security.core.authentication.NoOpAuthenticationSuccessHandler;
 import org.sunshine.security.jwt.authentication.JwtAuthenticationEntryPoint;
+import org.sunshine.security.jwt.authentication.JwtLogoutSuccessHandler;
 import org.sunshine.security.jwt.authenticator.AccessTokenAuthenticator;
 import org.sunshine.security.jwt.authenticator.RefreshTokenAuthenticator;
 import org.sunshine.security.jwt.authenticator.TokenAuthenticatorRegistry;
@@ -85,6 +87,12 @@ public class JwtSecurityComponent {
     @Bean
     public TokenAuthenticatorRegistry tokenAuthenticatorRegistry() {
         return new TokenAuthenticatorRegistry();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public LogoutSuccessHandler jwtLogoutSuccessHandler() {
+        return new JwtLogoutSuccessHandler();
     }
 
 }

@@ -199,6 +199,7 @@ public class JwtSecurityConfiguration {
             if (this.logoutSuccessHandler != null) {
                 logoutConfigurer.logoutSuccessHandler(this.logoutSuccessHandler);
             }
+            logoutConfigurer.logoutSuccessUrl(null);
         });
     }
 
