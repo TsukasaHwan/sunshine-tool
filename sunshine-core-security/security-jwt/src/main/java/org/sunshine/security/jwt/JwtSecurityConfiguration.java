@@ -34,6 +34,7 @@ import org.springframework.web.servlet.mvc.condition.PathPatternsRequestConditio
 import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.sunshine.core.tool.util.ClassUtils;
+import org.sunshine.security.core.DefaultSecurityConfiguration;
 import org.sunshine.security.core.context.TransmittableThreadLocalSecurityContextHolderStrategy;
 import org.sunshine.security.core.support.PathPatternRequestMatcher;
 import org.sunshine.security.jwt.authenticator.TokenAuthenticatorRegistry;
@@ -54,7 +55,7 @@ import java.util.Set;
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(JwtSecurityProperties.class)
 @EnableMethodSecurity(securedEnabled = true)
-@Import(JwtSecurityComponent.class)
+@Import({DefaultSecurityConfiguration.class, JwtSecurityComponent.class})
 public class JwtSecurityConfiguration {
 
     private final JwtSecurityProperties jwtSecurityProperties;
