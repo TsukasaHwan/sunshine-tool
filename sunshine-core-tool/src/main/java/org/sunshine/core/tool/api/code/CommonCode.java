@@ -49,9 +49,14 @@ public enum CommonCode implements ResultCode {
     AUTHENTICATION_FAILED(HttpServletResponse.SC_UNAUTHORIZED, "认证失败"),
 
     /**
-     * token过期
+     * 无效的令牌
      */
-    TOKEN_EXPIRED(HttpServletResponse.SC_UNAUTHORIZED, "token已过期，请重新登录"),
+    INVALID_TOKEN(HttpServletResponse.SC_UNAUTHORIZED, "无效的令牌"),
+
+    /**
+     * 令牌过期
+     */
+    TOKEN_EXPIRED(HttpServletResponse.SC_UNAUTHORIZED, "令牌已过期，请重新登录"),
 
     /**
      * 注销成功

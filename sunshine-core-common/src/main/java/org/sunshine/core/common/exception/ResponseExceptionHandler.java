@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -57,7 +58,7 @@ public class ResponseExceptionHandler {
      * @return {Result}
      */
     @ExceptionHandler(Exception.class)
-    public Result<?> handleException(Exception ex) {
+    public Result<?> handleException(Exception ex) throws AuthenticationException, AccessDeniedException {
         if (ex instanceof BusinessException exception) {
             return handleBusinessException(exception);
         } else if (ex instanceof BindException exception) {
@@ -66,6 +67,12 @@ public class ResponseExceptionHandler {
             return handleConstraintViolationException(exception);
         } else if (ex instanceof RateLimitExceededException exception) {
             return handleRateLimitExceededException(exception);
+        } else if (ex instanceof AuthenticationException ae) {
+            // 交给ExceptionTranslationFilter#doFilter处理
+            throw ae;
+        } else if (ex instanceof AccessDeniedException ade) {
+            // 交给ExceptionTranslationFilter#doFilter处理
+            throw ade;
         } else {
             return handleUnknownException(ex);
         }
