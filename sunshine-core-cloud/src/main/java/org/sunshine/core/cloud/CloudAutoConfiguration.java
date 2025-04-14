@@ -2,7 +2,7 @@ package org.sunshine.core.cloud;
 
 import com.alibaba.cloud.sentinel.feign.SentinelFeign;
 import com.alibaba.cloud.sentinel.feign.SentinelFeignAutoConfiguration;
-import com.alibaba.csp.sentinel.adapter.spring.webmvc.callback.BlockExceptionHandler;
+import com.alibaba.csp.sentinel.adapter.spring.webmvc_v6x.callback.BlockExceptionHandler;
 import com.alibaba.fastjson2.JSON;
 import feign.Feign;
 import feign.RequestInterceptor;
@@ -47,11 +47,11 @@ public class CloudAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public BlockExceptionHandler blockExceptionHandler() {
-        return (httpServletRequest, httpServletResponse, e) -> {
+        return (request, response, resourceName, e) -> {
             // Return 429 (Too Many Requests) by default.
-            httpServletResponse.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
-            httpServletResponse.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            httpServletResponse.getWriter().print(JSON.toJSONString(Result.fail(e.getMessage())));
+            response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.getWriter().print(JSON.toJSONString(Result.fail(e.getMessage())));
         };
     }
 
