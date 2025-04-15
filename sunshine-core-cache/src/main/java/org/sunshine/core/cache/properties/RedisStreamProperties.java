@@ -59,7 +59,7 @@ public class RedisStreamProperties {
          * 是否启用自定义线程池。
          * <p>默认为true。
          */
-        private boolean enable = true;
+        private Boolean enabled = true;
 
         /**
          * 核心线程数。
@@ -122,12 +122,12 @@ public class RedisStreamProperties {
          */
         private Class<? extends RejectedExecutionHandler> rejectedExecutionHandler = ThreadPoolExecutor.CallerRunsPolicy.class;
 
-        public boolean isEnable() {
-            return enable;
+        public Boolean getEnabled() {
+            return enabled;
         }
 
-        public void setEnable(boolean enable) {
-            this.enable = enable;
+        public void setEnabled(Boolean enabled) {
+            this.enabled = enabled;
         }
 
         public int getCorePoolSize() {

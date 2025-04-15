@@ -12,13 +12,13 @@ public class RedissonProperties {
     /**
      * Whether to enable
      */
-    private Boolean enable;
+    private Boolean enabled;
 
-    public Boolean getEnable() {
-        return enable;
+    public Boolean getEnabled() {
+        return enabled;
     }
 
-    public void setEnable(Boolean enable) {
-        this.enable = enable;
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 }

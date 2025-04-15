@@ -32,7 +32,7 @@ import java.util.List;
  * @since 2023/3/27
  */
 @AutoConfiguration
-@ConditionalOnProperty(prefix = "spring.data.redis", name = "redisson.enable", havingValue = "true")
+@ConditionalOnProperty(prefix = "spring.data.redis.redisson", name = "enabled", havingValue = "true")
 @EnableConfigurationProperties({RedisProperties.class, RedissonProperties.class})
 public class RedissonAutoConfiguration {
 
@@ -50,7 +50,7 @@ public class RedissonAutoConfiguration {
      * @return RedissonClient
      */
     @Bean(destroyMethod = "shutdown")
-    @ConditionalOnMissingBean(RedissonClient.class)
+    @ConditionalOnMissingBean
     @SuppressWarnings("deprecation")
     public RedissonClient redissonClient() {
         Config config = new Config();

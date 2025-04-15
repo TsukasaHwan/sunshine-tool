@@ -80,7 +80,7 @@ public class RedisStreamAutoConfiguration {
                 .hashValueSerializer(new FastJsonRedisSerializer<>(String.class))
                 .objectMapper(new ObjectHashMapper())
                 .targetType(String.class);
-        if (redisStreamProperties.getThreadPool().isEnable()) {
+        if (redisStreamProperties.getThreadPool().getEnabled()) {
             optionsBuilder.executor(redisStreamThreadPoolExecutor());
         }
         StreamMessageListenerContainer.StreamMessageListenerContainerOptions<String, ObjectRecord<String, String>> options = optionsBuilder.build();
