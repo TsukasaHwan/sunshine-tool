@@ -1,7 +1,7 @@
 package org.sunshine.security.jwt.authentication;
 
 import io.github.tsukasahwan.jwt.exception.AccessTokenBlacklistedException;
-import io.github.tsukasahwan.jwt.exception.ExpiredJwtAuthenticationException;
+import io.github.tsukasahwan.jwt.exception.ExpiredJwtException;
 import io.github.tsukasahwan.jwt.exception.InvalidTokenException;
 import io.github.tsukasahwan.jwt.exception.RefreshTokenRevokedException;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,7 +21,7 @@ public class JwtAuthenticationEntryPoint extends CommonAuthenticationEntryPoint 
 
     @Override
     protected void handleOtherException(HttpServletResponse response, AuthenticationException authException) {
-        if (authException instanceof ExpiredJwtAuthenticationException) {
+        if (authException instanceof ExpiredJwtException) {
             WebUtils.renderJson(response, Result.of(CommonCode.TOKEN_EXPIRED, CommonCode.TOKEN_EXPIRED.msg(), CommonCode.TOKEN_EXPIRED.name()));
         } else if (authException instanceof InvalidTokenException
                    || authException instanceof AccessTokenBlacklistedException
