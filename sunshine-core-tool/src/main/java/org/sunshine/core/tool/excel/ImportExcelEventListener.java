@@ -19,12 +19,12 @@ public class ImportExcelEventListener<T> extends AnalysisEventListener<T> {
     /**
      * 批量处理的条数
      */
-    private int batchCount;
+    private final int batchCount;
 
     /**
      * 临时存储读取到的数据
      */
-    private List<T> dataList = new ArrayList<>();
+    private final List<T> dataList = new ArrayList<>();
 
     /**
      * 数据处理接口
@@ -87,29 +87,11 @@ public class ImportExcelEventListener<T> extends AnalysisEventListener<T> {
     }
 
     /**
-     * 设置批量处理的条数。
-     *
-     * @param batchCount 批量处理的条数
-     */
-    public void setBatchCount(int batchCount) {
-        this.batchCount = batchCount;
-    }
-
-    /**
      * 获取临时存储的数据列表。
      *
      * @return 数据列表
      */
     public List<T> getDataList() {
         return dataList;
-    }
-
-    /**
-     * 设置临时存储的数据列表。
-     *
-     * @param dataList 数据列表
-     */
-    public void setDataList(List<T> dataList) {
-        this.dataList = dataList;
     }
 }
