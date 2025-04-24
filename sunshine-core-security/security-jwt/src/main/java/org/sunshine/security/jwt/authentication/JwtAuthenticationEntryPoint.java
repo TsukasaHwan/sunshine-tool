@@ -33,7 +33,7 @@ public class JwtAuthenticationEntryPoint extends CommonAuthenticationEntryPoint 
             if (authException instanceof InvalidTokenException) {
                 log.error("无效令牌", authException);
             }
-            WebUtils.renderJson(response, CommonCode.INVALID_TOKEN);
+            WebUtils.renderJson(response, Result.of(CommonCode.INVALID_TOKEN));
         } else {
             log.error("认证失败", authException);
             super.handleOtherException(response, authException);
