@@ -26,7 +26,7 @@ public class OperateLogListener {
     @Async
     @Order
     @EventListener(OperateLogEvent.class)
-    public void saveOperateLogLog(OperateLogEvent event) {
+    public void saveOperateLog(OperateLogEvent event) {
         @SuppressWarnings("unchecked")
         Map<String, Object> source = (Map<String, Object>) event.getSource();
         OperateLog operateLog = (OperateLog) source.get(LogExecutor.EVENT_LOG);
