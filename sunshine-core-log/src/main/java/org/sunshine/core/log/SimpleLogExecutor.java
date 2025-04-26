@@ -3,11 +3,11 @@ package org.sunshine.core.log;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.sunshine.core.log.annotation.OperateLog;
+import org.sunshine.core.log.annotation.LogOperation;
 import org.sunshine.core.log.event.OperateLogEvent;
+import org.sunshine.core.log.model.OperateLog;
 import org.sunshine.core.log.util.LogAbstractUtils;
 import org.sunshine.core.tool.util.SpringUtils;
-import org.sunshine.core.tool.util.StringUtils;
 import org.sunshine.core.tool.util.WebUtils;
 
 import java.util.Collections;
@@ -20,20 +20,19 @@ import java.util.Map;
 public class SimpleLogExecutor implements LogExecutor {
 
     @Override
-    public void execute(ProceedingJoinPoint point, OperateLog apiLog, long time) {
+    public void execute(ProceedingJoinPoint point, LogOperation logOperation, long time) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String className = point.getTarget().getClass().getName();
         String methodName = point.getSignature().getName();
 
-        String value = apiLog.value();
-        org.sunshine.core.log.model.OperateLog operateLog = new org.sunshine.core.log.model.OperateLog();
+        String value = logOperation.value();
+        OperateLog operateLog = new OperateLog();
         operateLog.setMethodClass(className);
         operateLog.setMethodName(methodName);
         operateLog.setTime(String.valueOf(time));
         operateLog.setTitle(value);
 
-        if (principal instanceof UserDetails userDetails &&
-            StringUtils.isNotEmpty(userDetails.getUsername())) {
+        if (principal instanceof UserDetails userDetails) {
             operateLog.setCreateBy(userDetails.getUsername());
         }
 
