@@ -13,6 +13,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -32,22 +33,15 @@ public class DefaultSecurityConfiguration {
     @Bean
     @Primary
     public CorsConfigurationSource corsConfigurationSource() {
-        List<String> allowMethod = List.of(
-                HttpMethod.GET.name(),
-                HttpMethod.HEAD.name(),
-                HttpMethod.POST.name(),
-                HttpMethod.PUT.name(),
-                HttpMethod.PATCH.name(),
-                HttpMethod.DELETE.name(),
-                HttpMethod.OPTIONS.name()
-        );
+        List<String> allowMethod = Arrays.stream(HttpMethod.values())
+                .map(HttpMethod::name)
+                .toList();
 
         List<String> allowHeader = List.of(
                 HttpHeaders.AUTHORIZATION,
                 HttpHeaders.ORIGIN,
                 HttpHeaders.CONTENT_TYPE,
-                HttpHeaders.ACCEPT,
-                "X-Requested-With"
+                HttpHeaders.ACCEPT
         );
 
         CorsConfiguration corsConfiguration = new CorsConfiguration();
