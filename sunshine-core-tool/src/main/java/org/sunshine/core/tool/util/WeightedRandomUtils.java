@@ -22,10 +22,10 @@ public class WeightedRandomUtils {
             throw new IllegalArgumentException("The weight list cannot be null or empty");
         }
 
-        BigDecimal totalRate = weights.stream().reduce(BigDecimal.ZERO, BigDecimal::add);
-        int scale = weights.stream().map(bigDecimal -> bigDecimal.stripTrailingZeros().scale()).max(Integer::compare).orElse(0);
+        BigDecimal totalWeight = weights.stream().reduce(BigDecimal.ZERO, BigDecimal::add);
+        int scale = weights.stream().map(weight -> weight.stripTrailingZeros().scale()).max(Integer::compare).orElse(0);
         BigDecimal multiplier = BigDecimal.TEN.pow(scale);
-        long randomValue = ThreadLocalRandom.current().nextLong(totalRate.multiply(multiplier).longValueExact());
+        long randomValue = ThreadLocalRandom.current().nextLong(totalWeight.multiply(multiplier).longValueExact());
 
         long accumulated = 0;
         for (int i = 0; i < weights.size(); i++) {
