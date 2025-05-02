@@ -14,7 +14,7 @@ import java.util.List;
  * @author Teamo
  * @since 2022/08/24
  */
-public class ImportExcelEventListener<T> extends AnalysisEventListener<T> {
+class ImportExcelEventListener<T> extends AnalysisEventListener<T> {
 
     /**
      * 批量处理的条数
