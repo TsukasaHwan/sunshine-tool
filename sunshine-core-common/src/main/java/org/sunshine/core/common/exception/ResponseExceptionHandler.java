@@ -13,6 +13,7 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.sunshine.core.cache.exception.DistributedLockAcquisitionException;
@@ -45,6 +46,7 @@ public class ResponseExceptionHandler {
     private static final ImmutableMap.Builder<Class<? extends Throwable>, ResultCode> BUILDER = ImmutableMap.builder();
 
     static {
+        BUILDER.put(MissingServletRequestParameterException.class, CommonCode.INVALID_PARAM);
         BUILDER.put(HttpMessageNotReadableException.class, CommonCode.INVALID_PARAM);
         BUILDER.put(HttpRequestMethodNotSupportedException.class, CommonCode.REQUEST_METHOD_NOT_SUPPORTED);
         BUILDER.put(DistributedLockAcquisitionException.class, CommonCode.SERVICE_UNAVAILABLE);

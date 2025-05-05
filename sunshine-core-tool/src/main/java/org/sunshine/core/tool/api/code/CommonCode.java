@@ -19,9 +19,9 @@ public enum CommonCode implements ResultCode {
     FAIL(HttpServletResponse.SC_BAD_REQUEST, "操作失败"),
 
     /**
-     * 非法参数
+     * 无效参数
      */
-    INVALID_PARAM(HttpServletResponse.SC_BAD_REQUEST, "非法参数"),
+    INVALID_PARAM(HttpServletResponse.SC_BAD_REQUEST, "无效参数"),
 
     /**
      * 请求方法不支持
