@@ -24,6 +24,11 @@ public enum CommonCode implements ResultCode {
     INVALID_PARAM(HttpServletResponse.SC_BAD_REQUEST, "无效参数"),
 
     /**
+     * 缺少参数
+     */
+    MISSING_PARAM(HttpServletResponse.SC_BAD_REQUEST, "缺少参数"),
+
+    /**
      * 请求方法不支持
      */
     REQUEST_METHOD_NOT_SUPPORTED(HttpServletResponse.SC_BAD_REQUEST, "请求方法不支持"),
