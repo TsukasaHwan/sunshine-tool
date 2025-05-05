@@ -816,6 +816,19 @@ public class DateUtils {
     }
 
     /**
+     * 当前日期是否在日期指定范围内<br>
+     * 起始日期和结束日期可以互换
+     *
+     * @param localDate 被检查的日期
+     * @param begin     起始日期（包含）
+     * @param end       结束日期（包含）
+     * @return 是否在范围内
+     */
+    public static boolean isIn(LocalDate localDate, LocalDate begin, LocalDate end) {
+        return (localDate.isAfter(begin) || localDate.isEqual(begin)) && (localDate.isBefore(end) || localDate.isEqual(end));
+    }
+
+    /**
      * 计算相对于dateToCompare的年龄，常用于计算指定生日在某年的年龄
      *
      * @param birthday      生日
