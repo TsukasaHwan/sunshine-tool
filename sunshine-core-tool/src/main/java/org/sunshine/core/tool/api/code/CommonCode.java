@@ -64,11 +64,6 @@ public enum CommonCode implements ResultCode {
     TOKEN_EXPIRED(HttpServletResponse.SC_UNAUTHORIZED, "令牌已过期，请重新登录"),
 
     /**
-     * 注销成功
-     */
-    LOGOUT_SUCCESS(HttpServletResponse.SC_OK, "注销成功"),
-
-    /**
      * 请求频率超过限制，请稍后重试
      */
     RATE_LIMIT_EXCEEDED(429, "请求频率超过限制，请稍后重试"),
