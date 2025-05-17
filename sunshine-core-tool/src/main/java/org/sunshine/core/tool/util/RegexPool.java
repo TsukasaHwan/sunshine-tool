@@ -195,4 +195,10 @@ public interface RegexPool {
      * 放宽汉字范围：如生僻姓名 刘欣䶮yǎn
      */
     String CHINESE_NAME = "^[\u2E80-\u9FFF·]{2,60}$";
+
+    /**
+     * 用户名
+     * 3-16位，只能是英文、数字、下划线、减号
+     */
+    String USERNAME = "^[a-zA-Z0-9_-]{3,16}$";
 }

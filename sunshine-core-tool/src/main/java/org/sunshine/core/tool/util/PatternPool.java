@@ -168,6 +168,12 @@ public class PatternPool {
      */
     public static final Pattern CHINESE_NAME = Pattern.compile(RegexPool.CHINESE_NAME);
 
+    /**
+     * 用户名
+     * 3-16位，只能是英文字母、数字、下划线
+     */
+    public static final Pattern USERNAME = Pattern.compile(RegexPool.USERNAME);
+
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     /**
      * Pattern池
