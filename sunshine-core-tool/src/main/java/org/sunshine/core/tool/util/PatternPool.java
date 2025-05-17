@@ -170,7 +170,7 @@ public class PatternPool {
 
     /**
      * 用户名
-     * 3-16位，只能是英文字母、数字、下划线
+     * 3-16位，只能是英文、数字、下划线、减号
      */
     public static final Pattern USERNAME = Pattern.compile(RegexPool.USERNAME);
 
