@@ -7,9 +7,11 @@ import io.github.tsukasahwan.jwt.exception.RefreshTokenRevokedException;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
 import org.sunshine.core.tool.api.code.CommonCode;
 import org.sunshine.core.tool.api.response.Result;
+import org.sunshine.core.tool.exception.BusinessException;
 import org.sunshine.core.tool.util.WebUtils;
 import org.sunshine.security.core.authentication.CommonAuthenticationEntryPoint;
 
@@ -34,6 +36,9 @@ public class JwtAuthenticationEntryPoint extends CommonAuthenticationEntryPoint 
                 log.error("无效令牌", authException);
             }
             WebUtils.renderJson(response, Result.of(CommonCode.INVALID_TOKEN));
+        } else if (authException instanceof InternalAuthenticationServiceException internalException
+                   && internalException.getCause() instanceof BusinessException businessException) {
+            WebUtils.renderJson(response, businessException.getResult());
         } else {
             log.error("认证失败", authException);
             super.handleOtherException(response, authException);
