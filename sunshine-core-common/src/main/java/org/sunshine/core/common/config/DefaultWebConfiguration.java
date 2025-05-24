@@ -36,13 +36,13 @@ import java.util.List;
 public class DefaultWebConfiguration implements WebMvcConfigurer {
 
     private final Converter<String, LocalDateTime> localDateTimeConverter = (StringToLocalDateTimeConverter) source ->
-            source.isBlank() ? null : LocalDateTime.parse(source, DateUtils.DATETIME_FORMATTER);
+            source.isBlank() ? null : DateUtils.parseDateTime(source);
 
     private final Converter<String, LocalDate> localDateConverter = (StringToLocalDateConverter) source ->
-            source.isBlank() ? null : LocalDate.parse(source, DateUtils.DATE_FORMATTER);
+            source.isBlank() ? null : DateUtils.parseDate(source);
 
     private final Converter<String, LocalTime> localTimeConverter = (StringToLocalTimeConverter) source ->
-            source.isBlank() ? null : LocalTime.parse(source, DateUtils.TIME_FORMATTER);
+            source.isBlank() ? null : DateUtils.parseTime(source);
 
     /**
      * 集成fastJson
