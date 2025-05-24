@@ -51,7 +51,7 @@ public class DefaultWebConfiguration implements WebMvcConfigurer {
         //处理中文乱码问题
         List<MediaType> fastMediaTypes = new ArrayList<>(2);
         fastMediaTypes.add(MediaType.APPLICATION_JSON);
-        fastMediaTypes.add(MediaType.valueOf("application/vnd.spring-boot.actuator.v2+json"));
+        // fastMediaTypes.add(MediaType.valueOf("application/vnd.spring-boot.actuator.v2+json"));
         fastJsonConverter.setSupportedMediaTypes(fastMediaTypes);
         fastJsonConverter.setFastJsonConfig(config);
         fastJsonConverter.setDefaultCharset(StandardCharsets.UTF_8);
