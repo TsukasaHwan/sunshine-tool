@@ -26,7 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -48,11 +48,8 @@ public class DefaultWebConfiguration implements WebMvcConfigurer {
         config.setReaderFeatures(JSONReader.Feature.FieldBased, JSONReader.Feature.SupportArrayToBean);
         config.setWriterFeatures(JSONWriter.Feature.WriteMapNullValue);
         config.setWriterFilters(new DataMaskJsonFilter());
-        //处理中文乱码问题
-        List<MediaType> fastMediaTypes = new ArrayList<>(2);
-        fastMediaTypes.add(MediaType.APPLICATION_JSON);
         // fastMediaTypes.add(MediaType.valueOf("application/vnd.spring-boot.actuator.v2+json"));
-        fastJsonConverter.setSupportedMediaTypes(fastMediaTypes);
+        fastJsonConverter.setSupportedMediaTypes(Collections.singletonList(MediaType.APPLICATION_JSON));
         fastJsonConverter.setFastJsonConfig(config);
         fastJsonConverter.setDefaultCharset(StandardCharsets.UTF_8);
         converters.add(0, fastJsonConverter);
