@@ -4,6 +4,8 @@ import org.springframework.web.util.UriUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 
 /**
@@ -14,25 +16,64 @@ import java.nio.charset.Charset;
 public class UrlUtils extends UriUtils {
 
     /**
-     * url 编码，同js decodeURIComponent
+     * 对字符串进行 URI 编码（等同于 JavaScript 的 encodeURIComponent）。
+     * <p>
+     * 此方法不会将特殊字符如 '+' 特殊对待，在 URI 编码中会被保留或按 RFC3986 标准编码。
+     * 如果希望在后续解码时正确还原空格，请确保原始字符串中的空格已转换为 %20 而非 +。
+     * </p>
      *
-     * @param source  url
-     * @param charset 字符集
-     * @return 编码后的url
+     * @param source  需要编码的字符串
+     * @param charset 字符集，例如 UTF-8
+     * @return URI 编码后的字符串
      */
-    public static String encodeUrl(String source, Charset charset) {
+    public static String encodeUri(String source, Charset charset) {
         return UrlUtils.encode(source, charset.name());
     }
 
     /**
-     * url 解码
+     * 对字符串进行 URL 编码，适用于 HTTP 表单提交、查询参数等场景。
+     * <p>
+     * 此方法会将空格编码为 '+'，符合 application/x-www-form-urlencoded 编码规范。
+     * 在使用 decodeUrl 解码时，'+' 会被还原为空格。
+     * </p>
      *
-     * @param source  url
-     * @param charset 字符集
-     * @return 解码url
+     * @param source  需要编码的字符串
+     * @param charset 字符集，例如 UTF-8
+     * @return URL 编码后的字符串
+     */
+    public static String encodeUrl(String source, Charset charset) {
+        return URLEncoder.encode(source, charset);
+    }
+
+    /**
+     * 对字符串进行 URI 解码，遵循 RFC3986 标准。
+     * <p>
+     * 注意：URI 解码不会将 '+' 解释为空格，如果字符串中包含 '+'，
+     * 将原样保留 '+' 而不是转换为空格。若需要将 '+' 视为空格，
+     * 建议在调用此方法前手动替换 '+' 为 %20。
+     * </p>
+     *
+     * @param source  需要解码的字符串
+     * @param charset 字符集，例如 UTF-8
+     * @return URI 解码后的字符串
+     */
+    public static String decodeUri(String source, Charset charset) {
+        return UrlUtils.decode(source, charset.name());
+    }
+
+    /**
+     * 对字符串进行 URL 解码，适用于 HTTP 查询参数、表单提交等场景。
+     * <p>
+     * 该方法会将 '+' 自动转换为空格，符合 application/x-www-form-urlencoded 编码规则。
+     * 因此更适合处理浏览器提交的 URL 参数。
+     * </p>
+     *
+     * @param source  需要解码的字符串
+     * @param charset 字符集，例如 UTF-8
+     * @return URL 解码后的字符串
      */
     public static String decodeUrl(String source, Charset charset) {
-        return UrlUtils.decode(source, charset.name());
+        return URLDecoder.decode(source, charset);
     }
 
     /**
