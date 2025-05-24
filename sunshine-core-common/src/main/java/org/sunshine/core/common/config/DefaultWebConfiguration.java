@@ -54,6 +54,7 @@ public class DefaultWebConfiguration implements WebMvcConfigurer {
         fastMediaTypes.add(MediaType.valueOf("application/vnd.spring-boot.actuator.v2+json"));
         fastJsonConverter.setSupportedMediaTypes(fastMediaTypes);
         fastJsonConverter.setFastJsonConfig(config);
+        fastJsonConverter.setDefaultCharset(StandardCharsets.UTF_8);
         converters.add(0, fastJsonConverter);
         converters.add(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
     }
