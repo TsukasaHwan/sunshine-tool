@@ -432,6 +432,36 @@ public class DateUtils {
     }
 
     /**
+     * java8 将字符串转换为时间
+     *
+     * @param dateStr 时间字符串
+     * @return 时间
+     */
+    public static LocalDateTime parseDateTime(String dateStr) {
+        return LocalDateTime.parse(dateStr, DATETIME_FORMATTER);
+    }
+
+    /**
+     * java8 将字符串转换为时间
+     *
+     * @param dateStr 时间字符串
+     * @return 时间
+     */
+    public static LocalDate parseDate(String dateStr) {
+        return LocalDate.parse(dateStr, DATE_FORMATTER);
+    }
+
+    /**
+     * java8 将字符串转换为时间
+     *
+     * @param dateStr 时间字符串
+     * @return 时间
+     */
+    public static LocalTime parseTime(String dateStr) {
+        return LocalTime.parse(dateStr, TIME_FORMATTER);
+    }
+
+    /**
      * 时间转 Instant
      *
      * @param dateTime 时间
