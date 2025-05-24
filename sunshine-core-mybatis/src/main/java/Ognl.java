@@ -1,7 +1,6 @@
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -46,26 +45,6 @@ public class Ognl {
             return map.isEmpty();
         }
         return false;
-    }
-
-    /**
-     * 判断是否为null
-     *
-     * @param o 对象
-     * @return 是否为null
-     */
-    public static boolean isNull(Object o) {
-        return Objects.isNull(o);
-    }
-
-    /**
-     * 判断对象是否不为null
-     *
-     * @param o 对象
-     * @return 是否不为null
-     */
-    public static boolean nonNull(Object o) {
-        return Objects.nonNull(o);
     }
 
     /**
