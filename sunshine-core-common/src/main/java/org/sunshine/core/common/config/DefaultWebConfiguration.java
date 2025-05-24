@@ -20,6 +20,7 @@ import org.sunshine.core.common.exception.ResponseExceptionHandler;
 import org.sunshine.core.tool.datamask.DataMaskJsonFilter;
 import org.sunshine.core.tool.enums.WebFilterOrderEnum;
 import org.sunshine.core.tool.util.DateUtils;
+import org.sunshine.core.tool.util.StringUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -34,15 +35,6 @@ import java.util.List;
  */
 @AutoConfiguration
 public class DefaultWebConfiguration implements WebMvcConfigurer {
-
-    private final Converter<String, LocalDateTime> localDateTimeConverter = (StringToLocalDateTimeConverter) source ->
-            source.isBlank() ? null : DateUtils.parseDateTime(source);
-
-    private final Converter<String, LocalDate> localDateConverter = (StringToLocalDateConverter) source ->
-            source.isBlank() ? null : DateUtils.parseDate(source);
-
-    private final Converter<String, LocalTime> localTimeConverter = (StringToLocalTimeConverter) source ->
-            source.isBlank() ? null : DateUtils.parseTime(source);
 
     /**
      * 集成fastJson
@@ -79,9 +71,9 @@ public class DefaultWebConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addFormatters(FormatterRegistry registry) {
-        registry.addConverter(localDateTimeConverter);
-        registry.addConverter(localDateConverter);
-        registry.addConverter(localTimeConverter);
+        registry.addConverter(StringToLocalDateTimeConverter.INSTANCE);
+        registry.addConverter(StringToLocalDateConverter.INSTANCE);
+        registry.addConverter(StringToLocalTimeConverter.INSTANCE);
     }
 
     @Bean
@@ -96,12 +88,30 @@ public class DefaultWebConfiguration implements WebMvcConfigurer {
         return new ResponseExceptionHandler();
     }
 
-    interface StringToLocalDateTimeConverter extends Converter<String, LocalDateTime> {
+    enum StringToLocalDateTimeConverter implements Converter<String, LocalDateTime> {
+        INSTANCE;
+
+        @Override
+        public LocalDateTime convert(String source) {
+            return StringUtils.isBlank(source) ? null : DateUtils.parseDateTime(source);
+        }
     }
 
-    interface StringToLocalDateConverter extends Converter<String, LocalDate> {
+    enum StringToLocalDateConverter implements Converter<String, LocalDate> {
+        INSTANCE;
+
+        @Override
+        public LocalDate convert(String source) {
+            return StringUtils.isBlank(source) ? null : DateUtils.parseDate(source);
+        }
     }
 
-    interface StringToLocalTimeConverter extends Converter<String, LocalTime> {
+    enum StringToLocalTimeConverter implements Converter<String, LocalTime> {
+        INSTANCE;
+
+        @Override
+        public LocalTime convert(String source) {
+            return StringUtils.isBlank(source) ? null : DateUtils.parseTime(source);
+        }
     }
 }
