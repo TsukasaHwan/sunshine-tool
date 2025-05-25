@@ -1,7 +1,6 @@
 package org.sunshine.core.tool.util;
 
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 
 import java.nio.charset.StandardCharsets;
@@ -275,7 +274,6 @@ public class RestClientUtils {
         return getRestClient()
                 .method(method)
                 .uri(url, uriVariables)
-                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML)
                 .acceptCharset(StandardCharsets.UTF_8)
                 .retrieve();
     }
@@ -284,7 +282,6 @@ public class RestClientUtils {
         return getRestClient()
                 .method(method)
                 .uri(url, uriVariables)
-                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML)
                 .acceptCharset(StandardCharsets.UTF_8)
                 .retrieve();
     }
@@ -294,7 +291,6 @@ public class RestClientUtils {
                 .method(method)
                 .uri(url, uriVariables)
                 .body(bodyValue)
-                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML)
                 .acceptCharset(StandardCharsets.UTF_8)
                 .retrieve();
     }
@@ -304,7 +300,6 @@ public class RestClientUtils {
                 .method(method)
                 .uri(url, uriVariables)
                 .body(bodyValue)
-                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML)
                 .acceptCharset(StandardCharsets.UTF_8)
                 .retrieve();
     }
@@ -314,7 +309,6 @@ public class RestClientUtils {
                 .method(method)
                 .uri(url, uriVariables)
                 .headers(requestHeaders -> requestHeaders.setAll(headers))
-                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML)
                 .acceptCharset(StandardCharsets.UTF_8)
                 .retrieve();
     }
@@ -324,7 +318,6 @@ public class RestClientUtils {
                 .method(method)
                 .uri(url, uriVariables)
                 .headers(requestHeaders -> requestHeaders.setAll(headers))
-                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML)
                 .acceptCharset(StandardCharsets.UTF_8)
                 .retrieve();
     }
@@ -335,7 +328,6 @@ public class RestClientUtils {
                 .uri(url, uriVariables)
                 .headers(requestHeaders -> requestHeaders.setAll(headers))
                 .body(bodyValue)
-                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML)
                 .acceptCharset(StandardCharsets.UTF_8)
                 .retrieve();
     }
@@ -346,7 +338,6 @@ public class RestClientUtils {
                 .uri(url, uriVariables)
                 .headers(requestHeaders -> requestHeaders.setAll(headers))
                 .body(bodyValue)
-                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML)
                 .acceptCharset(StandardCharsets.UTF_8)
                 .retrieve();
     }
