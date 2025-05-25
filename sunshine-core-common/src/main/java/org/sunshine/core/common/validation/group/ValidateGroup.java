@@ -1,4 +1,4 @@
-package org.sunshine.core.common.group;
+package org.sunshine.core.common.validation.group;
 
 import jakarta.validation.GroupSequence;
 import jakarta.validation.groups.Default;
@@ -8,6 +8,7 @@ import jakarta.validation.groups.Default;
  * @since 2022/03/24
  */
 public class ValidateGroup {
+
     /**
      * 更新校验组
      */
