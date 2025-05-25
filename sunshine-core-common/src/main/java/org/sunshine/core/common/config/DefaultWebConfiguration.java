@@ -4,7 +4,10 @@ import com.alibaba.fastjson2.JSONReader;
 import com.alibaba.fastjson2.JSONWriter;
 import com.alibaba.fastjson2.support.config.FastJsonConfig;
 import com.alibaba.fastjson2.support.spring6.http.converter.FastJsonHttpMessageConverter;
+import org.hibernate.validator.BaseHibernateValidatorConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.validation.ValidationConfigurationCustomizer;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.convert.converter.Converter;
@@ -80,6 +83,15 @@ public class DefaultWebConfiguration implements WebMvcConfigurer {
         FilterRegistrationBean<CorsFilter> filter = new FilterRegistrationBean<>(new CorsFilter(corsConfigurationSource));
         filter.setOrder(WebFilterOrderEnum.CORS_FILTER.getOrder());
         return filter;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ValidationConfigurationCustomizer validationConfigurationCustomizer() {
+        return configuration -> {
+            // 快速失败模式
+            configuration.addProperty(BaseHibernateValidatorConfiguration.FAIL_FAST, Boolean.TRUE.toString());
+        };
     }
 
     @Bean
