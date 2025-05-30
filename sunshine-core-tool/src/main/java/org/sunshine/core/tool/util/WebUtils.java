@@ -17,10 +17,9 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.method.HandlerMethod;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.Enumeration;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Miscellaneous utilities for web applications.
@@ -355,4 +354,49 @@ public class WebUtils extends org.springframework.web.util.WebUtils {
             return StringPool.EMPTY;
         }
     }
+
+    /**
+     * 解析HTTP请求的原始查询字符串，转换为键值对Map
+     *
+     * @param request HTTP请求对象
+     * @param charset 字符集（用于处理原始字节数据）
+     * @return 参数名到值的映射
+     */
+    public static Map<String, String> parseRawQuery(HttpServletRequest request, Charset charset) {
+        String rawQuery = request.getQueryString();
+        if (rawQuery == null || rawQuery.isBlank()) {
+            return Collections.emptyMap();
+        }
+
+        rawQuery = UrlUtils.decodeUrl(rawQuery, charset);
+        Map<String, String> params = new HashMap<>();
+
+        // 分割参数对
+        String[] pairs = rawQuery.split(StringPool.AMPERSAND);
+        for (String pair : pairs) {
+            // 跳过空对
+            if (pair.isEmpty()) {
+                continue;
+            }
+
+            int idx = pair.indexOf(StringPool.EQUALS);
+            String key, value;
+
+            if (idx < 0) {
+                // 没有等号的情况 (如 "param1")
+                key = pair;
+                value = StringPool.EMPTY;
+            } else {
+                // 分离键值对
+                key = pair.substring(0, idx);
+                value = pair.substring(idx + 1);
+            }
+
+            // 添加到Map
+            params.putIfAbsent(key, value);
+        }
+
+        return params;
+    }
+
 }
