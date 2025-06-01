@@ -1,6 +1,6 @@
 package org.sunshine.core.captcha.config;
 
-import com.xingyuv.captcha.service.CaptchaCacheService;
+import com.anji.captcha.service.CaptchaCacheService;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.sunshine.core.captcha.service.RedisCaptchaServiceImpl;

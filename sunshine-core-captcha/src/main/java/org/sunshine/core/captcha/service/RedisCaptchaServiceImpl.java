@@ -1,6 +1,6 @@
 package org.sunshine.core.captcha.service;
 
-import com.xingyuv.captcha.service.CaptchaCacheService;
+import com.anji.captcha.service.CaptchaCacheService;
 import jakarta.annotation.Resource;
 import org.sunshine.core.cache.RedisClient;
 
