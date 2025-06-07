@@ -44,7 +44,7 @@ public class MybatisPlusFastAutoGenerator {
                             .enableLombok()
                             .disableSerialVersionUID()
                             .addTableFills(new Column(scanner.apply("创建时间字段名："), FieldFill.INSERT))
-                            .addTableFills(new Column(scanner.apply("修改时间字段名："), FieldFill.INSERT_UPDATE));
+                            .addTableFills(new Column(scanner.apply("修改时间字段名："), FieldFill.UPDATE));
 
                     String logicDeleteColumnName = scanner.apply("逻辑删除字段名：");
                     entityBuilder.addTableFills(new Column(logicDeleteColumnName, FieldFill.INSERT));
