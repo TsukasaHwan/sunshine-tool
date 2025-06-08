@@ -56,8 +56,7 @@ public class MybatisPlusAutoConfiguration {
     @ConditionalOnBean(DynamicTableNameHandler.class)
     @ConditionalOnMissingBean(DynamicTableNameInnerInterceptor.class)
     public DynamicTableNameInnerInterceptor dynamicTableNameInnerInterceptor(DynamicTableNameHandler dynamicTableNameHandler) {
-        DynamicTableNameInnerInterceptor dynamicTableNameInnerInterceptor = new DynamicTableNameInnerInterceptor();
-        dynamicTableNameInnerInterceptor.setTableNameHandler(dynamicTableNameHandler);
+        DynamicTableNameInnerInterceptor dynamicTableNameInnerInterceptor = new DynamicTableNameInnerInterceptor(dynamicTableNameHandler);
         dynamicTableNameInnerInterceptor.setHook(DynamicTableSuffixContextHolder::clear);
         return dynamicTableNameInnerInterceptor;
     }
