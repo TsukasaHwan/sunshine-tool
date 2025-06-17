@@ -15,6 +15,7 @@ import org.springframework.format.FormatterRegistry;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.lang.NonNull;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -103,7 +104,7 @@ public class DefaultWebConfiguration implements WebMvcConfigurer {
         INSTANCE;
 
         @Override
-        public LocalDateTime convert(String source) {
+        public LocalDateTime convert(@NonNull String source) {
             return StringUtils.isBlank(source) ? null : DateUtils.parseDateTime(source);
         }
     }
@@ -112,7 +113,7 @@ public class DefaultWebConfiguration implements WebMvcConfigurer {
         INSTANCE;
 
         @Override
-        public LocalDate convert(String source) {
+        public LocalDate convert(@NonNull String source) {
             return StringUtils.isBlank(source) ? null : DateUtils.parseDate(source);
         }
     }
@@ -121,7 +122,7 @@ public class DefaultWebConfiguration implements WebMvcConfigurer {
         INSTANCE;
 
         @Override
-        public LocalTime convert(String source) {
+        public LocalTime convert(@NonNull String source) {
             return StringUtils.isBlank(source) ? null : DateUtils.parseTime(source);
         }
     }
