@@ -78,7 +78,7 @@ public class DelayedRecord<T> {
          * 设置延迟时间
          */
         public DelayedRecordBuilder<T> withDelay(long delay, TimeUnit unit) {
-            Assert.isTrue(delay >= 0L, "Delay must be greater than or equal to zero");
+            Assert.isTrue(delay > 0L, "Delay must be greater than zero");
             Assert.notNull(unit, "TimeUnit must be not null");
             this.delay = delay;
             this.unit = unit;
@@ -89,7 +89,7 @@ public class DelayedRecord<T> {
          * 创建延迟消息
          */
         public DelayedRecord<T> create() {
-            Assert.isTrue(this.delay >= 0L, "Delay must be greater than or equal to zero");
+            Assert.isTrue(this.delay > 0L, "Delay must be greater than zero");
             Assert.notNull(this.unit, "TimeUnit must be not null");
             return new DelayedRecord<>(this);
         }
