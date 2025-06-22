@@ -1,6 +1,5 @@
 package org.sunshine.oauth2.authorization.server.authentication;
 
-import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
@@ -30,7 +29,7 @@ public class OAuth2PasswordAuthenticationToken extends AbstractAuthenticationTok
      * @param clientPrincipal the authenticated client principal
      */
     public OAuth2PasswordAuthenticationToken(AuthorizationGrantType authorizationGrantType,
-                                             Authentication clientPrincipal, @Nullable Set<String> scopes, @Nullable Map<String, Object> additionalParameters) {
+                                             Authentication clientPrincipal, Set<String> scopes, Map<String, Object> additionalParameters) {
         super(Collections.emptyList());
         Assert.notNull(authorizationGrantType, "authorizationGrantType cannot be null");
         Assert.notNull(clientPrincipal, "clientPrincipal cannot be null");
