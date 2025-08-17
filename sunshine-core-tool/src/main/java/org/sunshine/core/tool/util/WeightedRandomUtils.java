@@ -24,7 +24,8 @@ public class WeightedRandomUtils {
 
         BigDecimal totalWeight = weights.stream().reduce(BigDecimal.ZERO, BigDecimal::add);
         int scale = weights.stream()
-                .map(weight -> Math.max(0, weight.stripTrailingZeros().scale())).max(Integer::compare)
+                .mapToInt(weight -> Math.max(0, weight.stripTrailingZeros().scale()))
+                .max()
                 .orElse(0);
         BigDecimal multiplier = BigDecimal.TEN.pow(scale);
         long randomValue = ThreadLocalRandom.current().nextLong(totalWeight.multiply(multiplier).longValueExact());
