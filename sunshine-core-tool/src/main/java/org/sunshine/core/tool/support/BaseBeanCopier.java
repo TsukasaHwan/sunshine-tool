@@ -6,6 +6,7 @@ import org.springframework.cglib.core.*;
 import org.sunshine.core.tool.util.BeanUtils;
 
 import java.beans.PropertyDescriptor;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Modifier;
 import java.security.ProtectionDomain;
 import java.util.HashMap;
@@ -21,10 +22,12 @@ import java.util.Map;
  *
  * @author L.cm
  */
+@SuppressWarnings("rawtypes")
 public abstract class BaseBeanCopier {
+    private static final String BEAN_NAME_PREFIX = BaseBeanCopier.class.getName();
     private static final BeanCopierKey KEY_FACTORY = (BeanCopierKey) KeyFactory.create(BeanCopierKey.class);
     private static final Type CONVERTER = TypeUtils.parseType("org.springframework.cglib.core.Converter");
-    private static final Type BEAN_COPIER = TypeUtils.parseType(BaseBeanCopier.class.getName());
+    private static final Type BEAN_COPIER = TypeUtils.parseType(BEAN_NAME_PREFIX);
     private static final Signature COPY = new Signature("copy", Type.VOID_TYPE, new Type[]{Constants.TYPE_OBJECT, Constants.TYPE_OBJECT, CONVERTER});
     private static final Signature CONVERT = TypeUtils.parseSignature("Object convert(Object, Class, Object)");
 
@@ -40,20 +43,13 @@ public abstract class BaseBeanCopier {
         Object newInstance(String source, String target, boolean useConverter);
     }
 
-    public static BaseBeanCopier create(Class<?> source, Class<?> target, boolean useConverter) {
-        return BaseBeanCopier.create(source, target, null, useConverter);
-    }
-
-    public static BaseBeanCopier create(Class<?> source, Class<?> target, ClassLoader classLoader, boolean useConverter) {
-        Generator gen;
-        if (classLoader == null) {
-            gen = new Generator();
-        } else {
-            gen = new Generator(classLoader);
-        }
+    public static BaseBeanCopier create(Class source, Class target, boolean useConverter) {
+        Object key = KEY_FACTORY.newInstance(source.getName(), target.getName(), useConverter);
+        Generator gen = new Generator(key);
         gen.setSource(source);
         gen.setTarget(target);
         gen.setUseConverter(useConverter);
+        gen.setUseCache(true);
         return gen.create();
     }
 
@@ -67,34 +63,29 @@ public abstract class BaseBeanCopier {
     abstract public void copy(Object from, Object to, Converter converter);
 
     public static class Generator extends AbstractClassGenerator {
-        private static final Source SOURCE = new Source(BaseBeanCopier.class.getName());
-        private final ClassLoader classLoader;
-        private Class<?> source;
-        private Class<?> target;
+        private static final Source SOURCE = new Source(BEAN_NAME_PREFIX);
+        private final Object key;
+        private Class source;
+        private Class target;
         private boolean useConverter;
+        private String className;
 
-        Generator() {
+        Generator(Object key) {
             super(SOURCE);
-            this.classLoader = null;
+            this.key = key;
         }
 
-        Generator(ClassLoader classLoader) {
-            super(SOURCE);
-            this.classLoader = classLoader;
-        }
-
-        public void setSource(Class<?> source) {
+        public void setSource(Class source) {
             if (!Modifier.isPublic(source.getModifiers())) {
                 setNamePrefix(source.getName());
             }
             this.source = source;
         }
 
-        public void setTarget(Class<?> target) {
+        public void setTarget(Class target) {
             if (!Modifier.isPublic(target.getModifiers())) {
                 setNamePrefix(target.getName());
             }
-
             this.target = target;
         }
 
@@ -104,6 +95,7 @@ public abstract class BaseBeanCopier {
 
         @Override
         protected ClassLoader getDefaultClassLoader() {
+            // L.cm 保证 和 返回使用同一个 ClassLoader
             return target.getClassLoader();
         }
 
@@ -113,7 +105,6 @@ public abstract class BaseBeanCopier {
         }
 
         public BaseBeanCopier create() {
-            Object key = KEY_FACTORY.newInstance(source.getName(), target.getName(), useConverter);
             return (BaseBeanCopier) super.create(key);
         }
 
@@ -124,7 +115,7 @@ public abstract class BaseBeanCopier {
             ClassEmitter ce = new ClassEmitter(v);
             ce.begin_class(Constants.V1_2,
                     Constants.ACC_PUBLIC,
-                    getClassName(),
+                    this.className,
                     BEAN_COPIER,
                     null,
                     Constants.SOURCE_FILE);
@@ -194,5 +185,24 @@ public abstract class BaseBeanCopier {
         protected Object nextInstance(Object instance) {
             return instance;
         }
+
+        @Override
+        protected Class generate(ClassLoaderData data) {
+            // 生成类名
+            data.reserveName(generateClassName(data.getUniqueNamePredicate()));
+            try {
+                return MethodHandles.lookup()
+                        .defineClass(DefaultGeneratorStrategy.INSTANCE.generate(this))
+                        .asSubclass(BaseBeanCopier.class);
+            } catch (Exception ex) {
+                throw new CodeGenerationException(ex);
+            }
+        }
+
+        private String generateClassName(Predicate nameTestPredicate) {
+            this.className = DefaultNamingPolicy.INSTANCE.getClassName(BEAN_NAME_PREFIX, BEAN_NAME_PREFIX, key, nameTestPredicate);
+            return this.className;
+        }
+
     }
 }

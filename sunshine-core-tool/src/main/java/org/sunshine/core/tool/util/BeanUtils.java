@@ -1,5 +1,7 @@
 package org.sunshine.core.tool.util;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.TypeReference;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.BeansException;
@@ -42,20 +44,24 @@ public class BeanUtils extends org.springframework.beans.BeanUtils {
      * @param callBack: 回调函数
      * @return 目标类集合
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public static <S, T> List<T> copyListProperties(List<S> sources, Supplier<T> target, BeanCallBack<S, T> callBack) {
         List<T> list = new ArrayList<>(sources.size());
         T t;
         for (S source : sources) {
+            if (source == null) {
+                list.add(null);
+                continue;
+            }
             t = target.get();
-            if (source instanceof Map) {
-                t = (T) toBean((Map<String, ?>) source, t.getClass());
+            if (source instanceof Map map) {
+                t = (T) toBean(map, t.getClass());
             } else {
                 copyProperties(source, t);
             }
             list.add(t);
             if (callBack != null) {
-                // 回调
+                // 回调处理
                 callBack.callBack(source, t);
             }
         }
@@ -197,6 +203,9 @@ public class BeanUtils extends org.springframework.beans.BeanUtils {
      * @throws BeansException if the copying failed
      */
     public static <T> T copyProperties(Object source, Class<T> target) throws BeansException {
+        if (source == null) {
+            return null;
+        }
         T to = newInstance(target);
         BeanUtils.copyProperties(source, to);
         return to;
@@ -208,9 +217,12 @@ public class BeanUtils extends org.springframework.beans.BeanUtils {
      * @param bean 源对象
      * @return {Map}
      */
-    @SuppressWarnings("unchecked")
     public static Map<String, Object> toMap(Object bean) {
-        return BeanMap.create(bean);
+        return JSON.parseObject(
+                JSON.toJSONString(bean),
+                new TypeReference<>() {
+                }
+        );
     }
 
     /**
@@ -221,10 +233,8 @@ public class BeanUtils extends org.springframework.beans.BeanUtils {
      * @param <T>       泛型标记
      * @return {T}
      */
-    public static <T> T toBean(Map<String, ?> beanMap, Class<T> valueType) {
-        T bean = BeanUtils.newInstance(valueType);
-        BeanMap.create(bean).putAll(beanMap);
-        return bean;
+    public static <T> T toBean(Map<String, Object> beanMap, Class<T> valueType) {
+        return JSON.parseObject(JSON.toJSONString(beanMap), valueType);
     }
 
     /**
