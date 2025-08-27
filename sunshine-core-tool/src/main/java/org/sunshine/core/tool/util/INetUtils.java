@@ -26,7 +26,7 @@ public class INetUtils {
             InetAddress address = InetAddress.getLocalHost();
             // force a best effort reverse DNS lookup
             hostname = address.getHostName();
-            if (hostname == null || "".equals(hostname)) {
+            if (hostname == null || hostname.isEmpty()) {
                 hostname = address.toString();
             }
         } catch (UnknownHostException ignore) {
@@ -46,7 +46,7 @@ public class INetUtils {
             InetAddress address = INetUtils.getLocalHostLANAddress();
             // force a best effort reverse DNS lookup
             hostAddress = address.getHostAddress();
-            if (hostAddress == null || "".equals(hostAddress)) {
+            if (hostAddress == null || hostAddress.isEmpty()) {
                 hostAddress = address.toString();
             }
         } catch (UnknownHostException ignore) {
