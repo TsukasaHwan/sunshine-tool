@@ -40,7 +40,7 @@ public class SpringUtils implements ApplicationContextAware {
     }
 
     public static <T> T getBean(String beanName, Class<T> clazz) {
-        if (null == beanName || "".equals(beanName.trim())) {
+        if (null == beanName || beanName.trim().isEmpty()) {
             return null;
         }
         if (clazz == null) {
