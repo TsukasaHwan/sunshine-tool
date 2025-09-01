@@ -49,10 +49,6 @@ public class BeanUtils extends org.springframework.beans.BeanUtils {
         List<T> list = new ArrayList<>(sources.size());
         T t;
         for (S source : sources) {
-            if (source == null) {
-                list.add(null);
-                continue;
-            }
             t = target.get();
             if (source instanceof Map map) {
                 t = (T) toBean(map, t.getClass());
