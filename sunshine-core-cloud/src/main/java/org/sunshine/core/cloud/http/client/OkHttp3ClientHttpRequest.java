@@ -25,7 +25,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
@@ -110,7 +109,6 @@ public class OkHttp3ClientHttpRequest extends AbstractStreamingClientHttpRequest
             return this.headers.getContentLength();
         }
 
-        @Nullable
         @Override
         public MediaType contentType() {
             String contentType = this.headers.getFirst(HttpHeaders.CONTENT_TYPE);
