@@ -199,9 +199,6 @@ public class BeanUtils extends org.springframework.beans.BeanUtils {
      * @throws BeansException if the copying failed
      */
     public static <T> T copyProperties(Object source, Class<T> target) throws BeansException {
-        if (source == null) {
-            return null;
-        }
         T to = newInstance(target);
         BeanUtils.copyProperties(source, to);
         return to;
