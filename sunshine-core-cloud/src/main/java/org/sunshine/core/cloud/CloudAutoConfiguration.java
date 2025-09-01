@@ -21,6 +21,8 @@ import org.sunshine.core.cloud.header.FeignRequestInterceptor;
 import org.sunshine.core.cloud.properties.FeignHeadersProperties;
 import org.sunshine.core.tool.api.response.Result;
 
+import java.nio.charset.StandardCharsets;
+
 /**
  * @author Teamo
  * @since 2023/6/14
@@ -51,6 +53,7 @@ public class CloudAutoConfiguration {
             // Return 429 (Too Many Requests) by default.
             response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setCharacterEncoding(StandardCharsets.UTF_8.name());
             response.getWriter().print(JSON.toJSONString(Result.fail(e.getMessage())));
         };
     }
