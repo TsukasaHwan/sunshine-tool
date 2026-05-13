@@ -14,7 +14,7 @@ public class NameMask extends PartMask implements MaskStrategy {
 
     @Override
     public String mask(String source, int[] params) {
-        if (source == null || source.length() == 0) {
+        if (source == null || source.isEmpty()) {
             return source;
         }
         if (source.length() <= 3) {

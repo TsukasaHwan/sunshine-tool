@@ -1,9 +1,9 @@
 package org.sunshine.core.cloud.header;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.NamedThreadLocal;
 import org.springframework.http.HttpHeaders;
-import org.springframework.lang.Nullable;
 import org.sunshine.core.cloud.properties.FeignHeadersProperties;
 import org.sunshine.core.tool.util.StringUtils;
 import org.sunshine.core.tool.util.WebUtils;

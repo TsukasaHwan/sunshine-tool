@@ -1,7 +1,7 @@
 package org.sunshine.core.cloud.header;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpHeaders;
-import org.springframework.lang.Nullable;
 import org.sunshine.core.cloud.properties.FeignHeadersProperties;
 
 import java.util.concurrent.Callable;
