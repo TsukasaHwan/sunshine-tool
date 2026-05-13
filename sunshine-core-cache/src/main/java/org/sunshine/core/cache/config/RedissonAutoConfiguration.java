@@ -12,11 +12,11 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.data.redis.autoconfigure.DataRedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.sunshine.core.cache.aspect.DistributedLockAspect;
-import org.sunshine.core.cache.properties.RedissonProperties;
+import org.sunshine.core.cache.properties.DataRedissonProperties;
 import org.sunshine.core.cache.redisson.DistributedTaskExecutor;
 import org.sunshine.core.cache.redisson.RedissonLockTemplate;
 import org.sunshine.core.cache.redisson.queue.DelayedQueueListener;
@@ -33,15 +33,15 @@ import java.util.List;
  */
 @AutoConfiguration
 @ConditionalOnProperty(prefix = "spring.data.redis.redisson", name = "enable", havingValue = "true")
-@EnableConfigurationProperties({RedisProperties.class, RedissonProperties.class})
+@EnableConfigurationProperties({DataRedisProperties.class, DataRedissonProperties.class})
 public class RedissonAutoConfiguration {
 
     private static final String REDIS_PROTOCOL_PREFIX = "redis://";
 
-    private final RedisProperties redisProperties;
+    private final DataRedisProperties dataRedisProperties;
 
-    public RedissonAutoConfiguration(RedisProperties redisProperties) {
-        this.redisProperties = redisProperties;
+    public RedissonAutoConfiguration(DataRedisProperties dataRedisProperties) {
+        this.dataRedisProperties = dataRedisProperties;
     }
 
     /**
@@ -55,10 +55,12 @@ public class RedissonAutoConfiguration {
     public RedissonClient redissonClient() {
         Config config = new Config();
         SingleServerConfig singleServerConfig = config.useSingleServer();
-        singleServerConfig.setAddress(REDIS_PROTOCOL_PREFIX + redisProperties.getHost() + ":" + redisProperties.getPort());
-        singleServerConfig.setTimeout((int) redisProperties.getTimeout().toMillis());
-        singleServerConfig.setDatabase(redisProperties.getDatabase());
-        String password = redisProperties.getPassword();
+        singleServerConfig.setAddress(REDIS_PROTOCOL_PREFIX + dataRedisProperties.getHost() + ":" + dataRedisProperties.getPort());
+        if (dataRedisProperties.getTimeout() != null) {
+            singleServerConfig.setTimeout((int) dataRedisProperties.getTimeout().toMillis());
+        }
+        singleServerConfig.setDatabase(dataRedisProperties.getDatabase());
+        String password = dataRedisProperties.getPassword();
         if (StringUtils.isNotBlank(password)) {
             singleServerConfig.setPassword(password);
         }

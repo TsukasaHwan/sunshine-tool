@@ -6,8 +6,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.data.redis.autoconfigure.DataRedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.stream.Consumer;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
@@ -21,7 +21,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.Assert;
 import org.sunshine.core.cache.RedisMQTemplate;
 import org.sunshine.core.cache.RedisMQTemplateImpl;
-import org.sunshine.core.cache.properties.RedisStreamProperties;
+import org.sunshine.core.cache.properties.DataRedisStreamProperties;
 import org.sunshine.core.cache.redisson.DistributedTaskExecutor;
 import org.sunshine.core.cache.stream.AbstractStreamListener;
 import org.sunshine.core.cache.stream.StreamDeadLetterQueueProcessor;
@@ -35,16 +35,16 @@ import java.util.concurrent.RejectedExecutionHandler;
  * @since 2023/5/26
  */
 @AutoConfiguration(after = {CacheAutoConfiguration.class, RedissonAutoConfiguration.class})
-@EnableConfigurationProperties({RedisProperties.class, RedisStreamProperties.class})
+@EnableConfigurationProperties({org.springframework.data.redis.support.collections.RedisProperties.class, DataRedisStreamProperties.class})
 public class RedisStreamAutoConfiguration {
 
-    private final RedisProperties redisProperties;
-    private final RedisStreamProperties redisStreamProperties;
+    private final DataRedisProperties dataRedisProperties;
+    private final DataRedisStreamProperties dataRedisStreamProperties;
 
-    public RedisStreamAutoConfiguration(RedisProperties redisProperties,
-                                        RedisStreamProperties redisStreamProperties) {
-        this.redisProperties = redisProperties;
-        this.redisStreamProperties = redisStreamProperties;
+    public RedisStreamAutoConfiguration(DataRedisProperties dataRedisProperties,
+                                        DataRedisStreamProperties dataRedisStreamProperties) {
+        this.dataRedisProperties = dataRedisProperties;
+        this.dataRedisStreamProperties = dataRedisStreamProperties;
     }
 
     /**
@@ -74,18 +74,20 @@ public class RedisStreamAutoConfiguration {
     public StreamMessageListenerContainer<String, ObjectRecord<String, String>> streamMessageListenerContainer(List<AbstractStreamListener<?>> listeners,
                                                                                                                RedisMQTemplate redisMQTemplate) {
         StreamMessageListenerContainer.StreamMessageListenerContainerOptionsBuilder<String, ObjectRecord<String, String>> optionsBuilder = StreamMessageListenerContainer.StreamMessageListenerContainerOptions.builder()
-                .batchSize(redisStreamProperties.getBatchSize())
+                .batchSize(dataRedisStreamProperties.getBatchSize())
                 .keySerializer(RedisSerializer.string())
                 .hashKeySerializer(RedisSerializer.string())
                 .hashValueSerializer(new FastJsonRedisSerializer<>(String.class))
                 .objectMapper(new ObjectHashMapper())
                 .targetType(String.class);
-        if (redisStreamProperties.getThreadPool().getEnabled()) {
+        if (dataRedisStreamProperties.getThreadPool().getEnabled()) {
             optionsBuilder.executor(redisStreamThreadPoolExecutor());
         }
         StreamMessageListenerContainer.StreamMessageListenerContainerOptions<String, ObjectRecord<String, String>> options = optionsBuilder.build();
 
-        Assert.isTrue(options.getPollTimeout().compareTo(redisProperties.getTimeout()) < 0, "Poll timeout must be smaller than 'spring.redis.timeout'!");
+        if (dataRedisProperties.getTimeout() != null) {
+            Assert.isTrue(options.getPollTimeout().compareTo(dataRedisProperties.getTimeout()) < 0, "Poll timeout must be smaller than 'spring.redis.timeout'!");
+        }
 
         StreamMessageListenerContainer<String, ObjectRecord<String, String>> container = StreamMessageListenerContainer
                 .create(redisMQTemplate.redisTemplate().getRequiredConnectionFactory(), options);
@@ -131,7 +133,7 @@ public class RedisStreamAutoConfiguration {
      * @return 配置好的ThreadPoolTaskExecutor实例
      */
     private ThreadPoolTaskExecutor redisStreamThreadPoolExecutor() {
-        RedisStreamProperties.ThreadPool threadPool = redisStreamProperties.getThreadPool();
+        DataRedisStreamProperties.ThreadPool threadPool = dataRedisStreamProperties.getThreadPool();
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(threadPool.getCorePoolSize());
         executor.setMaxPoolSize(threadPool.getMaxPoolSize());

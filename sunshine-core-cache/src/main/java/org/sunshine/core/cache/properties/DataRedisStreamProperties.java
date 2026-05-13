@@ -10,7 +10,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  * @since 2024/9/29
  */
 @ConfigurationProperties("spring.data.redis.stream")
-public class RedisStreamProperties {
+public class DataRedisStreamProperties {
 
     /**
      * 批量处理消息的数量。

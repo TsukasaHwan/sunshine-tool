@@ -1,50 +1,36 @@
 package org.sunshine.oauth2.authorization.server;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
+import org.springframework.security.config.annotation.web.configurers.oauth2.server.authorization.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
-import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
-import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
-import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
-import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
-import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.token.*;
-import org.springframework.security.oauth2.server.authorization.web.authentication.DelegatingAuthenticationConverter;
 import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2AuthorizationCodeAuthenticationConverter;
 import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2ClientCredentialsAuthenticationConverter;
 import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2RefreshTokenAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.DelegatingAuthenticationConverter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.Assert;
-import org.sunshine.oauth2.authorization.server.authentication.OAuth2PasswordAuthenticationConverter;
-import org.sunshine.oauth2.authorization.server.authentication.OAuth2PasswordAuthenticationProvider;
-import org.sunshine.oauth2.authorization.server.authorization.OAuth2AuthConsentServiceImpl;
-import org.sunshine.oauth2.authorization.server.authorization.OAuth2AuthServiceImpl;
-import org.sunshine.oauth2.authorization.server.authorization.OAuth2AuthedClientRepository;
-import org.sunshine.oauth2.authorization.server.entity.OAuth2Auth;
-import org.sunshine.oauth2.authorization.server.entity.OAuth2AuthConsent;
-import org.sunshine.oauth2.authorization.server.entity.OAuth2AuthedClient;
 import org.sunshine.oauth2.authorization.server.properties.OAuth2AuthorizationServerProperties;
 import org.sunshine.security.core.authentication.CommonAuthenticationEntryPoint;
 import org.sunshine.security.core.enums.RoleEnum;
@@ -69,7 +55,7 @@ public class AuthorizationServerConfiguration {
     }
 
     /**
-     * OAuth2 配置，默认禁用OpenID Connect 1.0
+     * OAuth2 配置，使用 OAuth 2.1 推荐的授权码模式
      *
      * @param http HttpSecurity
      * @return SecurityFilterChain
@@ -77,8 +63,7 @@ public class AuthorizationServerConfiguration {
      */
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
-    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http,
-                                                                      OAuth2PasswordAuthenticationProvider passwordAuthenticationProvider) throws Exception {
+    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
 
         http.sessionManagement(sessionManagementConfigurer -> sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
@@ -95,8 +80,7 @@ public class AuthorizationServerConfiguration {
                         Arrays.asList(
                                 new OAuth2AuthorizationCodeAuthenticationConverter(),
                                 new OAuth2RefreshTokenAuthenticationConverter(),
-                                new OAuth2ClientCredentialsAuthenticationConverter(),
-                                new OAuth2PasswordAuthenticationConverter()
+                                new OAuth2ClientCredentialsAuthenticationConverter()
                         )
                 )
         ));
@@ -112,8 +96,6 @@ public class AuthorizationServerConfiguration {
                 .with(authorizationServerConfigurer, oAuth2AuthorizationServerConfigurer -> {
                 });
 
-        http.authenticationProvider(passwordAuthenticationProvider);
-
         http.exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(new CommonAuthenticationEntryPoint()));
 
         http.csrf(AbstractHttpConfigurer::disable);
@@ -121,43 +103,6 @@ public class AuthorizationServerConfiguration {
         http.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
 
         return http.build();
-    }
-
-    /**
-     * 客户端应用
-     *
-     * @return RegisteredClientRepository
-     */
-    @Bean
-    @ConditionalOnMissingBean(RegisteredClientRepository.class)
-    public RegisteredClientRepository registeredClientRepository(@Autowired(required = false) BaseMapper<OAuth2AuthedClient> oAuth2AuthedClientMapper) {
-        return new OAuth2AuthedClientRepository(oAuth2AuthedClientMapper);
-    }
-
-    /**
-     * 令牌发放记录
-     *
-     * @param registeredClientRepository 注册客户端存储库
-     * @return OAuth2AuthorizationService
-     */
-    @Bean
-    @ConditionalOnMissingBean(OAuth2AuthorizationService.class)
-    public OAuth2AuthorizationService authorizationService(@Autowired(required = false) BaseMapper<OAuth2Auth> oAuth2AuthMapper,
-                                                           RegisteredClientRepository registeredClientRepository) {
-        return new OAuth2AuthServiceImpl(oAuth2AuthMapper, registeredClientRepository);
-    }
-
-    /**
-     * 资源拥有者授权
-     *
-     * @param registeredClientRepository 注册客户端存储库
-     * @return OAuth2AuthorizationConsentService
-     */
-    @Bean
-    @ConditionalOnMissingBean(OAuth2AuthorizationConsentService.class)
-    public OAuth2AuthorizationConsentService authorizationConsentService(@Autowired(required = false) BaseMapper<OAuth2AuthConsent> oAuth2AuthConsentMapper,
-                                                                         RegisteredClientRepository registeredClientRepository) {
-        return new OAuth2AuthConsentServiceImpl(oAuth2AuthConsentMapper, registeredClientRepository);
     }
 
     /**
@@ -266,18 +211,4 @@ public class AuthorizationServerConfiguration {
         return AuthorizationServerSettings.builder().build();
     }
 
-    /**
-     * OAuth2.1添加password模式支持
-     *
-     * @param authenticationManager {@link AuthenticationManager}
-     * @param authorizationService  {@link AuthorizationServerConfiguration#authorizationService(BaseMapper, RegisteredClientRepository)}
-     * @param tokenGenerator        {@link AuthorizationServerConfiguration#tokenGenerator(JwtEncoder, OAuth2TokenCustomizer)}
-     * @return OAuth2PasswordAuthenticationProvider
-     */
-    @Bean
-    public OAuth2PasswordAuthenticationProvider passwordAuthenticationProvider(AuthenticationManager authenticationManager,
-                                                                               OAuth2AuthorizationService authorizationService,
-                                                                               OAuth2TokenGenerator<?> tokenGenerator) {
-        return new OAuth2PasswordAuthenticationProvider(authenticationManager, authorizationService, tokenGenerator);
-    }
 }

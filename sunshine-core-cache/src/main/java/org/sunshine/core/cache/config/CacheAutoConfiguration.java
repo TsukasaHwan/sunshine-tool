@@ -4,16 +4,14 @@ import com.alibaba.fastjson2.JSONReader;
 import com.alibaba.fastjson2.JSONWriter;
 import com.alibaba.fastjson2.support.config.FastJsonConfig;
 import com.alibaba.fastjson2.support.spring6.data.redis.FastJsonRedisSerializer;
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
+import org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
@@ -24,7 +22,7 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.cache.RedisCacheWriter;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.JacksonJsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -33,6 +31,9 @@ import org.sunshine.core.cache.RedisClient;
 import org.sunshine.core.cache.RedisClientImpl;
 import org.sunshine.core.cache.aspect.RateLimitAspect;
 import org.sunshine.core.cache.support.CustomCacheManager;
+import tools.jackson.databind.DefaultTyping;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
@@ -43,7 +44,7 @@ import java.util.concurrent.TimeUnit;
  */
 @EnableCaching
 @AutoConfiguration
-@AutoConfigureBefore(RedisAutoConfiguration.class)
+@AutoConfigureBefore(DataRedisAutoConfiguration.class)
 public class CacheAutoConfiguration {
 
     private final static Logger log = LoggerFactory.getLogger(CacheAutoConfiguration.class);
@@ -117,12 +118,16 @@ public class CacheAutoConfiguration {
     @SuppressWarnings("deprecation")
     private RedisSerializer<?> getRedisSerializer(RedisSerializer<?> redisSerializer) {
         Assert.notNull(redisSerializer, "RedisSerializer must not be null!");
-        if (redisSerializer instanceof Jackson2JsonRedisSerializer<?>) {
-            ObjectMapper om = new ObjectMapper();
-            om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-            om.activateDefaultTyping(om.getPolymorphicTypeValidator(), ObjectMapper.DefaultTyping.NON_FINAL);
-            om.findAndRegisterModules();
-            redisSerializer = new Jackson2JsonRedisSerializer<>(om, Object.class);
+        if (redisSerializer instanceof JacksonJsonRedisSerializer<?>) {
+            // 1. 在 Builder 中完成所有配置
+            BasicPolymorphicTypeValidator ptv = BasicPolymorphicTypeValidator.builder().build();
+            JsonMapper jm = JsonMapper.builder()
+                    .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.ALWAYS))
+                    .activateDefaultTyping(ptv, DefaultTyping.NON_FINAL)
+                    .findAndAddModules()
+                    .build();
+
+            redisSerializer = new JacksonJsonRedisSerializer<>(jm, Object.class);
         } else if (redisSerializer instanceof FastJsonRedisSerializer<?> fastJsonRedisSerializer) {
             FastJsonConfig fastJsonConfig = fastJsonRedisSerializer.getFastJsonConfig();
             fastJsonConfig.setReaderFeatures(

@@ -1,6 +1,5 @@
 package org.sunshine.enums.conversion.converter;
 
-
 import jakarta.persistence.AttributeConverter;
 import org.sunshine.enums.core.enums.CodeEnum;
 
@@ -43,7 +42,7 @@ public abstract class AbstractEnumConverter<S extends CodeEnum, M extends Number
         }
         //获取 子类中 <S,T> 规定的参数类型
         Type[] actualTypeArguments = ((ParameterizedType) (getClass().getGenericSuperclass())).getActualTypeArguments();
-        if (actualTypeArguments != null && actualTypeArguments.length > 0) {
+        if (actualTypeArguments.length > 0) {
             //获取第一个泛型参数 S
             Class<S> clazz = (Class<S>) actualTypeArguments[0];
             //判断是否是枚举类,获取枚举的所有实例

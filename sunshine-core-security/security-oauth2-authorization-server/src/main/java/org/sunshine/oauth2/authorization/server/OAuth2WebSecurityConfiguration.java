@@ -19,15 +19,14 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.web.servlet.mvc.condition.PathPatternsRequestCondition;
-import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.sunshine.core.tool.util.ClassUtils;
 import org.sunshine.oauth2.authorization.server.properties.OAuth2AuthorizationServerProperties;
 import org.sunshine.security.core.DefaultSecurityConfiguration;
 import org.sunshine.security.core.access.CommonAccessDeniedHandler;
 import org.sunshine.security.core.authentication.CommonAuthenticationEntryPoint;
-import org.sunshine.security.core.support.PathPatternRequestMatcher;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -95,8 +94,7 @@ public class OAuth2WebSecurityConfiguration {
     @ConditionalOnMissingBean(DaoAuthenticationProvider.class)
     public DaoAuthenticationProvider daoAuthenticationProvider(UserDetailsService userDetailsService,
                                                                PasswordEncoder passwordEncoder) {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService);
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder);
         // 是否隐藏用户不存在异常，默认:true-隐藏；false-抛出异常；
         provider.setHideUserNotFoundExceptions(false);
@@ -107,8 +105,7 @@ public class OAuth2WebSecurityConfiguration {
         List<PathPatternRequestMatcher> matchers = new ArrayList<>(16);
         RequestMappingHandlerMapping mapping = this.context.getBean(RequestMappingHandlerMapping.class);
         mapping.getHandlerMethods().forEach((requestMappingInfo, handlerMethod) -> {
-            if (requestMappingInfo == null ||
-                ClassUtils.getAnnotation(handlerMethod, PermitAll.class) == null) {
+            if (ClassUtils.getAnnotation(handlerMethod, PermitAll.class) == null) {
                 return;
             }
 
@@ -116,14 +113,9 @@ public class OAuth2WebSecurityConfiguration {
             Set<String> patterns = new LinkedHashSet<>(16);
             PathPatternsRequestCondition pathPatternsCondition = requestMappingInfo.getPathPatternsCondition();
             if (pathPatternsCondition == null) {
-                PatternsRequestCondition patternsRequestCondition = requestMappingInfo.getPatternsCondition();
-                if (patternsRequestCondition == null) {
-                    return;
-                }
-                patterns.addAll(patternsRequestCondition.getPatterns());
-            } else {
-                patterns.addAll(pathPatternsCondition.getPatternValues());
+                return;
             }
+            patterns.addAll(pathPatternsCondition.getPatternValues());
 
             requestMappingInfo.getMethodsCondition().getMethods().forEach(requestMethod -> {
                 HttpMethod httpMethod = HttpMethod.valueOf(requestMethod.name());

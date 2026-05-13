@@ -6,7 +6,7 @@
 
     <groupId>org.sunshine</groupId>
     <artifactId>sunshine-tool</artifactId>
-    <version>2.0-SNAPSHOT</version>
+    <version>${revision}</version>
     <name>sunshine-tool</name>
     <description>
         Talk is cheap, show me the code.
@@ -41,14 +41,15 @@
     <packaging>pom</packaging>
 
     <properties>
-        <java.version>17</java.version>
+        <revision>3.0-SNAPSHOT</revision>
+
+        <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <spring-boot.version>3.2.9</spring-boot.version>
-        <spring-cloud.version>2023.0.3</spring-cloud.version>
-        <spring-cloud-alibaba.version>2023.0.3.2</spring-cloud-alibaba.version>
-        <spring-security-oauth2-server.version>1.2.6</spring-security-oauth2-server.version>
+        <spring-boot.version>4.0.6</spring-boot.version>
+        <spring-cloud.version>2025.1.0</spring-cloud.version>
+        <spring-cloud-alibaba.version>2025.1.0.0</spring-cloud-alibaba.version>
         <guava.version>33.4.8-jre</guava.version>
 
         <mybatis-plus.version>3.5.14</mybatis-plus.version>
@@ -153,6 +154,33 @@
                 <artifactId>maven-deploy-plugin</artifactId>
                 <version>2.8</version>
             </plugin>
+
+            <!-- 新增：flatten 插件，解决 install/deploy 时 ${revision} 不被替换的问题 -->
+            <!--<plugin>-->
+            <!--    <groupId>org.codehaus.mojo</groupId>-->
+            <!--    <artifactId>flatten-maven-plugin</artifactId>-->
+            <!--    <version>1.6.0</version>-->
+            <!--    <configuration>-->
+            <!--        <updatePomFile>true</updatePomFile>-->
+            <!--        <flattenMode>resolveCiFriendliesOnly</flattenMode>-->
+            <!--    </configuration>-->
+            <!--    <executions>-->
+            <!--        <execution>-->
+            <!--            <id>flatten</id>-->
+            <!--            <phase>process-resources</phase>-->
+            <!--            <goals>-->
+            <!--                <goal>flatten</goal>-->
+            <!--            </goals>-->
+            <!--        </execution>-->
+            <!--        <execution>-->
+            <!--            <id>flatten.clean</id>-->
+            <!--            <phase>clean</phase>-->
+            <!--            <goals>-->
+            <!--                <goal>clean</goal>-->
+            <!--            </goals>-->
+            <!--        </execution>-->
+            <!--    </executions>-->
+            <!--</plugin>-->
         </plugins>
     </build>
 

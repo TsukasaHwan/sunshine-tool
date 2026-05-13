@@ -2,7 +2,7 @@ package org.sunshine.core.tool.config;
 
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.boot.web.server.autoconfigure.ServerProperties;
 import org.sunshine.core.tool.util.INetUtils;
 
 /**

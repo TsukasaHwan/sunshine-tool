@@ -1,6 +1,6 @@
 package org.sunshine.enums.conversion;
 
-import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.persistence.autoconfigure.EntityScan;
 
 /**
  * @author: Teamo

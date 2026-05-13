@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 import org.sunshine.core.cloud.http.LbRestTemplate;
 import org.sunshine.core.cloud.http.RestTemplateHeaderInterceptor;
@@ -180,7 +180,7 @@ public class RestTemplateAutoConfiguration {
     }
 
     private void configMessageConverters(List<HttpMessageConverter<?>> converters) {
-        converters.removeIf(x -> x instanceof StringHttpMessageConverter || x instanceof MappingJackson2HttpMessageConverter);
+        converters.removeIf(x -> x instanceof StringHttpMessageConverter || x instanceof JacksonJsonHttpMessageConverter);
         converters.add(new StringHttpMessageConverter(StandardCharsets.UTF_8));
         FastJsonHttpMessageConverter fastJsonConverter = new FastJsonHttpMessageConverter();
         FastJsonConfig config = new FastJsonConfig();

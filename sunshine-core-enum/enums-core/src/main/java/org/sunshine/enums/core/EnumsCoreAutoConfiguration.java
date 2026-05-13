@@ -1,35 +1,38 @@
 package org.sunshine.enums.core;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.sunshine.enums.core.mvc.JsonEnumConverter;
 import org.sunshine.enums.core.mvc.MvcConfiguration;
+import org.sunshine.enums.core.serializer.JsonEnumDeserializer;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.module.SimpleModule;
 
 /**
- * @author sneb
- * @description
- * @since 2022-11-09 10:06
- **/
+ * @author Teamo
+ * @since 2025-05-13
+ */
 @AutoConfiguration
 public class EnumsCoreAutoConfiguration {
 
     @Bean
-    @ConditionalOnBean(ObjectMapper.class)
-    public JsonEnumConverter jsonEnumConverter(MappingJackson2HttpMessageConverter httpMessageConverter,
-                                               ObjectMapper objectMapper) {
-        return new JsonEnumConverter(httpMessageConverter, objectMapper);
+    @ConditionalOnBean(JsonMapper.class)
+    public JsonMapper jsonMapper() {
+        SimpleModule simpleModule = new SimpleModule();
+        // 为所有Enum类型注册自定义反序列化器
+        simpleModule.addDeserializer(Enum.class, new JsonEnumDeserializer());
+
+        return JsonMapper.builder()
+                .addModule(simpleModule)
+                .build();
     }
 
     @Bean
-    @ConditionalOnMissingBean(MappingJackson2HttpMessageConverter.class)
-    public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
-        return new MappingJackson2HttpMessageConverter();
+    public JacksonJsonHttpMessageConverter jacksonJsonHttpMessageConverter(JsonMapper jsonMapper) {
+        return new JacksonJsonHttpMessageConverter(jsonMapper);
     }
 
     @Bean

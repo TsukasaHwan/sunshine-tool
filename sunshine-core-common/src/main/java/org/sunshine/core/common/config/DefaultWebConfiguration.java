@@ -5,17 +5,17 @@ import com.alibaba.fastjson2.JSONWriter;
 import com.alibaba.fastjson2.support.config.FastJsonConfig;
 import com.alibaba.fastjson2.support.spring6.http.converter.FastJsonHttpMessageConverter;
 import org.hibernate.validator.BaseHibernateValidatorConfiguration;
+import org.jspecify.annotations.NonNull;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.validation.ValidationConfigurationCustomizer;
+import org.springframework.boot.validation.autoconfigure.ValidationConfigurationCustomizer;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverters;
 import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.lang.NonNull;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -31,7 +31,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Collections;
-import java.util.List;
 
 /**
  * @author Teamo
@@ -43,10 +42,10 @@ public class DefaultWebConfiguration implements WebMvcConfigurer {
     /**
      * 集成fastJson
      *
-     * @param converters 添加消息转换器的列表（最初是一个空列表）
+     * @param builder ServerBuilder
      */
     @Override
-    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+    public void configureMessageConverters(HttpMessageConverters.ServerBuilder builder) {
         FastJsonHttpMessageConverter fastJsonConverter = new FastJsonHttpMessageConverter();
         FastJsonConfig config = new FastJsonConfig();
         config.setReaderFeatures(JSONReader.Feature.FieldBased, JSONReader.Feature.SupportArrayToBean);
@@ -56,8 +55,8 @@ public class DefaultWebConfiguration implements WebMvcConfigurer {
         fastJsonConverter.setSupportedMediaTypes(Collections.singletonList(MediaType.APPLICATION_JSON));
         fastJsonConverter.setFastJsonConfig(config);
         fastJsonConverter.setDefaultCharset(StandardCharsets.UTF_8);
-        converters.add(0, fastJsonConverter);
-        converters.add(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
+        builder.withJsonConverter(fastJsonConverter)
+                .withStringConverter(new StringHttpMessageConverter(StandardCharsets.UTF_8));
     }
 
     @Override

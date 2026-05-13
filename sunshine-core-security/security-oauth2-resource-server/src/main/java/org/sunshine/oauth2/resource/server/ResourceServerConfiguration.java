@@ -21,8 +21,8 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.web.servlet.mvc.condition.PathPatternsRequestCondition;
-import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.sunshine.core.tool.util.ClassUtils;
 import org.sunshine.oauth2.resource.server.properties.OAuth2ResourceServerProperties;
@@ -31,7 +31,6 @@ import org.sunshine.security.core.access.CommonAccessDeniedHandler;
 import org.sunshine.security.core.authentication.CommonAuthenticationEntryPoint;
 import org.sunshine.security.core.enums.RoleEnum;
 import org.sunshine.security.core.oauth2.TokenConstant;
-import org.sunshine.security.core.support.PathPatternRequestMatcher;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -113,8 +112,7 @@ public class ResourceServerConfiguration {
         List<PathPatternRequestMatcher> matchers = new ArrayList<>(16);
         RequestMappingHandlerMapping mapping = this.context.getBean(RequestMappingHandlerMapping.class);
         mapping.getHandlerMethods().forEach((requestMappingInfo, handlerMethod) -> {
-            if (requestMappingInfo == null ||
-                ClassUtils.getAnnotation(handlerMethod, PermitAll.class) == null) {
+            if (ClassUtils.getAnnotation(handlerMethod, PermitAll.class) == null) {
                 return;
             }
 
@@ -122,14 +120,9 @@ public class ResourceServerConfiguration {
             Set<String> patterns = new LinkedHashSet<>(16);
             PathPatternsRequestCondition pathPatternsCondition = requestMappingInfo.getPathPatternsCondition();
             if (pathPatternsCondition == null) {
-                PatternsRequestCondition patternsRequestCondition = requestMappingInfo.getPatternsCondition();
-                if (patternsRequestCondition == null) {
-                    return;
-                }
-                patterns.addAll(patternsRequestCondition.getPatterns());
-            } else {
-                patterns.addAll(pathPatternsCondition.getPatternValues());
+                return;
             }
+            patterns.addAll(pathPatternsCondition.getPatternValues());
 
             requestMappingInfo.getMethodsCondition().getMethods().forEach(requestMethod -> {
                 HttpMethod httpMethod = HttpMethod.valueOf(requestMethod.name());

@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @since 2022/01/07
  */
 @ConfigurationProperties("spring.data.redis.redisson")
-public class RedissonProperties {
+public class DataRedissonProperties {
 
     /**
      * Whether to enable
