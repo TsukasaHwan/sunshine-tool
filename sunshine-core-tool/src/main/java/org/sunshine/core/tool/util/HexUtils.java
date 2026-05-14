@@ -1,6 +1,6 @@
 package org.sunshine.core.tool.util;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -96,8 +96,7 @@ public class HexUtils {
      * @param data Hex data
      * @return decode hex to bytes
      */
-    @Nullable
-    public static byte[] decode(@Nullable String data) {
+    public static byte @Nullable [] decode(@Nullable String data) {
         if (StringUtils.isBlank(data)) {
             return null;
         }

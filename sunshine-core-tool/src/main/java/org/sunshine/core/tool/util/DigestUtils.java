@@ -1,6 +1,6 @@
 package org.sunshine.core.tool.util;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -77,7 +77,7 @@ public class DigestUtils extends org.springframework.util.DigestUtils {
         return slowEquals(a.getBytes(StandardCharsets.UTF_8), b.getBytes(StandardCharsets.UTF_8));
     }
 
-    public static boolean slowEquals(@Nullable byte[] a, @Nullable byte[] b) {
+    public static boolean slowEquals(byte @Nullable [] a, byte @Nullable [] b) {
         if (a == null || b == null) {
             return false;
         }

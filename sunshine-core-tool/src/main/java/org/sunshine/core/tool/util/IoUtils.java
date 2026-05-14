@@ -1,6 +1,6 @@
 package org.sunshine.core.tool.util;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.StreamUtils;
 
 import java.io.*;
@@ -154,7 +154,7 @@ public class IoUtils extends StreamUtils {
      * @param output 要写入的OutputStream
      * @throws IOException 如果发生 I/O 错误
      */
-    public static void write(@Nullable final byte[] bytes, final OutputStream output) throws IOException {
+    public static void write(final byte @Nullable [] bytes, final OutputStream output) throws IOException {
         if (bytes != null) {
             output.write(bytes);
         }

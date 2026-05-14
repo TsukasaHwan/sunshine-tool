@@ -1,6 +1,6 @@
 package org.sunshine.core.tool.util;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Teamo
