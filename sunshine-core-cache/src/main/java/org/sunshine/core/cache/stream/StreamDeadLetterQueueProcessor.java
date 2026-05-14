@@ -117,9 +117,9 @@ public class StreamDeadLetterQueueProcessor {
                 }
                 // 重新投递
                 streamOperations.add(StreamRecords.newRecord()
-                        .ofObject(records.get(0).getValue())
+                        .ofObject(records.getFirst().getValue())
                         .withStreamKey(streamKey));
-                streamOperations.acknowledge(group, records.get(0));
+                streamOperations.acknowledge(group, records.getFirst());
                 logger.info("[RETRY_SUCCESS] 消息{}重新投递成功，流键：{}", recordId, streamKey);
             });
         });

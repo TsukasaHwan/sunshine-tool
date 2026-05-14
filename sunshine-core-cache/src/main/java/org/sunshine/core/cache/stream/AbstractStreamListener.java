@@ -1,6 +1,7 @@
 package org.sunshine.core.cache.stream;
 
 import com.alibaba.fastjson2.JSON;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +19,7 @@ import java.lang.reflect.Type;
  * @since 2023/5/26
  */
 public abstract class AbstractStreamListener<T extends AbstractStreamMessage>
-        implements StreamListener<String, ObjectRecord<String, String>> {
+        implements StreamListener<String, @NonNull ObjectRecord<String, String>> {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractStreamListener.class);
 
