@@ -1,6 +1,7 @@
 package org.sunshine.core.tool.config;
 
 import jakarta.servlet.DispatcherType;
+import org.jspecify.annotations.NonNull;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -34,8 +35,8 @@ public class XssConfiguration {
      * 全局过滤器
      */
     @Bean
-    public FilterRegistrationBean<RequestFilter> xssFilterBean() {
-        FilterRegistrationBean<RequestFilter> registration = new FilterRegistrationBean<>();
+    public FilterRegistrationBean<@NonNull RequestFilter> xssFilterBean() {
+        FilterRegistrationBean<@NonNull RequestFilter> registration = new FilterRegistrationBean<>();
         registration.setDispatcherTypes(DispatcherType.REQUEST);
         registration.setFilter(new RequestFilter(requestProperties, xssProperties));
         registration.addUrlPatterns("/*");

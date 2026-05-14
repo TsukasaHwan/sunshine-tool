@@ -2,6 +2,7 @@ package org.sunshine.core.cache.config;
 
 import com.alibaba.fastjson2.support.spring6.data.redis.FastJsonRedisSerializer;
 import com.alibaba.ttl.TtlRunnable;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.BeanUtils;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -71,25 +72,26 @@ public class RedisStreamAutoConfiguration {
     @ConditionalOnBean(AbstractStreamListener.class)
     @ConditionalOnMissingBean(StreamMessageListenerContainer.class)
     @Bean(initMethod = "start", destroyMethod = "stop")
-    public StreamMessageListenerContainer<String, ObjectRecord<String, String>> streamMessageListenerContainer(List<AbstractStreamListener<?>> listeners,
-                                                                                                               RedisMQTemplate redisMQTemplate) {
-        StreamMessageListenerContainer.StreamMessageListenerContainerOptionsBuilder<String, ObjectRecord<String, String>> optionsBuilder = StreamMessageListenerContainer.StreamMessageListenerContainerOptions.builder()
-                .batchSize(dataRedisStreamProperties.getBatchSize())
-                .keySerializer(RedisSerializer.string())
-                .hashKeySerializer(RedisSerializer.string())
-                .hashValueSerializer(new FastJsonRedisSerializer<>(String.class))
-                .objectMapper(new ObjectHashMapper())
-                .targetType(String.class);
+    public StreamMessageListenerContainer<String, @NonNull ObjectRecord<String, String>> streamMessageListenerContainer(List<AbstractStreamListener<?>> listeners,
+                                                                                                                        RedisMQTemplate redisMQTemplate) {
+        StreamMessageListenerContainer.StreamMessageListenerContainerOptionsBuilder<String, @NonNull ObjectRecord<String, String>> optionsBuilder =
+                StreamMessageListenerContainer.StreamMessageListenerContainerOptions.builder()
+                        .batchSize(dataRedisStreamProperties.getBatchSize())
+                        .keySerializer(RedisSerializer.string())
+                        .hashKeySerializer(RedisSerializer.string())
+                        .hashValueSerializer(new FastJsonRedisSerializer<>(String.class))
+                        .objectMapper(new ObjectHashMapper())
+                        .targetType(String.class);
         if (dataRedisStreamProperties.getThreadPool().getEnabled()) {
             optionsBuilder.executor(redisStreamThreadPoolExecutor());
         }
-        StreamMessageListenerContainer.StreamMessageListenerContainerOptions<String, ObjectRecord<String, String>> options = optionsBuilder.build();
+        StreamMessageListenerContainer.StreamMessageListenerContainerOptions<String, @NonNull ObjectRecord<String, String>> options = optionsBuilder.build();
 
         if (dataRedisProperties.getTimeout() != null) {
             Assert.isTrue(options.getPollTimeout().compareTo(dataRedisProperties.getTimeout()) < 0, "Poll timeout must be smaller than 'spring.redis.timeout'!");
         }
 
-        StreamMessageListenerContainer<String, ObjectRecord<String, String>> container = StreamMessageListenerContainer
+        StreamMessageListenerContainer<String, @NonNull ObjectRecord<String, String>> container = StreamMessageListenerContainer
                 .create(redisMQTemplate.redisTemplate().getRequiredConnectionFactory(), options);
 
         String consumerName = buildConsumerName();

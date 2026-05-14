@@ -79,8 +79,8 @@ public class DefaultWebConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public FilterRegistrationBean<CorsFilter> corsFilterBean(CorsConfigurationSource corsConfigurationSource) {
-        FilterRegistrationBean<CorsFilter> filter = new FilterRegistrationBean<>(new CorsFilter(corsConfigurationSource));
+    public FilterRegistrationBean<@NonNull CorsFilter> corsFilterBean(CorsConfigurationSource corsConfigurationSource) {
+        FilterRegistrationBean<@NonNull CorsFilter> filter = new FilterRegistrationBean<>(new CorsFilter(corsConfigurationSource));
         filter.setOrder(WebFilterOrderEnum.CORS_FILTER.getOrder());
         return filter;
     }
