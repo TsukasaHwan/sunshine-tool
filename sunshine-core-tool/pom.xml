@@ -63,6 +63,7 @@
             <groupId>org.apache.fesod</groupId>
             <artifactId>fesod-sheet</artifactId>
             <version>${fesod.version}</version>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
