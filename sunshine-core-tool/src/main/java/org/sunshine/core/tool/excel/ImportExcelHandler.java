@@ -1,8 +1,8 @@
 package org.sunshine.core.tool.excel;
 
-import cn.idev.excel.FastExcel;
-import cn.idev.excel.context.AnalysisContext;
-import cn.idev.excel.read.builder.ExcelReaderBuilder;
+import org.apache.fesod.sheet.FesodSheet;
+import org.apache.fesod.sheet.context.AnalysisContext;
+import org.apache.fesod.sheet.read.builder.ExcelReaderBuilder;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 import org.sunshine.core.tool.util.Exceptions;
@@ -34,7 +34,7 @@ public interface ImportExcelHandler<T> {
         Assert.notNull(inputStream, "InputStream must not be null");
         ImportExcelEventListener<T> listener = new ImportExcelEventListener<>(this, batchCount);
         InputStream bis = inputStream instanceof BufferedInputStream ? inputStream : new BufferedInputStream(inputStream);
-        return FastExcel.read(bis, clazz, listener);
+        return FesodSheet.read(bis, clazz, listener);
     }
 
     /**

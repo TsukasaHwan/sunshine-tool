@@ -60,10 +60,9 @@
         </dependency>
 
         <dependency>
-            <groupId>cn.idev.excel</groupId>
-            <artifactId>fastexcel</artifactId>
-            <version>${fastexcel.version}</version>
-            <optional>true</optional>
+            <groupId>org.apache.fesod</groupId>
+            <artifactId>fesod-sheet</artifactId>
+            <version>${fesod.version}</version>
         </dependency>
 
         <dependency>
