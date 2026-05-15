@@ -73,7 +73,7 @@
 
         <captcha.version>1.4.0</captcha.version>
 
-        <bcprov-jdk18on.version>1.78.1</bcprov-jdk18on.version>
+        <bcprov-jdk18on.version>1.84</bcprov-jdk18on.version>
 
         <xxl-job.version>3.0.0</xxl-job.version>
     </properties>
