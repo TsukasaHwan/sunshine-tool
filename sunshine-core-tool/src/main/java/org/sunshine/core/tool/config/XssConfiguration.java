@@ -19,7 +19,7 @@ import org.sunshine.core.tool.request.XssProperties;
  * @since 2020/9/17
  */
 @AutoConfiguration
-@ConditionalOnProperty(value = "xss.enabled", havingValue = "true")
+@ConditionalOnProperty(value = "sunshine.xss.enabled", havingValue = "true")
 @EnableConfigurationProperties({XssProperties.class, RequestProperties.class})
 public class XssConfiguration {
 

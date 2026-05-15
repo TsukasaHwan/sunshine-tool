@@ -12,6 +12,6 @@ import org.sunshine.core.sms.config.TencentSmsConfiguration;
  */
 @AutoConfiguration
 @Import({AliYunSmsConfiguration.class, TencentSmsConfiguration.class})
-@ConditionalOnProperty(value = "sms.enabled", havingValue = "true")
+@ConditionalOnProperty(value = "sunshine.sms.enabled", havingValue = "true")
 public class SmsAutoConfiguration {
 }

@@ -25,6 +25,7 @@
     </developers>
 
     <modules>
+        <module>sunshine-bom</module>
         <module>sunshine-core-tool</module>
         <module>sunshine-core-common</module>
         <module>sunshine-core-security</module>
@@ -108,6 +109,11 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 

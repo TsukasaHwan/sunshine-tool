@@ -1,0 +1,20 @@
+{
+  "properties": [
+    {
+      "name": "feign.headers.allowed",
+      "type": "java.util.List<java.lang.String>",
+      "deprecation": {
+        "replacement": "sunshine.feign.headers.allowed",
+        "level": "warning"
+      }
+    },
+    {
+      "name": "spring.data.redis.redisson.enable",
+      "type": "java.lang.Boolean",
+      "deprecation": {
+        "replacement": "spring.data.redis.redisson.enabled",
+        "level": "warning"
+      }
+    }
+  ]
+}

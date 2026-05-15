@@ -21,7 +21,7 @@ import org.sunshine.core.oss.rule.OssRule;
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(OSSClient.class)
 @EnableConfigurationProperties(OssProperties.class)
-@ConditionalOnProperty(value = "oss.client-type", havingValue = "aliyun")
+@ConditionalOnProperty(value = "sunshine.oss.client-type", havingValue = "aliyun")
 public class AliOssConfiguration {
 
     private final OssProperties ossProperties;

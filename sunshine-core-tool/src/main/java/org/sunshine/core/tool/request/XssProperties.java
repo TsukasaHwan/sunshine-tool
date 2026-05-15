@@ -9,7 +9,7 @@ import java.util.List;
  * @author Teamo
  * @since 2020/9/17
  */
-@ConfigurationProperties("xss")
+@ConfigurationProperties("sunshine.xss")
 public class XssProperties {
     /**
      * turn on xss

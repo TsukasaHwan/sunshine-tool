@@ -36,7 +36,7 @@ import java.util.concurrent.RejectedExecutionHandler;
  * @since 2023/5/26
  */
 @AutoConfiguration(after = {CacheAutoConfiguration.class, RedissonAutoConfiguration.class})
-@EnableConfigurationProperties({org.springframework.data.redis.support.collections.RedisProperties.class, DataRedisStreamProperties.class})
+@EnableConfigurationProperties({DataRedisProperties.class, DataRedisStreamProperties.class})
 public class RedisStreamAutoConfiguration {
 
     private final DataRedisProperties dataRedisProperties;
@@ -95,7 +95,7 @@ public class RedisStreamAutoConfiguration {
                 .create(redisMQTemplate.redisTemplate().getRequiredConnectionFactory(), options);
 
         String consumerName = buildConsumerName();
-        listeners.parallelStream().forEach(listener -> {
+        listeners.forEach(listener -> {
             String streamKey = listener.getStreamKey();
             String group = listener.getGroup();
 

@@ -25,7 +25,7 @@ import java.util.List;
  *
  * @author Teamo
  */
-@ConfigurationProperties("request")
+@ConfigurationProperties("sunshine.request")
 public class RequestProperties {
 
     /**

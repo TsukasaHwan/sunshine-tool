@@ -41,7 +41,7 @@ public class CloudAutoConfiguration {
     @Bean
     @Scope("prototype")
     @ConditionalOnMissingBean
-    @ConditionalOnProperty(name = "feign.sentinel.enabled")
+    @ConditionalOnProperty(name = "feign.sentinel.enabled", havingValue = "true")
     public Feign.Builder feignSentinelBuilder(RequestInterceptor requestInterceptor) {
         return SentinelFeign.builder().requestInterceptor(requestInterceptor);
     }

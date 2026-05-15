@@ -1,0 +1,36 @@
+{
+  "properties": [
+    {
+      "name": "xss.enabled",
+      "type": "java.lang.Boolean",
+      "deprecation": {
+        "replacement": "sunshine.xss.enabled",
+        "level": "warning"
+      }
+    },
+    {
+      "name": "xss.skip-url",
+      "type": "java.util.List<java.lang.String>",
+      "deprecation": {
+        "replacement": "sunshine.xss.skip-url",
+        "level": "warning"
+      }
+    },
+    {
+      "name": "request.enabled",
+      "type": "java.lang.Boolean",
+      "deprecation": {
+        "replacement": "sunshine.request.enabled",
+        "level": "warning"
+      }
+    },
+    {
+      "name": "request.skip-url",
+      "type": "java.util.List<java.lang.String>",
+      "deprecation": {
+        "replacement": "sunshine.request.skip-url",
+        "level": "warning"
+      }
+    }
+  ]
+}

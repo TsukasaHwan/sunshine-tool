@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author Teamo
  * @since 2022/03/03
  */
-@ConfigurationProperties("sms")
+@ConfigurationProperties("sunshine.sms")
 public class SmsProperties {
 
     /**

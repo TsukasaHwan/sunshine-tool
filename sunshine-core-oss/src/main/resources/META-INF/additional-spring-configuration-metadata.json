@@ -1,0 +1,60 @@
+{
+  "properties": [
+    {
+      "name": "oss.enabled",
+      "type": "java.lang.Boolean",
+      "deprecation": {
+        "replacement": "sunshine.oss.enabled",
+        "level": "warning"
+      }
+    },
+    {
+      "name": "oss.client-type",
+      "type": "org.sunshine.core.oss.props.OssProperties$ClientType",
+      "deprecation": {
+        "replacement": "sunshine.oss.client-type",
+        "level": "warning"
+      }
+    },
+    {
+      "name": "oss.endpoint",
+      "type": "java.lang.String",
+      "deprecation": {
+        "replacement": "sunshine.oss.endpoint",
+        "level": "warning"
+      }
+    },
+    {
+      "name": "oss.access-key",
+      "type": "java.lang.String",
+      "deprecation": {
+        "replacement": "sunshine.oss.access-key",
+        "level": "warning"
+      }
+    },
+    {
+      "name": "oss.secret-key",
+      "type": "java.lang.String",
+      "deprecation": {
+        "replacement": "sunshine.oss.secret-key",
+        "level": "warning"
+      }
+    },
+    {
+      "name": "oss.bucket-name",
+      "type": "java.lang.String",
+      "deprecation": {
+        "replacement": "sunshine.oss.bucket-name",
+        "level": "warning"
+      }
+    },
+    {
+      "name": "oss.args",
+      "type": "java.util.Map<java.lang.String,java.lang.Object>",
+      "deprecation": {
+        "replacement": "sunshine.oss.args",
+        "level": "warning"
+      }
+    }
+  ]
+}

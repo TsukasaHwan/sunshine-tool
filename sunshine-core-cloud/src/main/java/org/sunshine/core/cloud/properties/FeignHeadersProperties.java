@@ -12,7 +12,7 @@ import java.util.List;
  * @since 2023/6/14
  */
 @RefreshScope
-@ConfigurationProperties("feign.headers")
+@ConfigurationProperties("sunshine.feign.headers")
 public class FeignHeadersProperties {
 
     private List<String> allowed = Arrays.asList(

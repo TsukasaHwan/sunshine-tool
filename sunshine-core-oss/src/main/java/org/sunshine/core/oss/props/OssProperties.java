@@ -9,7 +9,7 @@ import java.util.Map;
  *
  * @author Chill
  */
-@ConfigurationProperties(prefix = "oss")
+@ConfigurationProperties(prefix = "sunshine.oss")
 public class OssProperties {
 
     /**

@@ -1,6 +1,8 @@
 package org.sunshine.core.log;
 
+import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -25,14 +27,27 @@ public class LogAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    @ConditionalOnClass(SqlHelper.class)
+    public OperateLogPersister mybatisPlusOperateLogPersister() {
+        return new MybatisPlusOperateLogPersister();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(OperateLogPersister.class)
+    public OperateLogPersister loggingOperateLogPersister() {
+        return new LoggingOperateLogPersister();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     public LogOperationAspect operateLogAspect(LogExecutor logExecutor) {
         return new LogOperationAspect(logExecutor);
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public OperateLogListener apiLogListener(ServerInfo serverInfo) {
-        return new OperateLogListener(serverInfo);
+    public OperateLogListener apiLogListener(ServerInfo serverInfo, OperateLogPersister persister) {
+        return new OperateLogListener(serverInfo, persister);
     }
 
     @Bean

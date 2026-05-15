@@ -32,7 +32,7 @@ import java.util.List;
  * @since 2023/3/27
  */
 @AutoConfiguration
-@ConditionalOnProperty(prefix = "spring.data.redis.redisson", name = "enable", havingValue = "true")
+@ConditionalOnProperty(prefix = "spring.data.redis.redisson", name = "enabled", havingValue = "true")
 @EnableConfigurationProperties({DataRedisProperties.class, DataRedissonProperties.class})
 public class RedissonAutoConfiguration {
 

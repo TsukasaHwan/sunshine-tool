@@ -19,7 +19,7 @@ import org.sunshine.core.oss.rule.OssRule;
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(MinioClient.class)
 @EnableConfigurationProperties(OssProperties.class)
-@ConditionalOnProperty(value = "oss.client-type", havingValue = "minio")
+@ConditionalOnProperty(value = "sunshine.oss.client-type", havingValue = "minio")
 public class MinioConfiguration {
 
     private final OssProperties ossProperties;

@@ -18,11 +18,12 @@
    - 配置yml
 
      ```yaml
-     xss: 
-       enabled: true
-       # 要忽略XSS攻击的url
-       skip-url: 
-         - /
+     sunshine:
+       xss:
+         enabled: true
+         # 要忽略XSS攻击的url
+         skip-url:
+           - /
      ```
 
      经过上述配置即可开启XSS防御

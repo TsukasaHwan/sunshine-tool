@@ -27,7 +27,7 @@
              port: 6379
          # 启用redisson
          redisson:
-           enable: true
+           enabled: true
       ```
     - ```java
        /**

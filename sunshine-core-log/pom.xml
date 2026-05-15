@@ -17,10 +17,12 @@
             <artifactId>sunshine-core-tool</artifactId>
             <version>${revision}</version>
         </dependency>
+
         <dependency>
-            <groupId>org.sunshine</groupId>
-            <artifactId>sunshine-core-mybatis</artifactId>
-            <version>${revision}</version>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus</artifactId>
+            <version>${mybatis-plus.version}</version>
+            <optional>true</optional>
         </dependency>
 
         <dependency>

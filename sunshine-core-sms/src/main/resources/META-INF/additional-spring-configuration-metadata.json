@@ -1,0 +1,52 @@
+{
+  "properties": [
+    {
+      "name": "sms.enabled",
+      "type": "java.lang.Boolean",
+      "deprecation": {
+        "replacement": "sunshine.sms.enabled",
+        "level": "warning"
+      }
+    },
+    {
+      "name": "sms.client-type",
+      "type": "org.sunshine.core.sms.props.SmsProperties$ClientType",
+      "deprecation": {
+        "replacement": "sunshine.sms.client-type",
+        "level": "warning"
+      }
+    },
+    {
+      "name": "sms.key-id",
+      "type": "java.lang.String",
+      "deprecation": {
+        "replacement": "sunshine.sms.key-id",
+        "level": "warning"
+      }
+    },
+    {
+      "name": "sms.key-secret",
+      "type": "java.lang.String",
+      "deprecation": {
+        "replacement": "sunshine.sms.key-secret",
+        "level": "warning"
+      }
+    },
+    {
+      "name": "sms.endpoint",
+      "type": "java.lang.String",
+      "deprecation": {
+        "replacement": "sunshine.sms.endpoint",
+        "level": "warning"
+      }
+    },
+    {
+      "name": "sms.region-id",
+      "type": "java.lang.String",
+      "deprecation": {
+        "replacement": "sunshine.sms.region-id",
+        "level": "warning"
+      }
+    }
+  ]
+}

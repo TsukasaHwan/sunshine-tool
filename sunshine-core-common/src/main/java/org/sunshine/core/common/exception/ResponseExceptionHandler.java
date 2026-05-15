@@ -1,14 +1,11 @@
 package org.sunshine.core.common.exception;
 
-import com.google.common.collect.ImmutableMap;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -19,11 +16,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.sunshine.core.cache.exception.DistributedLockAcquisitionException;
 import org.sunshine.core.cache.exception.RateLimitExceededException;
 import org.sunshine.core.tool.api.code.CommonCode;
-import org.sunshine.core.tool.api.code.ResultCode;
 import org.sunshine.core.tool.api.response.Result;
 import org.sunshine.core.tool.exception.BusinessException;
 
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -36,76 +31,15 @@ import java.util.Set;
 @RestControllerAdvice
 public class ResponseExceptionHandler {
 
-    private final static Logger log = LoggerFactory.getLogger(ResponseExceptionHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(ResponseExceptionHandler.class);
 
-    /**
-     * 线程安全并且不能改变
-     */
-    private static Map<Class<? extends Throwable>, ResultCode> exceptions;
-
-    private static final ImmutableMap.Builder<Class<? extends Throwable>, ResultCode> BUILDER = ImmutableMap.builder();
-
-    static {
-        BUILDER.put(MissingServletRequestParameterException.class, CommonCode.MISSING_PARAM);
-        BUILDER.put(HttpMessageNotReadableException.class, CommonCode.INVALID_PARAM);
-        BUILDER.put(HttpRequestMethodNotSupportedException.class, CommonCode.REQUEST_METHOD_NOT_SUPPORTED);
-        BUILDER.put(DistributedLockAcquisitionException.class, CommonCode.SERVICE_UNAVAILABLE);
-    }
-
-    /**
-     * 已知、未知异常捕获
-     *
-     * @param ex 异常
-     * @return {Result}
-     */
-    @ExceptionHandler(Exception.class)
-    public Result<?> handleException(Exception ex) throws AuthenticationException, AccessDeniedException {
-        if (ex instanceof BusinessException exception) {
-            return handleBusinessException(exception);
-        } else if (ex instanceof BindException exception) {
-            return handleBindException(exception);
-        } else if (ex instanceof ConstraintViolationException exception) {
-            return handleConstraintViolationException(exception);
-        } else if (ex instanceof RateLimitExceededException exception) {
-            return handleRateLimitExceededException(exception);
-        } else if (ex instanceof AuthenticationException ae) {
-            // 交给ExceptionTranslationFilter#doFilter处理
-            throw ae;
-        } else if (ex instanceof AccessDeniedException ade) {
-            // 交给ExceptionTranslationFilter#doFilter处理
-            throw ade;
-        } else {
-            return handleUnknownException(ex);
-        }
-    }
-
-    /**
-     * 处理限流异常
-     *
-     * @param exception 限流异常
-     * @return {Result}
-     */
-    private Result<?> handleRateLimitExceededException(RateLimitExceededException exception) {
-        return Result.of(CommonCode.RATE_LIMIT_EXCEEDED, exception.getMessage());
-    }
-
-    /**
-     * 自定义异常捕获
-     *
-     * @param ex 自定义异常
-     * @return {Result}
-     */
-    private Result<?> handleBusinessException(BusinessException ex) {
+    @ExceptionHandler(BusinessException.class)
+    public Result<?> handleBusinessException(BusinessException ex) {
         return ex.getResult();
     }
 
-    /**
-     * 处理绑定异常
-     *
-     * @param ex 绑定异常
-     * @return {Result}
-     */
-    private Result<Void> handleBindException(BindException ex) {
+    @ExceptionHandler(BindException.class)
+    public Result<Void> handleBindException(BindException ex) {
         BindingResult bindingResult = ex.getBindingResult();
         FieldError fieldError = bindingResult.getFieldError();
         if (Objects.nonNull(fieldError)) {
@@ -119,13 +53,8 @@ public class ResponseExceptionHandler {
         return Result.fail(msg);
     }
 
-    /**
-     * 处理约束违反异常
-     *
-     * @param ex 约束违反异常
-     * @return {Result}
-     */
-    private Result<Void> handleConstraintViolationException(ConstraintViolationException ex) {
+    @ExceptionHandler(ConstraintViolationException.class)
+    public Result<Void> handleConstraintViolationException(ConstraintViolationException ex) {
         Set<ConstraintViolation<?>> constraintViolations = ex.getConstraintViolations();
         String msg = constraintViolations.stream()
                 .map(ConstraintViolation::getMessage)
@@ -134,21 +63,34 @@ public class ResponseExceptionHandler {
         return Result.fail(msg);
     }
 
-    /**
-     * 处理未知异常
-     *
-     * @param ex 异常
-     * @return {Result}
-     */
-    private Result<Void> handleUnknownException(Exception ex) {
-        if (exceptions == null) {
-            exceptions = BUILDER.build();
-        }
-        // 从EXCEPTIONS中找异常类型所对应的错误代码，如果找到了将错误代码响应给用户，如果找不到给用户响应系统异常
-        if (exceptions.get(ex.getClass()) == null) {
-            log.error(ex.getMessage(), ex);
-            return Result.of(CommonCode.SERVER_ERROR);
-        }
-        return Result.of(exceptions.get(ex.getClass()));
+    @ExceptionHandler(RateLimitExceededException.class)
+    public Result<?> handleRateLimitExceededException(RateLimitExceededException ex) {
+        return Result.of(CommonCode.RATE_LIMIT_EXCEEDED, ex.getMessage());
+    }
+
+    @ExceptionHandler(DistributedLockAcquisitionException.class)
+    public Result<?> handleDistributedLockAcquisitionException(DistributedLockAcquisitionException ex) {
+        return Result.of(CommonCode.SERVICE_UNAVAILABLE);
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public Result<?> handleMissingServletRequestParameterException(MissingServletRequestParameterException ex) {
+        return Result.of(CommonCode.MISSING_PARAM);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public Result<?> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        return Result.of(CommonCode.INVALID_PARAM);
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public Result<?> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
+        return Result.of(CommonCode.REQUEST_METHOD_NOT_SUPPORTED);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public Result<?> handleUnknownException(Exception ex) {
+        log.error(ex.getMessage(), ex);
+        return Result.of(CommonCode.SERVER_ERROR);
     }
 }
